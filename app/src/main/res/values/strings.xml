@@ -4,4 +4,5 @@
     <string name="username">Username</string>
     <string name="password">Password</string>
     <string name="dashboard">Dashboard</string>
+    <string name="order_summary">Order Summary</string>
 </resources>
