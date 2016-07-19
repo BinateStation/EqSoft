@@ -5,4 +5,10 @@
     <string name="password">Password</string>
     <string name="dashboard">Dashboard</string>
     <string name="order_summary">Order Summary</string>
+    <string name="total_sales">Total Sales</string>
+    <string name="amount_received">Amount Received</string>
+    <string name="amount_pending">Amount Pending</string>
+    <string name="receipts">Receipts</string>
+    <string name="products">Products</string>
+    <string name="customers">Customers</string>
 </resources>
