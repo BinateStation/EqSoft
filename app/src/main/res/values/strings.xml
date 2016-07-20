@@ -11,4 +11,9 @@
     <string name="receipts">Receipts</string>
     <string name="products">Products</string>
     <string name="customers">Customers</string>
+    <string name="sync_by_usb">Sync by USB</string>
+    <string name="sync_by_web">Sync by WEB</string>
+    <string name="change_password">Change Password</string>
+    <string name="logout">Logout</string>
+    <string name="menu">Menu</string>
 </resources>
