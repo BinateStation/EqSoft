@@ -16,4 +16,10 @@
     <string name="change_password">Change Password</string>
     <string name="logout">Logout</string>
     <string name="menu">Menu</string>
+    <string name="type_to_search">Type to search</string>
+    <string name="balance">Balance</string>
+    <string-array name="customer_sort">
+        <item>Sort By</item>
+        <item>Route</item>
+    </string-array>
 </resources>

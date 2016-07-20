@@ -1,11 +1,15 @@
-package rkr.binatestation.eqsoft;
+package rkr.binatestation.eqsoft.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+
+import rkr.binatestation.eqsoft.R;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -22,6 +26,10 @@ public class HomeActivity extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.global_menu, menu);
         return true;
+    }
+
+    public void onCustomerClick(View view) {
+        startActivity(new Intent(view.getContext(), CustomersActivity.class));
     }
 
     @Override

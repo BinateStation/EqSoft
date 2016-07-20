@@ -1,9 +1,11 @@
-package rkr.binatestation.eqsoft;
+package rkr.binatestation.eqsoft.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+
+import rkr.binatestation.eqsoft.R;
 
 public class LoginActivity extends AppCompatActivity {
 

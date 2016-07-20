@@ -199,6 +199,7 @@
             android:layout_margin="@dimen/activity_widget_margin"
             android:layout_weight="1"
             android:background="@drawable/bg_button_light"
+            android:onClick="onCustomerClick"
             android:orientation="vertical"
             android:padding="@dimen/activity_widget_margin">
 
