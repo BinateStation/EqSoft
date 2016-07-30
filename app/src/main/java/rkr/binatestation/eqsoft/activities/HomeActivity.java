@@ -32,6 +32,10 @@ public class HomeActivity extends AppCompatActivity {
         startActivity(new Intent(view.getContext(), CustomersActivity.class));
     }
 
+    public void onProductsClick(View view) {
+        startActivity(new Intent(view.getContext(), ProductsActivity.class));
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {

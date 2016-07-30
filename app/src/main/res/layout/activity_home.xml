@@ -47,7 +47,7 @@
             android:layout_marginLeft="@dimen/activity_horizontal_margin"
             android:layout_marginRight="@dimen/activity_horizontal_margin"
             android:layout_marginStart="@dimen/activity_horizontal_margin"
-            android:background="@color/shade" />
+            android:background="@color/light_shade" />
 
         <android.support.v7.widget.LinearLayoutCompat
             android:layout_width="match_parent"
@@ -167,6 +167,7 @@
             android:layout_margin="@dimen/activity_widget_margin"
             android:layout_weight="1"
             android:background="@drawable/bg_button_light"
+            android:onClick="onProductsClick"
             android:orientation="vertical"
             android:padding="@dimen/activity_widget_margin">
 
@@ -190,6 +191,8 @@
                 android:layout_gravity="center"
                 android:layout_marginTop="@dimen/activity_widget_margin"
                 android:background="@drawable/bg_button_oval_dark"
+                android:contentDescription="@string/products"
+                android:onClick="onProductsClick"
                 android:src="@drawable/ic_add_white_24dp" />
         </android.support.v7.widget.LinearLayoutCompat>
 
@@ -223,6 +226,8 @@
                 android:layout_gravity="center"
                 android:layout_marginTop="@dimen/activity_widget_margin"
                 android:background="@drawable/bg_button_oval_dark"
+                android:contentDescription="@string/customers"
+                android:onClick="onCustomerClick"
                 android:src="@drawable/ic_add_white_24dp" />
         </android.support.v7.widget.LinearLayoutCompat>
     </android.support.v7.widget.LinearLayoutCompat>

@@ -26,6 +26,9 @@
         <activity
             android:name=".activities.CustomersActivity"
             android:label="@string/customers" />
+        <activity
+            android:name=".activities.ProductsActivity"
+            android:label="@string/products" />
     </application>
 
 </manifest>
