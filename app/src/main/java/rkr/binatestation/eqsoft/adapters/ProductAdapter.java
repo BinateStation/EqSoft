@@ -16,6 +16,12 @@ import rkr.binatestation.eqsoft.R;
  * CustomerAdapter.
  */
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView> {
+    int itemCount;
+
+    public ProductAdapter(int itemCount) {
+        this.itemCount = itemCount;
+    }
+
     @Override
     public ItemView onCreateViewHolder(ViewGroup parent, int viewType) {
         return new ItemView(
@@ -35,7 +41,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
 
     @Override
     public int getItemCount() {
-        return 5;
+        return itemCount;
     }
 
     private void popupEnterQuantity(Context context) {

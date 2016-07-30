@@ -29,6 +29,9 @@
         <activity
             android:name=".activities.ProductsActivity"
             android:label="@string/products" />
+        <activity
+            android:name=".activities.OrderActivity"
+            android:label="@string/order" />
     </application>
 
 </manifest>

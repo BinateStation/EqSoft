@@ -1,40 +1,30 @@
 package rkr.binatestation.eqsoft.activities;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.View;
 
 import rkr.binatestation.eqsoft.R;
 import rkr.binatestation.eqsoft.adapters.ProductAdapter;
 
-public class ProductsActivity extends AppCompatActivity {
-    SearchView productSearch;
-    RecyclerView productsRecyclerView;
+public class OrderActivity extends AppCompatActivity {
+    RecyclerView selectedProductsRecyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_products);
+        setContentView(R.layout.activity_order);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        productSearch = (SearchView) findViewById(R.id.AP_productSearch);
-        productsRecyclerView = (RecyclerView) findViewById(R.id.Ap_productsRecyclerView);
+        selectedProductsRecyclerView = (RecyclerView) findViewById(R.id.AO_selectedProducts);
 
-        productSearch.setQueryHint(getString(R.string.type_to_search));
-        productsRecyclerView.setLayoutManager(new LinearLayoutManager(productsRecyclerView.getContext()));
-        productsRecyclerView.setAdapter(new ProductAdapter(4));
-    }
-
-    public void checkOut(View view) {
-        startActivity(new Intent(getBaseContext(), OrderActivity.class));
+        selectedProductsRecyclerView.setLayoutManager(new LinearLayoutManager(selectedProductsRecyclerView.getContext()));
+        selectedProductsRecyclerView.setAdapter(new ProductAdapter(2));
     }
 
     @Override
@@ -43,5 +33,4 @@ public class ProductsActivity extends AppCompatActivity {
         inflater.inflate(R.menu.global_menu, menu);
         return true;
     }
-
 }

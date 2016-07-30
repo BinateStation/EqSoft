@@ -25,6 +25,11 @@
     <string name="enter_quantity">Enter Quantity</string>
     <string name="quantity">Quantity</string>
     <string name="amount">Amount</string>
+    <string name="previous_balance">Previous Balance</string>
+    <string name="add_more">Add more +</string>
+    <string name="advance">Advance</string>
+    <string name="proceed">Proceed</string>
+    <string name="order">Order</string>
     <string-array name="customer_sort">
         <item>Sort By</item>
         <item>Route</item>
