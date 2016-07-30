@@ -32,6 +32,9 @@
         <activity
             android:name=".activities.OrderActivity"
             android:label="@string/order" />
+        <activity
+            android:name=".activities.ReceiptsActivity"
+            android:label="@string/receipts" />
     </application>
 
 </manifest>

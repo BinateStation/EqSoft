@@ -30,8 +30,13 @@
     <string name="advance">Advance</string>
     <string name="proceed">Proceed</string>
     <string name="order">Order</string>
+    <string name="done">Done</string>
+    <string name="received_amount">Received Amount</string>
     <string-array name="customer_sort">
         <item>Sort By</item>
         <item>Route</item>
     </string-array>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
