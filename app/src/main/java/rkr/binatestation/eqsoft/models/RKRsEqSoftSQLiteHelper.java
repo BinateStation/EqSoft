@@ -18,6 +18,8 @@ public class RKRsEqSoftSQLiteHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase database) {
         database.execSQL(UserDetailsModel.UserDetailsTable.SQL_CREATE_USER_DETAILS);
+        database.execSQL(CustomerModel.CustomersTable.SQL_CREATE_USER_DETAILS);
+        database.execSQL(ProductModel.ProductsTable.SQL_CREATE_USER_DETAILS);
     }
 
     @Override
@@ -25,6 +27,8 @@ public class RKRsEqSoftSQLiteHelper extends SQLiteOpenHelper {
         Log.w(RKRsEqSoftSQLiteHelper.class.getName(), "Upgrading database from version "
                 + oldVersion + " to " + newVersion + ", which will destroy all old data");
         db.execSQL("DROP TABLE IF EXISTS " + UserDetailsModel.UserDetailsTable.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + CustomerModel.CustomersTable.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + ProductModel.ProductsTable.TABLE_NAME);
         onCreate(db);
     }
 }
