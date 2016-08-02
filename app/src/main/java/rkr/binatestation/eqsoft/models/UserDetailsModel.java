@@ -8,6 +8,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 import android.util.Log;
 
+import com.google.common.collect.Lists;
+
 import org.jetbrains.annotations.Contract;
 
 import java.io.Serializable;
@@ -82,6 +84,34 @@ public class UserDetailsModel implements Serializable {
             Log.i("InsertID", "Categories : " + insertId);
         } else {
             updateRow(obj);
+        }
+    }
+
+    /**
+     * This method will do a compound insert in to the table
+     * It will splits the list in to lists of 500 objects and generate insert query for all 500 objects in each
+     *
+     * @param userDetailsModelList the list of table rows to insert.
+     */
+    public void insertMultipleRows(List<UserDetailsModel> userDetailsModelList) {
+        for (List<UserDetailsModel> masterList : Lists.partition(userDetailsModelList, 500)) {
+            String query = "REPLACE INTO '" +
+                    UserDetailsTable.TABLE_NAME + "' ('" +
+                    UserDetailsTable.COLUMN_NAME_USER_ID + "','" +
+                    UserDetailsTable.COLUMN_NAME_USER_NAME + "','" +
+                    UserDetailsTable.COLUMN_NAME_PASSWORD + "') VALUES ('";
+            for (int i = 0; i < masterList.size(); i++) {
+                UserDetailsModel master = masterList.get(i);
+                query += master.getUserId() + "' , '" +
+                        master.getUserName() + "' , '" +
+                        master.getPassword() + "')";
+                if (i != (masterList.size() - 1)) {
+                    query += ",('";
+                }
+            }
+            Cursor cursor = database.rawQuery(query, null);
+            Log.d("Query executed", cursor.getCount() + " : " + query);
+            cursor.close();
         }
     }
 

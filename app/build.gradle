@@ -29,4 +29,5 @@ dependencies {
     compile 'com.android.support:support-v4:24.1.1'
     compile 'org.jetbrains:annotations-java5:15.0'
     debugCompile 'im.dino:dbinspector:3.3.0@aar'
+    compile 'com.google.guava:guava:19.0'
 }

@@ -20,6 +20,9 @@ public class RKRsEqSoftSQLiteHelper extends SQLiteOpenHelper {
         database.execSQL(UserDetailsModel.UserDetailsTable.SQL_CREATE_USER_DETAILS);
         database.execSQL(CustomerModel.CustomersTable.SQL_CREATE_USER_DETAILS);
         database.execSQL(ProductModel.ProductsTable.SQL_CREATE_USER_DETAILS);
+        database.execSQL(OrderModel.OrdersTable.SQL_CREATE_USER_DETAILS);
+        database.execSQL(OrderItemModel.OrderItemsTable.SQL_CREATE_USER_DETAILS);
+        database.execSQL(ReceiptModel.ReceiptsTable.SQL_CREATE_USER_DETAILS);
     }
 
     @Override
@@ -29,6 +32,9 @@ public class RKRsEqSoftSQLiteHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + UserDetailsModel.UserDetailsTable.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + CustomerModel.CustomersTable.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + ProductModel.ProductsTable.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + OrderModel.OrdersTable.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + OrderItemModel.OrderItemsTable.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + ReceiptModel.ReceiptsTable.TABLE_NAME);
         onCreate(db);
     }
 }

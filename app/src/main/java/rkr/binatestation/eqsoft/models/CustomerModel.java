@@ -8,6 +8,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 import android.util.Log;
 
+import com.google.common.collect.Lists;
+
 import org.jetbrains.annotations.Contract;
 
 import java.io.Serializable;
@@ -181,6 +183,52 @@ public class CustomerModel implements Serializable {
             Log.i("InsertID", "Categories : " + insertId);
         } else {
             updateRow(obj);
+        }
+    }
+
+    /**
+     * This method will do a compound insert in to the table
+     * It will splits the list in to lists of 500 objects and generate insert query for all 500 objects in each
+     *
+     * @param customerModelList the list of table rows to insert.
+     */
+    public void insertMultipleRows(List<CustomerModel> customerModelList) {
+        for (List<CustomerModel> masterList : Lists.partition(customerModelList, 500)) {
+            String query = "REPLACE INTO '" +
+                    CustomersTable.TABLE_NAME + "' ('" +
+                    CustomersTable.COLUMN_NAME_ADDRESS_1 + "','" +
+                    CustomersTable.COLUMN_NAME_ADDRESS_2 + "','" +
+                    CustomersTable.COLUMN_NAME_ADDRESS_3 + "','" +
+                    CustomersTable.COLUMN_NAME_BALANCE + "','" +
+                    CustomersTable.COLUMN_NAME_CODE + "','" +
+                    CustomersTable.COLUMN_NAME_EMAIL + "','" +
+                    CustomersTable.COLUMN_NAME_LEDGER_NAME + "','" +
+                    CustomersTable.COLUMN_NAME_MOBILE + "','" +
+                    CustomersTable.COLUMN_NAME_NAME + "','" +
+                    CustomersTable.COLUMN_NAME_PHONE + "','" +
+                    CustomersTable.COLUMN_NAME_ROUTE + "','" +
+                    CustomersTable.COLUMN_NAME_ROUTE_INDEX + "') VALUES ('";
+            for (int i = 0; i < masterList.size(); i++) {
+                CustomerModel master = masterList.get(i);
+                query += master.getAddress1() + "' , '" +
+                        master.getAddress2() + "' , '" +
+                        master.getAddress3() + "' , '" +
+                        master.getBalance() + "' , '" +
+                        master.getCode() + "' , '" +
+                        master.getEmail() + "' , '" +
+                        master.getLedgerName() + "' , '" +
+                        master.getMobile() + "' , '" +
+                        master.getName() + "' , '" +
+                        master.getPhone() + "' , '" +
+                        master.getRoute() + "' , '" +
+                        master.getRouteIndex() + "')";
+                if (i != (masterList.size() - 1)) {
+                    query += ",('";
+                }
+            }
+            Cursor cursor = database.rawQuery(query, null);
+            Log.d("Query executed", cursor.getCount() + " : " + query);
+            cursor.close();
         }
     }
 

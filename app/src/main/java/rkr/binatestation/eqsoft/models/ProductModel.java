@@ -8,6 +8,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 import android.util.Log;
 
+import com.google.common.collect.Lists;
+
 import org.jetbrains.annotations.Contract;
 
 import java.io.Serializable;
@@ -126,6 +128,42 @@ public class ProductModel implements Serializable {
             Log.i("InsertID", "Categories : " + insertId);
         } else {
             updateRow(obj);
+        }
+    }
+
+    /**
+     * This method will do a compound insert in to the table
+     * It will splits the list in to lists of 500 objects and generate insert query for all 500 objects in each
+     *
+     * @param productModelList the list of table rows to insert.
+     */
+    public void insertMultipleRows(List<ProductModel> productModelList) {
+        for (List<ProductModel> masterList : Lists.partition(productModelList, 500)) {
+            String query = "REPLACE INTO '" +
+                    ProductsTable.TABLE_NAME + "' ('" +
+                    ProductsTable.COLUMN_NAME_CATEGORY + "','" +
+                    ProductsTable.COLUMN_NAME_CODE + "','" +
+                    ProductsTable.COLUMN_NAME_MRP + "','" +
+                    ProductsTable.COLUMN_NAME_NAME + "','" +
+                    ProductsTable.COLUMN_NAME_SELLING_RATE + "','" +
+                    ProductsTable.COLUMN_NAME_STOCK + "','" +
+                    ProductsTable.COLUMN_NAME_TAX_RATE + "') VALUES ('";
+            for (int i = 0; i < masterList.size(); i++) {
+                ProductModel master = masterList.get(i);
+                query += master.getCategory() + "' , '" +
+                        master.getCode() + "' , '" +
+                        master.getMRP() + "' , '" +
+                        master.getName() + "' , '" +
+                        master.getSellingRate() + "' , '" +
+                        master.getStock() + "' , '" +
+                        master.getTaxRate() + "')";
+                if (i != (masterList.size() - 1)) {
+                    query += ",('";
+                }
+            }
+            Cursor cursor = database.rawQuery(query, null);
+            Log.d("Query executed", cursor.getCount() + " : " + query);
+            cursor.close();
         }
     }
 
