@@ -28,8 +28,8 @@ public class Util {
      * static variable for saving images in external storage directory.
      */
 
-    private static final String captureImagePath = Environment.getExternalStorageDirectory().toString() +
-            File.separator + "PicLo" + File.separator + "Images" + File.separator;
+    private static final String databasePath = Environment.getExternalStorageDirectory().toString() +
+            File.separator + "EQSoft" + File.separator + "DATABASE" + File.separator;
 
     /**
      * Method to check Weather a valid Email ID
@@ -43,13 +43,13 @@ public class Util {
      * static method used to get the External Storage path which ensures whether it exits or not
      */
 
-    public static String getCaptureImagePath() {
-        File file = new File(captureImagePath);
+    public static String getDatabasePath() {
+        File file = new File(databasePath);
         if (file.exists()) {
-            return captureImagePath;
+            return databasePath;
         } else {
             if (file.mkdirs()) {
-                return captureImagePath;
+                return databasePath;
             } else {
                 return Environment.getExternalStorageDirectory().toString() + File.separator;
             }
@@ -204,6 +204,22 @@ public class Util {
                             if (goBack) {
                                 activity.onBackPressed();
                             }
+                        }
+                    }).show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void showAlert(final Context context, String title, String message) {
+        try {
+            new AlertDialog.Builder(context)
+                    .setTitle(title)
+                    .setMessage(message)
+                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
                         }
                     }).show();
         } catch (Exception e) {

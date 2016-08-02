@@ -81,7 +81,7 @@ public class UserDetailsModel implements Serializable {
             long insertId;
             insertId = database.insert(UserDetailsTable.TABLE_NAME, null, values);
 
-            Log.i("InsertID", "Categories : " + insertId);
+            Log.i("InsertID", "UserDetailsTable : " + insertId);
         } else {
             updateRow(obj);
         }
@@ -152,11 +152,22 @@ public class UserDetailsModel implements Serializable {
 
     public UserDetailsModel getRow(String userId) {
         Cursor cursor = database.query(UserDetailsTable.TABLE_NAME, null, UserDetailsTable.COLUMN_NAME_USER_ID + " = ?", new String[]{userId}, null, null, null);
+        UserDetailsModel userDetailsModel = null;
         if (cursor.moveToFirst()) {
-            return cursorToUserDetailsModel(cursor);
+            userDetailsModel = cursorToUserDetailsModel(cursor);
         }
         cursor.close();
-        return null;
+        return userDetailsModel;
+    }
+
+    public UserDetailsModel getRow(String userName, String password) {
+        Cursor cursor = database.query(UserDetailsTable.TABLE_NAME, null, UserDetailsTable.COLUMN_NAME_USER_NAME + " = ? and " + UserDetailsTable.COLUMN_NAME_PASSWORD + " = ?", new String[]{userName, password}, null, null, null);
+        UserDetailsModel userDetailsModel = null;
+        if (cursor.moveToFirst()) {
+            userDetailsModel = cursorToUserDetailsModel(cursor);
+        }
+        cursor.close();
+        return userDetailsModel;
     }
 
     @Contract("_ -> !null")

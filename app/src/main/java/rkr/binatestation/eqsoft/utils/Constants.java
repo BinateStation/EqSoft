@@ -31,11 +31,8 @@ public final class Constants {
      */
     public static final String KEY_IS_LOGGED_IN = "is_logged_in";
     public static final String KEY_USER_ID = "user_id";
-    public static final String KEY_USER_EMAIL = "user_email";
-    public static final String KEY_USER_FULL_NAME = "user_full_name";
-    public static final String KEY_MOBILE = "mobile";
     public static final String KEY_USER_NAME = "user_name";
-    public static final String KEY_CATEGORY_LAST_UPDATED_DATE = "category_last_updated_date";
+    public static final String KEY_SYNC_TYPE = "sync_type";
 
     /**
      ***********************************************************************************************
