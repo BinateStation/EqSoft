@@ -70,6 +70,7 @@
                     android:text="@string/total_sales" />
 
                 <TextView
+                    android:id="@+id/AH_totalSales"
                     style="@style/TextAppearance.AppCompat.Headline"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -92,6 +93,7 @@
                     android:text="@string/amount_received" />
 
                 <TextView
+                    android:id="@+id/AH_amountReceived"
                     style="@style/TextAppearance.AppCompat.Headline"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -114,6 +116,7 @@
                     android:text="@string/amount_pending" />
 
                 <TextView
+                    android:id="@+id/AH_amountPending"
                     style="@style/TextAppearance.AppCompat.Headline"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -147,6 +150,7 @@
                 android:text="@string/receipts" />
 
             <TextView
+                android:id="@+id/AH_noOfReceipts"
                 style="@style/TextAppearance.AppCompat.Headline"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -181,6 +185,7 @@
                 android:text="@string/products" />
 
             <TextView
+                android:id="@+id/AH_noOfProducts"
                 style="@style/TextAppearance.AppCompat.Headline"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -216,6 +221,7 @@
                 android:text="@string/customers" />
 
             <TextView
+                android:id="@+id/AH_noOfCustomers"
                 style="@style/TextAppearance.AppCompat.Headline"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

@@ -286,6 +286,20 @@ public class CustomerModel implements Serializable {
         return customerModel;
     }
 
+    /**
+     * This method will counts how many rows available in this table
+     *
+     * @return the count of the OrdersTable#TABLE_NAME
+     */
+    public String getCount() {
+        Cursor cursor = database.rawQuery("SELECT count(*) FROM " + CustomersTable.TABLE_NAME, null);
+        Integer count = 0;
+        if (cursor.moveToFirst())
+            count += cursor.getInt(0);
+        cursor.close();
+        return "" + count;
+    }
+
     @Contract("_ -> !null")
     private CustomerModel cursorToCustomerModel(Cursor cursor) {
         return new CustomerModel(
@@ -333,6 +347,7 @@ public class CustomerModel implements Serializable {
 
         private static final String TEXT_TYPE = " TEXT";
         private static final String COMMA_SEP = ",";
+        private static final String UNIQUE = " UNIQUE ";
         public static final String SQL_CREATE_USER_DETAILS =
                 "CREATE TABLE " + TABLE_NAME + " (" +
                         _ID + " INTEGER PRIMARY KEY," +
@@ -340,7 +355,7 @@ public class CustomerModel implements Serializable {
                         COLUMN_NAME_ADDRESS_2 + TEXT_TYPE + COMMA_SEP +
                         COLUMN_NAME_ADDRESS_3 + TEXT_TYPE + COMMA_SEP +
                         COLUMN_NAME_BALANCE + TEXT_TYPE + COMMA_SEP +
-                        COLUMN_NAME_CODE + TEXT_TYPE + COMMA_SEP +
+                        COLUMN_NAME_CODE + TEXT_TYPE + UNIQUE + COMMA_SEP +
                         COLUMN_NAME_EMAIL + TEXT_TYPE + COMMA_SEP +
                         COLUMN_NAME_LEDGER_NAME + TEXT_TYPE + COMMA_SEP +
                         COLUMN_NAME_MOBILE + TEXT_TYPE + COMMA_SEP +

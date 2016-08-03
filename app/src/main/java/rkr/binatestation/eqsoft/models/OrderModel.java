@@ -14,7 +14,9 @@ import org.jetbrains.annotations.Contract;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by RKR on 1/8/2016.
@@ -199,6 +201,24 @@ public class OrderModel implements Serializable {
         return list;
     }
 
+    public Map<String, String> getTotalAmountReceivedAndPendingAmount() {
+        Map<String, String> stringMap = new LinkedHashMap<>();
+        Cursor cursor = database.query(OrdersTable.TABLE_NAME, null, null, null, null, null, null);
+        cursor.moveToFirst();
+        Double totalAmount = 0.0;
+        Double totalAmountReceived = 0.0;
+        while (!cursor.isAfterLast()) {
+            OrderModel obj = cursorToProductModel(cursor);
+            totalAmount += Double.parseDouble(obj.getAmount());
+            totalAmountReceived += Double.parseDouble(obj.getReceivedAmount());
+            cursor.moveToNext();
+        }
+        cursor.close();
+        stringMap.put("KEY_TOTAL_AMOUNT_RECEIVED", "" + totalAmountReceived);
+        stringMap.put("KEY_TOTAL_PENDING_AMOUNT", "" + (totalAmount - totalAmountReceived));
+        return stringMap;
+    }
+
 
     public OrderModel getRow(String id) {
         Cursor cursor = database.query(OrdersTable.TABLE_NAME, null, OrdersTable._ID + " = ?", new String[]{id}, null, null, null);
@@ -208,6 +228,20 @@ public class OrderModel implements Serializable {
         }
         cursor.close();
         return productModel;
+    }
+
+    /**
+     * This method will counts how many rows available in this table
+     *
+     * @return the count of the OrdersTable#TABLE_NAME
+     */
+    public String getCount() {
+        Cursor cursor = database.rawQuery("SELECT count(*) FROM " + OrdersTable.TABLE_NAME, null);
+        Integer count = 0;
+        if (cursor.moveToFirst())
+            count += cursor.getInt(0);
+        cursor.close();
+        return "" + count;
     }
 
     @Contract("_ -> !null")

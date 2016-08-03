@@ -216,6 +216,20 @@ public class ProductModel implements Serializable {
         return productModel;
     }
 
+    /**
+     * This method will counts how many rows available in this table
+     *
+     * @return the count of the OrdersTable#TABLE_NAME
+     */
+    public String getCount() {
+        Cursor cursor = database.rawQuery("SELECT count(*) FROM " + ProductsTable.TABLE_NAME, null);
+        Integer count = 0;
+        if (cursor.moveToFirst())
+            count += cursor.getInt(0);
+        cursor.close();
+        return "" + count;
+    }
+
     @Contract("_ -> !null")
     private ProductModel cursorToProductModel(Cursor cursor) {
         return new ProductModel(
@@ -248,11 +262,12 @@ public class ProductModel implements Serializable {
 
         private static final String TEXT_TYPE = " TEXT";
         private static final String COMMA_SEP = ",";
+        private static final String UNIQUE = " UNIQUE ";
         public static final String SQL_CREATE_USER_DETAILS =
                 "CREATE TABLE " + TABLE_NAME + " (" +
                         _ID + " INTEGER PRIMARY KEY," +
                         COLUMN_NAME_CATEGORY + TEXT_TYPE + COMMA_SEP +
-                        COLUMN_NAME_CODE + TEXT_TYPE + COMMA_SEP +
+                        COLUMN_NAME_CODE + TEXT_TYPE + UNIQUE + COMMA_SEP +
                         COLUMN_NAME_MRP + TEXT_TYPE + COMMA_SEP +
                         COLUMN_NAME_NAME + TEXT_TYPE + COMMA_SEP +
                         COLUMN_NAME_SELLING_RATE + TEXT_TYPE + COMMA_SEP +

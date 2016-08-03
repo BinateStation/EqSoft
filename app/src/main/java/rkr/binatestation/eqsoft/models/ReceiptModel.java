@@ -172,6 +172,20 @@ public class ReceiptModel implements Serializable {
         return productModel;
     }
 
+    /**
+     * This method will counts how many rows available in this table
+     *
+     * @return the count of the OrdersTable#TABLE_NAME
+     */
+    public String getCount() {
+        Cursor cursor = database.rawQuery("SELECT count(*) FROM " + ReceiptsTable.TABLE_NAME, null);
+        Integer count = 0;
+        if (cursor.moveToFirst())
+            count += cursor.getInt(0);
+        cursor.close();
+        return "" + count;
+    }
+
     @Contract("_ -> !null")
     private ReceiptModel cursorToProductModel(Cursor cursor) {
         return new ReceiptModel(

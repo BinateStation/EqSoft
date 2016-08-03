@@ -190,10 +190,11 @@ public class UserDetailsModel implements Serializable {
 
         private static final String TEXT_TYPE = " TEXT";
         private static final String COMMA_SEP = ",";
+        private static final String UNIQUE = " UNIQUE ";
         public static final String SQL_CREATE_USER_DETAILS =
                 "CREATE TABLE " + TABLE_NAME + " (" +
                         _ID + " INTEGER PRIMARY KEY," +
-                        COLUMN_NAME_USER_ID + TEXT_TYPE + COMMA_SEP +
+                        COLUMN_NAME_USER_ID + TEXT_TYPE + UNIQUE + COMMA_SEP +
                         COLUMN_NAME_USER_NAME + TEXT_TYPE + COMMA_SEP +
                         COLUMN_NAME_PASSWORD + TEXT_TYPE +
                         " )";
