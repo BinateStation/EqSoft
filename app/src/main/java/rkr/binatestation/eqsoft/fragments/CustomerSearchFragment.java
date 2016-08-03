@@ -13,8 +13,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import rkr.binatestation.eqsoft.R;
 import rkr.binatestation.eqsoft.adapters.CustomerAdapter;
+import rkr.binatestation.eqsoft.models.CustomerModel;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -25,6 +29,7 @@ public class CustomerSearchFragment extends DialogFragment {
     public static String tag = CustomerSearchFragment.class.getSimpleName();
     SearchView customerSearch;
     RecyclerView customersRecyclerView;
+    List<CustomerModel> customerModelList = new ArrayList<>();
 
     public CustomerSearchFragment() {
         // Required empty public constructor
@@ -44,7 +49,7 @@ public class CustomerSearchFragment extends DialogFragment {
 
         customerSearch.setQueryHint(getString(R.string.type_to_search));
         customersRecyclerView.setLayoutManager(new LinearLayoutManager(customersRecyclerView.getContext()));
-        customersRecyclerView.setAdapter(new CustomerAdapter());
+        customersRecyclerView.setAdapter(new CustomerAdapter(customerModelList));
         return view;
     }
 

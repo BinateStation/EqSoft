@@ -58,18 +58,18 @@ public class DataSyncUSB extends AsyncTask<Context, Integer, Boolean> {
                 for (int i = 0; i < customersJsonArray.length(); i++) {
                     JSONObject customerJsonObject = customersJsonArray.getJSONObject(i);
                     customerModelList.add(new CustomerModel(
-                            customerJsonObject.optString("Address1"),
-                            customerJsonObject.optString("Address2"),
-                            customerJsonObject.optString("Address3"),
-                            customerJsonObject.optString("Balance"),
-                            customerJsonObject.optString("Code"),
-                            customerJsonObject.optString("Email"),
-                            customerJsonObject.optString("LedgerName"),
-                            customerJsonObject.optString("Mobile"),
-                            customerJsonObject.optString("Name"),
-                            customerJsonObject.optString("Phone"),
-                            customerJsonObject.optString("Route"),
-                            customerJsonObject.optString("RouteIndex")
+                            customerJsonObject.optString("Address1").trim(),
+                            customerJsonObject.optString("Address2").trim(),
+                            customerJsonObject.optString("Address3").trim(),
+                            customerJsonObject.optString("Balance").trim(),
+                            customerJsonObject.optString("Code").trim(),
+                            customerJsonObject.optString("Email").trim(),
+                            customerJsonObject.optString("LedgerName").trim(),
+                            customerJsonObject.optString("Mobile").trim(),
+                            customerJsonObject.optString("Name").trim(),
+                            customerJsonObject.optString("Phone").trim(),
+                            customerJsonObject.optString("Route").trim(),
+                            customerJsonObject.optString("RouteIndex").trim()
                     ));
                 }
 
@@ -86,13 +86,13 @@ public class DataSyncUSB extends AsyncTask<Context, Integer, Boolean> {
                 for (int i = 0; i < productsJsonArray.length(); i++) {
                     JSONObject productJsonObject = productsJsonArray.getJSONObject(i);
                     productModelList.add(new ProductModel(
-                            productJsonObject.optString("Category"),
-                            productJsonObject.optString("Code"),
-                            productJsonObject.optString("MRP"),
-                            productJsonObject.optString("Name"),
-                            productJsonObject.optString("SellingRate"),
-                            productJsonObject.optString("Stock"),
-                            productJsonObject.optString("TaxRate")
+                            productJsonObject.optString("Category").trim(),
+                            productJsonObject.optString("Code").trim(),
+                            productJsonObject.optString("MRP").trim(),
+                            productJsonObject.optString("Name").trim(),
+                            productJsonObject.optString("SellingRate").trim(),
+                            productJsonObject.optString("Stock").trim(),
+                            productJsonObject.optString("TaxRate").trim()
                     ));
                 }
 

@@ -9,7 +9,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 
 import rkr.binatestation.eqsoft.R;
-import rkr.binatestation.eqsoft.adapters.ProductAdapter;
 
 public class OrderActivity extends AppCompatActivity {
     RecyclerView selectedProductsRecyclerView;
@@ -24,7 +23,7 @@ public class OrderActivity extends AppCompatActivity {
         selectedProductsRecyclerView = (RecyclerView) findViewById(R.id.AO_selectedProducts);
 
         selectedProductsRecyclerView.setLayoutManager(new LinearLayoutManager(selectedProductsRecyclerView.getContext()));
-        selectedProductsRecyclerView.setAdapter(new ProductAdapter(2));
+//        selectedProductsRecyclerView.setAdapter(new ProductAdapter(2));
     }
 
     @Override

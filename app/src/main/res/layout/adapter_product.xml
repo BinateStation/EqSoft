@@ -28,18 +28,21 @@
             android:padding="2dp">
 
             <TextView
+                android:id="@+id/AP_productName"
                 style="@style/Base.TextAppearance.AppCompat.Title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Prod. Name" />
 
             <TextView
+                android:id="@+id/AP_productMRP"
                 style="@style/Base.TextAppearance.AppCompat.Title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="MRP - 580.50" />
 
             <TextView
+                android:id="@+id/AP_productCode"
                 style="@style/Base.TextAppearance.AppCompat.Medium"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -64,6 +67,7 @@
                 android:text="@string/stock" />
 
             <TextView
+                android:id="@+id/AP_productStock"
                 style="@style/Base.TextAppearance.AppCompat.Large.Inverse"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -76,6 +80,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@color/colorPrimary"
+            android:gravity="center"
             android:orientation="vertical">
 
             <TextView
@@ -86,6 +91,7 @@
                 android:text="@string/selling_price" />
 
             <TextView
+                android:id="@+id/AP_productSellingPrice"
                 style="@style/Base.TextAppearance.AppCompat.Large.Inverse"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

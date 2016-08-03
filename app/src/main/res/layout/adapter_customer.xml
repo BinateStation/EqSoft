@@ -22,12 +22,14 @@
             android:padding="2dp">
 
             <TextView
+                android:id="@+id/AC_ledgerName"
                 style="@style/Base.TextAppearance.AppCompat.Title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Ledger Name" />
 
             <TextView
+                android:id="@+id/AC_phone"
                 style="@style/Base.TextAppearance.AppCompat.Medium"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -50,6 +52,7 @@
                 android:text="@string/balance" />
 
             <TextView
+                android:id="@+id/AC_balance"
                 style="@style/Base.TextAppearance.AppCompat.Large.Inverse"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

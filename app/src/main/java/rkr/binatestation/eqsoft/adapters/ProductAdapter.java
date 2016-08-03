@@ -8,18 +8,23 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.TextView;
+
+import java.util.List;
+import java.util.Locale;
 
 import rkr.binatestation.eqsoft.R;
+import rkr.binatestation.eqsoft.models.ProductModel;
 
 /**
  * Created by RKR on 20/7/2016.
  * CustomerAdapter.
  */
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView> {
-    int itemCount;
+    List<ProductModel> productModelList;
 
-    public ProductAdapter(int itemCount) {
-        this.itemCount = itemCount;
+    public ProductAdapter(List<ProductModel> productModelList) {
+        this.productModelList = productModelList;
     }
 
     @Override
@@ -37,11 +42,20 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
                 popupEnterQuantity(view.getContext());
             }
         });
+        holder.productName.setText(getItem(position).getName());
+        holder.productMRP.setText(String.format(Locale.getDefault(), "MRP - %s", getItem(position).getMRP()));
+        holder.productCode.setText(getItem(position).getCode());
+        holder.stock.setText(getItem(position).getStock());
+        holder.sellingPrice.setText(getItem(position).getSellingRate());
+    }
+
+    private ProductModel getItem(Integer position) {
+        return productModelList.get(position);
     }
 
     @Override
     public int getItemCount() {
-        return itemCount;
+        return productModelList.size();
     }
 
     private void popupEnterQuantity(Context context) {
@@ -61,10 +75,18 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
 
     class ItemView extends RecyclerView.ViewHolder {
         View itemView;
+        TextView productName, productMRP, productCode, stock, sellingPrice;
+        View selectedView;
 
         public ItemView(View itemView) {
             super(itemView);
             this.itemView = itemView;
+            productName = (TextView) itemView.findViewById(R.id.AP_productName);
+            productMRP = (TextView) itemView.findViewById(R.id.AP_productMRP);
+            productCode = (TextView) itemView.findViewById(R.id.AP_productCode);
+            stock = (TextView) itemView.findViewById(R.id.AP_productStock);
+            sellingPrice = (TextView) itemView.findViewById(R.id.AP_productSellingPrice);
+            selectedView = itemView.findViewById(R.id.AP_isSelected);
         }
     }
 }
