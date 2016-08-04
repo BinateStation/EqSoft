@@ -101,6 +101,11 @@ public class HomeActivity extends AppCompatActivity {
         startActivity(new Intent(view.getContext(), ReceiptsActivity.class));
     }
 
+    public void order(View view) {
+        startActivity(new Intent(getBaseContext(), OrderActivity.class));
+    }
+
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {

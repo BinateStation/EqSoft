@@ -29,7 +29,7 @@
 
             <TextView
                 android:id="@+id/AP_productName"
-                style="@style/Base.TextAppearance.AppCompat.Title"
+                style="@style/Base.TextAppearance.AppCompat.Subhead"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Prod. Name" />
