@@ -1,25 +1,31 @@
 package rkr.binatestation.eqsoft.activities;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.View;
+import android.widget.AdapterView;
 
 import java.util.List;
 
 import rkr.binatestation.eqsoft.R;
 import rkr.binatestation.eqsoft.adapters.CustomerAdapter;
 import rkr.binatestation.eqsoft.models.CustomerModel;
+import rkr.binatestation.eqsoft.utils.Constants;
 
 public class CustomersActivity extends AppCompatActivity {
 
     SearchView customerSearch;
     RecyclerView customersRecyclerView;
+    AppCompatSpinner sort;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +36,7 @@ public class CustomersActivity extends AppCompatActivity {
 
         customerSearch = (SearchView) findViewById(R.id.AC_customerSearch);
         customersRecyclerView = (RecyclerView) findViewById(R.id.AC_customerRecyclerView);
+        sort = (AppCompatSpinner) findViewById(R.id.AC_sort);
 
         customerSearch.setQueryHint(getString(R.string.type_to_search));
         customersRecyclerView.setLayoutManager(new LinearLayoutManager(customersRecyclerView.getContext()));
@@ -37,26 +44,40 @@ public class CustomersActivity extends AppCompatActivity {
         customerSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                getCustomerList(query);
+                getCustomerList(query, sort.getSelectedItemPosition());
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                getCustomerList(newText);
+                getCustomerList(newText, sort.getSelectedItemPosition());
                 return true;
             }
         });
-        getCustomerList("");
+
+        sort.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                if (i != 0) {
+                    getCustomerList("", sort.getSelectedItemPosition());
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+        getCustomerList("", sort.getSelectedItemPosition());
     }
 
-    private void getCustomerList(final String query) {
+    private void getCustomerList(final String query, final int sortType) {
         new AsyncTask<Void, Void, List<CustomerModel>>() {
             @Override
             protected List<CustomerModel> doInBackground(Void... voids) {
                 CustomerModel customerModelDB = new CustomerModel(getBaseContext());
                 customerModelDB.open();
-                List<CustomerModel> customerModelList = customerModelDB.getAllRows(query);
+                List<CustomerModel> customerModelList = customerModelDB.getAllRows(query, sortType);
                 customerModelDB.close();
                 return customerModelList;
             }
@@ -64,7 +85,13 @@ public class CustomersActivity extends AppCompatActivity {
             @Override
             protected void onPostExecute(List<CustomerModel> customerModelList) {
                 super.onPostExecute(customerModelList);
-                customersRecyclerView.setAdapter(new CustomerAdapter(customerModelList));
+                customersRecyclerView.setAdapter(new CustomerAdapter(customerModelList, new CustomerAdapter.OnAdapterInteractionListener() {
+                    @Override
+                    public void onItemSelected(CustomerModel customerModel) {
+                        startActivity(new Intent(getBaseContext(), ProductsActivity.class)
+                                .putExtra(Constants.KEY_CUSTOMER, customerModel));
+                    }
+                }));
             }
         }.execute();
     }

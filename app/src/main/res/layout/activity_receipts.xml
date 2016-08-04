@@ -50,17 +50,18 @@
                     android:padding="2dp">
 
                     <TextView
+                        android:id="@+id/AR_customerLedgerName"
                         style="@style/Base.TextAppearance.AppCompat.Title"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Ledger Name" />
+                        android:hint="@string/select_your_customer" />
 
                     <TextView
+                        android:id="@+id/AR_customerMobile"
                         style="@style/Base.TextAppearance.AppCompat.Medium"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="end"
-                        android:text="+919895799937" />
+                        android:gravity="end" />
                 </android.support.v7.widget.LinearLayoutCompat>
 
                 <ImageButton
@@ -69,12 +70,14 @@
                     android:layout_gravity="center"
                     android:layout_margin="10dp"
                     android:background="@drawable/bg_button_oval_dark"
+                    android:contentDescription="@string/customers"
                     android:onClick="showSearchDialog"
                     android:src="@drawable/ic_arrow_drop_down_white_24dp" />
             </android.support.v7.widget.LinearLayoutCompat>
         </android.support.v7.widget.CardView>
 
-        <android.support.v7.widget.AppCompatTextView
+        <TextView
+            android:id="@+id/AR_balance"
             style="@style/Base.TextAppearance.AppCompat.Headline"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

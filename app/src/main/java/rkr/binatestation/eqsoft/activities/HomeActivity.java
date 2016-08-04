@@ -15,15 +15,17 @@ import android.widget.TextView;
 import java.util.Map;
 
 import rkr.binatestation.eqsoft.R;
+import rkr.binatestation.eqsoft.fragments.CustomerSearchFragment;
 import rkr.binatestation.eqsoft.models.CustomerModel;
 import rkr.binatestation.eqsoft.models.OrderModel;
 import rkr.binatestation.eqsoft.models.ProductModel;
 import rkr.binatestation.eqsoft.models.ReceiptModel;
+import rkr.binatestation.eqsoft.utils.Constants;
 
 public class HomeActivity extends AppCompatActivity {
 
     TextView totalSales, amountReceived, amountPending, noOfReceipts, noOfProducts, noOfCustomers;
-
+    CustomerSearchFragment customerSearchFragment;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -102,7 +104,19 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     public void order(View view) {
-        startActivity(new Intent(getBaseContext(), OrderActivity.class));
+        customerSearchFragment = CustomerSearchFragment.newInstance(new CustomerSearchFragment.OnCustomerSearchFragmentInteractionListener() {
+            @Override
+            public void onItemSelected(CustomerModel customerModel) {
+                if (customerSearchFragment != null) {
+                    customerSearchFragment.dismiss();
+                }
+                startActivity(
+                        new Intent(getBaseContext(), OrderActivity.class)
+                                .putExtra(Constants.KEY_CUSTOMER, customerModel)
+                );
+            }
+        });
+        customerSearchFragment.show(getSupportFragmentManager(), CustomerSearchFragment.tag);
     }
 
 

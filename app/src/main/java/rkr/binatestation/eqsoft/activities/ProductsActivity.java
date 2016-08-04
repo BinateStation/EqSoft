@@ -11,16 +11,24 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
+import android.widget.TextView;
 
 import java.util.List;
 
 import rkr.binatestation.eqsoft.R;
 import rkr.binatestation.eqsoft.adapters.ProductAdapter;
+import rkr.binatestation.eqsoft.fragments.CustomerSearchFragment;
+import rkr.binatestation.eqsoft.models.CustomerModel;
 import rkr.binatestation.eqsoft.models.ProductModel;
+import rkr.binatestation.eqsoft.utils.Constants;
 
 public class ProductsActivity extends AppCompatActivity {
     SearchView productSearch;
     RecyclerView productsRecyclerView;
+    TextView customerName, totalAmount;
+    CustomerModel customerModel;
+    ProductAdapter productAdapter;
+    CustomerSearchFragment customerSearchFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,8 +37,13 @@ public class ProductsActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        if (getIntent().hasExtra(Constants.KEY_CUSTOMER)) {
+            customerModel = (CustomerModel) getIntent().getSerializableExtra(Constants.KEY_CUSTOMER);
+        }
         productSearch = (SearchView) findViewById(R.id.AP_productSearch);
         productsRecyclerView = (RecyclerView) findViewById(R.id.Ap_productsRecyclerView);
+        customerName = (TextView) findViewById(R.id.AP_customerLedgerName);
+        totalAmount = (TextView) findViewById(R.id.AP_totalAmount);
 
         productSearch.setQueryHint(getString(R.string.type_to_search));
         productsRecyclerView.setLayoutManager(new LinearLayoutManager(productsRecyclerView.getContext()));
@@ -48,6 +61,13 @@ public class ProductsActivity extends AppCompatActivity {
             }
         });
         getProducts("");
+        setCustomerName();
+    }
+
+    public void setCustomerName() {
+        if (customerModel != null) {
+            customerName.setText(customerModel.getLedgerName());
+        }
     }
 
     private void getProducts(final String query) {
@@ -64,13 +84,52 @@ public class ProductsActivity extends AppCompatActivity {
             @Override
             protected void onPostExecute(List<ProductModel> productModels) {
                 super.onPostExecute(productModels);
-                productsRecyclerView.setAdapter(new ProductAdapter(productModels));
+                productsRecyclerView.setAdapter(productAdapter = new ProductAdapter(productModels, customerModel, new ProductAdapter.OnAdapterInteractionListener() {
+                    @Override
+                    public void onItemClicked() {
+                        customerSearchFragment = CustomerSearchFragment.newInstance(new CustomerSearchFragment.OnCustomerSearchFragmentInteractionListener() {
+                            @Override
+                            public void onItemSelected(CustomerModel customerModel) {
+                                ProductsActivity.this.customerModel = customerModel;
+                                if (productAdapter != null) {
+                                    productAdapter.setCustomerModel(customerModel);
+                                }
+                                setCustomerName();
+                                if (customerSearchFragment != null) {
+                                    customerSearchFragment.dismiss();
+                                }
+                            }
+                        });
+                        customerSearchFragment.show(getSupportFragmentManager(), CustomerSearchFragment.tag);
+
+                    }
+                }));
             }
         }.execute();
     }
 
     public void checkOut(View view) {
-        startActivity(new Intent(getBaseContext(), OrderActivity.class));
+        startActivity(
+                new Intent(getBaseContext(), OrderActivity.class)
+                        .putExtra(Constants.KEY_CUSTOMER, customerModel)
+        );
+    }
+
+    public void selectCustomer(View view) {
+        customerSearchFragment = CustomerSearchFragment.newInstance(new CustomerSearchFragment.OnCustomerSearchFragmentInteractionListener() {
+            @Override
+            public void onItemSelected(CustomerModel customerModel) {
+                ProductsActivity.this.customerModel = customerModel;
+                if (productAdapter != null) {
+                    productAdapter.setCustomerModel(customerModel);
+                }
+                setCustomerName();
+                if (customerSearchFragment != null) {
+                    customerSearchFragment.dismiss();
+                }
+            }
+        });
+        customerSearchFragment.show(getSupportFragmentManager(), CustomerSearchFragment.tag);
     }
 
     @Override

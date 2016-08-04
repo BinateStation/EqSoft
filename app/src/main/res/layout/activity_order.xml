@@ -52,10 +52,10 @@
                         android:text="@string/customer" />
 
                     <TextView
+                        android:id="@+id/AO_customerLedgerName"
                         style="@style/Base.TextAppearance.AppCompat.Title"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Ledger Name" />
+                        android:layout_height="wrap_content" />
                 </android.support.v7.widget.LinearLayoutCompat>
 
                 <View
@@ -78,11 +78,11 @@
                         android:text="@string/previous_balance" />
 
                     <TextView
+                        android:id="@+id/AO_previousBalance"
                         style="@style/Base.TextAppearance.AppCompat.Title"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="end"
-                        android:text="1500.00" />
+                        android:gravity="end" />
                 </android.support.v7.widget.LinearLayoutCompat>
 
             </android.support.v7.widget.LinearLayoutCompat>

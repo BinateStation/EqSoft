@@ -20,6 +20,7 @@
             app:popupTheme="@style/AppTheme.Light.PopupOverlay">
 
             <android.support.v7.widget.AppCompatSpinner
+                android:id="@+id/AC_sort"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"

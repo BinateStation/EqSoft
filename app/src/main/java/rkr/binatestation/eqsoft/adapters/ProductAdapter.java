@@ -1,8 +1,13 @@
 package rkr.binatestation.eqsoft.adapters;
 
 import android.content.Context;
+import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatDialog;
+import android.support.v7.widget.AppCompatButton;
+import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +19,7 @@ import java.util.List;
 import java.util.Locale;
 
 import rkr.binatestation.eqsoft.R;
+import rkr.binatestation.eqsoft.models.CustomerModel;
 import rkr.binatestation.eqsoft.models.ProductModel;
 
 /**
@@ -22,9 +28,17 @@ import rkr.binatestation.eqsoft.models.ProductModel;
  */
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView> {
     List<ProductModel> productModelList;
+    CustomerModel customerModel;
+    OnAdapterInteractionListener onAdapterInteractionListener;
 
-    public ProductAdapter(List<ProductModel> productModelList) {
+    public ProductAdapter(List<ProductModel> productModelList, CustomerModel customerModel, OnAdapterInteractionListener onAdapterInteractionListener) {
         this.productModelList = productModelList;
+        this.customerModel = customerModel;
+        this.onAdapterInteractionListener = onAdapterInteractionListener;
+    }
+
+    public void setCustomerModel(CustomerModel customerModel) {
+        this.customerModel = customerModel;
     }
 
     @Override
@@ -35,11 +49,17 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
     }
 
     @Override
-    public void onBindViewHolder(ItemView holder, int position) {
+    public void onBindViewHolder(final ItemView holder, int position) {
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                popupEnterQuantity(view.getContext());
+                if (customerModel != null) {
+                    popupEnterQuantity(view.getContext(), getItem(holder.getAdapterPosition()));
+                } else {
+                    if (onAdapterInteractionListener != null) {
+                        onAdapterInteractionListener.onItemClicked();
+                    }
+                }
             }
         });
         holder.productName.setText(getItem(position).getName());
@@ -58,8 +78,8 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
         return productModelList.size();
     }
 
-    private void popupEnterQuantity(Context context) {
-        AppCompatDialog appCompatDialog = new AppCompatDialog(context);
+    private void popupEnterQuantity(Context context, final ProductModel item) {
+        final AppCompatDialog appCompatDialog = new AppCompatDialog(context);
         appCompatDialog.setContentView(R.layout.popup_enter_product_quantity);
 
         WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
@@ -70,7 +90,72 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
         window.setAttributes(layoutParams);
         window.getAttributes().windowAnimations = R.style.dialog_animation;
 
+
+        TextView productName = (TextView) appCompatDialog.findViewById(R.id.PEPQ_productName);
+        TextView MRP = (TextView) appCompatDialog.findViewById(R.id.PEPQ_MRP);
+        TextView productCode = (TextView) appCompatDialog.findViewById(R.id.PEPQ_productCode);
+        TextView stock = (TextView) appCompatDialog.findViewById(R.id.PEPQ_stock);
+        TextView sellingPrice = (TextView) appCompatDialog.findViewById(R.id.PEPQ_sellingPrice);
+        TextInputEditText quantity = (TextInputEditText) appCompatDialog.findViewById(R.id.PEPQ_quantity);
+        final AppCompatTextView amount = (AppCompatTextView) appCompatDialog.findViewById(R.id.PEPQ_amount);
+        AppCompatButton okay = (AppCompatButton) appCompatDialog.findViewById(R.id.PEPQ_ok);
+
+        try {
+            if (item != null) {
+                if (productName != null) {
+                    productName.setText(item.getName());
+                }
+                if (MRP != null) {
+                    MRP.setText(String.format(Locale.getDefault(), "MRP - %s", item.getMRP()));
+                }
+                if (productCode != null) {
+                    productCode.setText(item.getCode());
+                }
+                if (stock != null) {
+                    stock.setText(item.getStock());
+                }
+                if (sellingPrice != null) {
+                    sellingPrice.setText(item.getSellingRate());
+                }
+                if (quantity != null) {
+                    quantity.addTextChangedListener(new TextWatcher() {
+                        @Override
+                        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                        }
+
+                        @Override
+                        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                        }
+
+                        @Override
+                        public void afterTextChanged(Editable editable) {
+                            if (editable.length() > 0) {
+                                if (amount != null) {
+                                    amount.setText(String.format("%s", Integer.parseInt(editable.toString()) * Double.parseDouble(item.getSellingRate())));
+                                }
+                            }
+                        }
+                    });
+                }
+                if (okay != null) {
+                    okay.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            appCompatDialog.dismiss();
+                        }
+                    });
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         appCompatDialog.show();
+    }
+
+    public interface OnAdapterInteractionListener {
+        void onItemClicked();
     }
 
     class ItemView extends RecyclerView.ViewHolder {

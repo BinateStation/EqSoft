@@ -17,9 +17,11 @@ import rkr.binatestation.eqsoft.models.CustomerModel;
  */
 public class CustomerAdapter extends RecyclerView.Adapter<CustomerAdapter.ItemView> {
     List<CustomerModel> customerModelList;
+    OnAdapterInteractionListener listener;
 
-    public CustomerAdapter(List<CustomerModel> customerModelList) {
+    public CustomerAdapter(List<CustomerModel> customerModelList, OnAdapterInteractionListener listener) {
         this.customerModelList = customerModelList;
+        this.listener = listener;
     }
 
     @Override
@@ -34,10 +36,18 @@ public class CustomerAdapter extends RecyclerView.Adapter<CustomerAdapter.ItemVi
     }
 
     @Override
-    public void onBindViewHolder(ItemView holder, int position) {
+    public void onBindViewHolder(final ItemView holder, int position) {
         holder.ledgerName.setText(getItem(position).getLedgerName());
         holder.phone.setText(getItem(position).getMobile());
         holder.balance.setText(getItem(position).getBalance());
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (listener != null) {
+                    listener.onItemSelected(getItem(holder.getAdapterPosition()));
+                }
+            }
+        });
     }
 
     @Override
@@ -45,11 +55,17 @@ public class CustomerAdapter extends RecyclerView.Adapter<CustomerAdapter.ItemVi
         return customerModelList.size();
     }
 
+    public interface OnAdapterInteractionListener {
+        void onItemSelected(CustomerModel customerModel);
+    }
+
     class ItemView extends RecyclerView.ViewHolder {
         TextView ledgerName, phone, balance;
+        View itemView;
 
         public ItemView(View itemView) {
             super(itemView);
+            this.itemView = itemView;
             ledgerName = (TextView) itemView.findViewById(R.id.AC_ledgerName);
             phone = (TextView) itemView.findViewById(R.id.AC_phone);
             balance = (TextView) itemView.findViewById(R.id.AC_balance);

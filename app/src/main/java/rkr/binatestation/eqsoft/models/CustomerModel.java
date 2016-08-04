@@ -275,10 +275,18 @@ public class CustomerModel implements Serializable {
         return list;
     }
 
-    public List<CustomerModel> getAllRows(String query) {
+    public List<CustomerModel> getAllRows(String query, int sortType) {
         List<CustomerModel> list = new ArrayList<>();
+        String sortBy = null;
+        switch (sortType) {
+            case 1:
+                sortBy = CustomersTable.COLUMN_NAME_ROUTE;
+                break;
+            default:
+                sortBy = null;
+        }
         Cursor cursor = database.query(CustomersTable.TABLE_NAME, null, CustomersTable.COLUMN_NAME_LEDGER_NAME + " LIKE '" + query + "%' OR " +
-                CustomersTable.COLUMN_NAME_MOBILE + " LIKE '" + query + "%' ", null, null, null, null);
+                CustomersTable.COLUMN_NAME_MOBILE + " LIKE '" + query + "%' ", null, null, null, sortBy);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             CustomerModel obj = cursorToCustomerModel(cursor);
