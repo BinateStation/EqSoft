@@ -26,6 +26,7 @@ import rkr.binatestation.eqsoft.models.CustomerModel;
 import rkr.binatestation.eqsoft.models.OrderItemModel;
 import rkr.binatestation.eqsoft.models.OrderModel;
 import rkr.binatestation.eqsoft.models.ProductModel;
+import rkr.binatestation.eqsoft.utils.Constants;
 import rkr.binatestation.eqsoft.utils.Util;
 
 /**
@@ -37,11 +38,14 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
     CustomerModel customerModel;
     Map<String, OrderItemModel> orderItemModelMap = new LinkedHashMap<>();
     OnAdapterInteractionListener onAdapterInteractionListener;
+    Boolean clickable;
 
-    public ProductAdapter(List<ProductModel> productModelList, CustomerModel customerModel, OnAdapterInteractionListener onAdapterInteractionListener) {
+    public ProductAdapter(List<ProductModel> productModelList, CustomerModel customerModel, Map<String, OrderItemModel> orderItemModelMap, boolean clickable, OnAdapterInteractionListener onAdapterInteractionListener) {
         this.productModelList = productModelList;
         this.customerModel = customerModel;
         this.onAdapterInteractionListener = onAdapterInteractionListener;
+        this.orderItemModelMap = orderItemModelMap;
+        this.clickable = clickable;
     }
 
     public void setCustomerModel(CustomerModel customerModel) {
@@ -61,18 +65,20 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
 
     @Override
     public void onBindViewHolder(final ItemView holder, int position) {
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (customerModel != null) {
-                    popupEnterQuantity(view.getContext(), getItem(holder.getAdapterPosition()), holder.getAdapterPosition());
-                } else {
-                    if (onAdapterInteractionListener != null) {
-                        onAdapterInteractionListener.onItemClicked();
+        if (clickable) {
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (customerModel != null) {
+                        popupEnterQuantity(view.getContext(), getItem(holder.getAdapterPosition()), holder.getAdapterPosition());
+                    } else {
+                        if (onAdapterInteractionListener != null) {
+                            onAdapterInteractionListener.onItemClicked();
+                        }
                     }
                 }
-            }
-        });
+            });
+        }
         holder.productName.setText(getItem(position).getName());
         holder.productMRP.setText(String.format(Locale.getDefault(), "MRP - %s", getItem(position).getMRP()));
         holder.productCode.setText(getItem(position).getCode());
@@ -202,7 +208,8 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
                             "" + (Double.parseDouble(orderModel.getAmount()) + Double.parseDouble(amount)),
                             orderModel.getReceivedAmount(),
                             orderModel.getDueDate(),
-                            orderModel.getRemarks()
+                            orderModel.getRemarks(),
+                            orderModel.getUserId()
                     ));
                     orderModelDB.close();
                     orderItemModel = new OrderItemModel(
@@ -225,7 +232,8 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
                             amount,
                             "0",
                             "",
-                            ""
+                            "",
+                            Util.getStringFromSharedPreferences(context, Constants.KEY_USER_ID)
                     ));
                     orderModelDB.close();
                     if (orderId != -1) {
@@ -254,6 +262,9 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
                 if (orderItemModel != null) {
                     orderItemModelMap.put(orderItemModel.getProductCode(), orderItemModel);
                     notifyItemChanged(adapterPosition);
+                    if (onAdapterInteractionListener != null) {
+                        onAdapterInteractionListener.onProductSelected();
+                    }
                 }
             }
         }.execute();
@@ -261,6 +272,8 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
 
     public interface OnAdapterInteractionListener {
         void onItemClicked();
+
+        void onProductSelected();
     }
 
     class ItemView extends RecyclerView.ViewHolder {

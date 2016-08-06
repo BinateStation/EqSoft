@@ -220,6 +220,19 @@ public class ProductModel implements Serializable {
         return list;
     }
 
+    public List<ProductModel> getAllSelectedProducts(String selectionArgs) {
+        List<ProductModel> list = new ArrayList<>();
+        Cursor cursor = database.query(ProductsTable.TABLE_NAME, null, String.format("%s IN (%s)", ProductsTable.COLUMN_NAME_CODE, selectionArgs), null, null, null, ProductsTable.COLUMN_NAME_CATEGORY);
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            ProductModel obj = cursorToProductModel(cursor);
+            list.add(obj);
+            cursor.moveToNext();
+        }
+        cursor.close();
+        return list;
+    }
+
 
     public ProductModel getRow(String code) {
         Cursor cursor = database.query(ProductsTable.TABLE_NAME, null, ProductsTable.COLUMN_NAME_CODE + " = ?", new String[]{code}, null, null, null);

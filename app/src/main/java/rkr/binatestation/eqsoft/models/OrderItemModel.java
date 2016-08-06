@@ -96,7 +96,7 @@ public class OrderItemModel implements Serializable {
     }
 
     public void insert(OrderItemModel obj) {
-        if (getRow(obj.getProductCode()) == null) {
+        if (getRow(obj.getProductCode(), obj.getOrderId()) == null) {
             ContentValues values = new ContentValues();
             values.put(OrderItemsTable.COLUMN_NAME_ORDER_ID, obj.getOrderId());
             values.put(OrderItemsTable.COLUMN_NAME_PRODUCT_CODE, obj.getProductCode());
@@ -154,7 +154,9 @@ public class OrderItemModel implements Serializable {
         values.put(OrderItemsTable.COLUMN_NAME_QUANTITY, obj.getQuantity());
         values.put(OrderItemsTable.COLUMN_NAME_AMOUNT, obj.getAmount());
 
-        database.update(OrderItemsTable.TABLE_NAME, values, OrderItemsTable.COLUMN_NAME_PRODUCT_CODE + " = ?", new String[]{obj.getProductCode()});
+        database.update(OrderItemsTable.TABLE_NAME, values,
+                OrderItemsTable.COLUMN_NAME_PRODUCT_CODE + " = ? and " +
+                        OrderItemsTable.COLUMN_NAME_ORDER_ID + " = ? ", new String[]{obj.getProductCode(), "" + obj.getOrderId()});
         System.out.println("Categories Row Updated with id: " + obj.getProductCode());
     }
 
@@ -195,8 +197,10 @@ public class OrderItemModel implements Serializable {
     }
 
 
-    public OrderItemModel getRow(String productCode) {
-        Cursor cursor = database.query(OrderItemsTable.TABLE_NAME, null, OrderItemsTable.COLUMN_NAME_PRODUCT_CODE + " = ?", new String[]{productCode}, null, null, null);
+    public OrderItemModel getRow(String productCode, Long orderId) {
+        Cursor cursor = database.query(OrderItemsTable.TABLE_NAME, null,
+                OrderItemsTable.COLUMN_NAME_PRODUCT_CODE + " = ? and " +
+                        OrderItemsTable.COLUMN_NAME_ORDER_ID + " = ? ", new String[]{productCode, "" + orderId}, null, null, null);
         OrderItemModel productModel = null;
         if (cursor.moveToFirst()) {
             productModel = cursorToProductModel(cursor);
@@ -231,6 +235,7 @@ public class OrderItemModel implements Serializable {
 
         private static final String TEXT_TYPE = " TEXT";
         private static final String COMMA_SEP = ",";
+        private static final String UNIQUE = " UNIQUE ";
         public static final String SQL_CREATE_USER_DETAILS =
                 "CREATE TABLE " + TABLE_NAME + " (" +
                         _ID + " INTEGER PRIMARY KEY," +
@@ -238,8 +243,8 @@ public class OrderItemModel implements Serializable {
                         COLUMN_NAME_PRODUCT_CODE + TEXT_TYPE + COMMA_SEP +
                         COLUMN_NAME_RATE + TEXT_TYPE + COMMA_SEP +
                         COLUMN_NAME_QUANTITY + TEXT_TYPE + COMMA_SEP +
-                        COLUMN_NAME_AMOUNT + TEXT_TYPE +
-                        " )";
+                        COLUMN_NAME_AMOUNT + TEXT_TYPE + COMMA_SEP +
+                        UNIQUE + "( " + COLUMN_NAME_PRODUCT_CODE + COMMA_SEP + COLUMN_NAME_ORDER_ID + ") ON CONFLICT REPLACE)";
     }
 
 }

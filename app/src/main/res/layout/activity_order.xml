@@ -53,7 +53,7 @@
 
                     <TextView
                         android:id="@+id/AO_customerLedgerName"
-                        style="@style/Base.TextAppearance.AppCompat.Title"
+                        style="@style/Base.TextAppearance.AppCompat.Caption"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
                 </android.support.v7.widget.LinearLayoutCompat>
@@ -92,14 +92,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
-            <android.support.v7.widget.AppCompatTextView
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="end"
+                android:onClick="addMore"
                 android:padding="@dimen/activity_widget_margin"
                 android:text="@string/add_more" />
 
             <android.support.v7.widget.AppCompatTextView
+                android:id="@+id/AO_totalAmount"
                 style="@style/Base.TextAppearance.AppCompat.Headline"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

@@ -26,16 +26,18 @@ public class ReceiptModel implements Serializable {
     String receiptDateTime;
     String customerCode;
     String amount;
+    String userId;
 
     Context context;
     private SQLiteDatabase database;
     private RKRsEqSoftSQLiteHelper dbHelper;
 
-    public ReceiptModel(Long receiptId, String receiptDateTime, String customerCode, String amount) {
+    public ReceiptModel(Long receiptId, String receiptDateTime, String customerCode, String amount, String userId) {
         this.receiptId = receiptId;
         this.receiptDateTime = receiptDateTime;
         this.customerCode = customerCode;
         this.amount = amount;
+        this.userId = userId;
     }
 
     public ReceiptModel(Context context) {
@@ -75,6 +77,14 @@ public class ReceiptModel implements Serializable {
         this.amount = amount;
     }
 
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
     public void open() throws SQLException {
         database = dbHelper.getWritableDatabase();
     }
@@ -89,6 +99,7 @@ public class ReceiptModel implements Serializable {
         values.put(ReceiptsTable.COLUMN_NAME_RECEIPT_DATE, obj.getReceiptDateTime());
         values.put(ReceiptsTable.COLUMN_NAME_CUSTOMER_CODE, obj.getCustomerCode());
         values.put(ReceiptsTable.COLUMN_NAME_AMOUNT, obj.getAmount());
+        values.put(ReceiptsTable.COLUMN_NAME_USER_ID, obj.getUserId());
 
         long insertId;
         insertId = database.insert(ReceiptsTable.TABLE_NAME, null, values);
@@ -109,13 +120,15 @@ public class ReceiptModel implements Serializable {
                     ReceiptsTable.COLUMN_NAME_RECEIPT_ID + "','" +
                     ReceiptsTable.COLUMN_NAME_RECEIPT_DATE + "','" +
                     ReceiptsTable.COLUMN_NAME_CUSTOMER_CODE + "','" +
-                    ReceiptsTable.COLUMN_NAME_AMOUNT + "') VALUES ('";
+                    ReceiptsTable.COLUMN_NAME_AMOUNT + "','" +
+                    ReceiptsTable.COLUMN_NAME_USER_ID + "') VALUES ('";
             for (int i = 0; i < masterList.size(); i++) {
                 ReceiptModel master = masterList.get(i);
                 query += master.getReceiptId() + "' , '" +
                         master.getReceiptDateTime() + "' , '" +
                         master.getCustomerCode() + "' , '" +
-                        master.getAmount() + "')";
+                        master.getAmount() + "' , '" +
+                        master.getUserId() + "')";
                 if (i != (masterList.size() - 1)) {
                     query += ",('";
                 }
@@ -133,6 +146,7 @@ public class ReceiptModel implements Serializable {
         values.put(ReceiptsTable.COLUMN_NAME_RECEIPT_DATE, obj.getReceiptDateTime());
         values.put(ReceiptsTable.COLUMN_NAME_CUSTOMER_CODE, obj.getCustomerCode());
         values.put(ReceiptsTable.COLUMN_NAME_AMOUNT, obj.getAmount());
+        values.put(ReceiptsTable.COLUMN_NAME_USER_ID, obj.getUserId());
 
         database.update(ReceiptsTable.TABLE_NAME, values, ReceiptsTable._ID + " = ?", new String[]{id});
         System.out.println("Categories Row Updated with id: " + id);
@@ -192,7 +206,8 @@ public class ReceiptModel implements Serializable {
                 cursor.getLong(ReceiptsTable.COLUMN_INDEX_RECEIPT_ID),
                 cursor.getString(ReceiptsTable.COLUMN_INDEX_RECEIPT_DATE),
                 cursor.getString(ReceiptsTable.COLUMN_INDEX_CUSTOMER_CODE),
-                cursor.getString(ReceiptsTable.COLUMN_INDEX_AMOUNT)
+                cursor.getString(ReceiptsTable.COLUMN_INDEX_AMOUNT),
+                cursor.getString(ReceiptsTable.COLUMN_INDEX_USER_ID)
         );
     }
 
@@ -202,10 +217,12 @@ public class ReceiptModel implements Serializable {
         public static final String COLUMN_NAME_RECEIPT_DATE = "receipt_date";
         public static final String COLUMN_NAME_CUSTOMER_CODE = "customer_code";
         public static final String COLUMN_NAME_AMOUNT = "amount";
+        public static final String COLUMN_NAME_USER_ID = "user_id";
         public static final int COLUMN_INDEX_RECEIPT_ID = 1;
         public static final int COLUMN_INDEX_RECEIPT_DATE = 2;
         public static final int COLUMN_INDEX_CUSTOMER_CODE = 3;
         public static final int COLUMN_INDEX_AMOUNT = 4;
+        public static final int COLUMN_INDEX_USER_ID = 5;
 
         private static final String TEXT_TYPE = " TEXT";
         private static final String COMMA_SEP = ",";
@@ -215,7 +232,8 @@ public class ReceiptModel implements Serializable {
                         COLUMN_NAME_RECEIPT_ID + TEXT_TYPE + COMMA_SEP +
                         COLUMN_NAME_RECEIPT_DATE + TEXT_TYPE + COMMA_SEP +
                         COLUMN_NAME_CUSTOMER_CODE + TEXT_TYPE + COMMA_SEP +
-                        COLUMN_NAME_AMOUNT + TEXT_TYPE +
+                        COLUMN_NAME_AMOUNT + TEXT_TYPE + COMMA_SEP +
+                        COLUMN_NAME_USER_ID + TEXT_TYPE +
                         " )";
     }
 

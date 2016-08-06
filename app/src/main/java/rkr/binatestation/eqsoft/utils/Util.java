@@ -3,6 +3,7 @@ package rkr.binatestation.eqsoft.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Typeface;
 import android.net.Uri;
@@ -17,6 +18,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Created by RKR on 27-01-2016.
@@ -229,4 +231,37 @@ public class Util {
             e.printStackTrace();
         }
     }
+
+    public static void putStringsToSharedPreferences(Context context, Map<String, String> values) {
+        SharedPreferences.Editor editor = context.getSharedPreferences(context.getPackageName(), Context.MODE_PRIVATE).edit();
+        for (String key : values.keySet()) {
+            editor.putString(key, values.get(key));
+        }
+        editor.apply();
+    }
+
+    public static void putBooleansToSharedPreferences(Context context, Map<String, Boolean> values) {
+        SharedPreferences.Editor editor = context.getSharedPreferences(context.getPackageName(), Context.MODE_PRIVATE).edit();
+        for (String key : values.keySet()) {
+            editor.putBoolean(key, values.get(key));
+        }
+        editor.apply();
+    }
+
+    public static void putIntsToSharedPreferences(Context context, Map<String, Integer> values) {
+        SharedPreferences.Editor editor = context.getSharedPreferences(context.getPackageName(), Context.MODE_PRIVATE).edit();
+        for (String key : values.keySet()) {
+            editor.putInt(key, values.get(key));
+        }
+        editor.apply();
+    }
+
+    public static String getStringFromSharedPreferences(Context context, String key) {
+        return context.getSharedPreferences(context.getPackageName(), Context.MODE_PRIVATE).getString(key, "");
+    }
+
+    public static Boolean getBooleanFromSharedPreferences(Context context, String key) {
+        return context.getSharedPreferences(context.getPackageName(), Context.MODE_PRIVATE).getBoolean(key, false);
+    }
+
 }

@@ -90,6 +90,8 @@ public class ProductsActivity extends AppCompatActivity {
                     orderItemModelDB.open();
                     orderItemModelMap = orderItemModelDB.getAllRows(orderModel.getOrderId());
                     orderItemModelDB.close();
+                } else {
+                    orderItemModelMap.clear();
                 }
                 return orderModel;
             }
@@ -122,7 +124,7 @@ public class ProductsActivity extends AppCompatActivity {
             @Override
             protected void onPostExecute(List<ProductModel> productModels) {
                 super.onPostExecute(productModels);
-                productsRecyclerView.setAdapter(productAdapter = new ProductAdapter(productModels, customerModel, new ProductAdapter.OnAdapterInteractionListener() {
+                productsRecyclerView.setAdapter(productAdapter = new ProductAdapter(productModels, customerModel, orderItemModelMap, true, new ProductAdapter.OnAdapterInteractionListener() {
                     @Override
                     public void onItemClicked() {
                         customerSearchFragment = CustomerSearchFragment.newInstance(new CustomerSearchFragment.OnCustomerSearchFragmentInteractionListener() {
@@ -139,6 +141,11 @@ public class ProductsActivity extends AppCompatActivity {
                             }
                         });
                         customerSearchFragment.show(getSupportFragmentManager(), CustomerSearchFragment.tag);
+                    }
+
+                    @Override
+                    public void onProductSelected() {
+                        setOrderItemModelMap();
                     }
                 }));
             }
