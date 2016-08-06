@@ -197,15 +197,16 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
                 orderModelDB.open();
                 OrderModel orderModel = orderModelDB.getCustomersRow(customerModel.getCode());
                 orderModelDB.close();
-
+                String totalAmount;
                 OrderItemModel orderItemModel = null;
                 if (orderModel != null) {
+                    totalAmount = "" + (Double.parseDouble(orderModel.getAmount()) + Double.parseDouble(amount));
                     orderModelDB.open();
                     orderModelDB.updateRow(new OrderModel(
                             orderModel.getOrderId(),
                             orderModel.getDocDate(),
                             orderModel.getCustomerCode(),
-                            "" + (Double.parseDouble(orderModel.getAmount()) + Double.parseDouble(amount)),
+                            totalAmount,
                             orderModel.getReceivedAmount(),
                             orderModel.getDueDate(),
                             orderModel.getRemarks(),
@@ -224,6 +225,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
                     orderItemModelDB.insert(orderItemModel);
                     orderItemModelDB.close();
                 } else {
+                    totalAmount = amount;
                     orderModelDB.open();
                     Long orderId = orderModelDB.insert(new OrderModel(
                             Long.parseLong("0"),
@@ -250,6 +252,21 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
                         orderItemModelDB.close();
                     }
                 }
+
+                CustomerModel customerModelDB = new CustomerModel(context);
+                customerModelDB.open();
+                try {
+                    if (customerModel != null) {
+                        customerModel.setBalance("" +
+                                (Double.parseDouble(customerModel.getBalance()) +
+                                        Double.parseDouble(totalAmount))
+                        );
+                        customerModelDB.updateRow(customerModel);
+                    }
+                } catch (NumberFormatException e) {
+                    e.printStackTrace();
+                }
+                customerModelDB.close();
                 return orderItemModel;
             }
 

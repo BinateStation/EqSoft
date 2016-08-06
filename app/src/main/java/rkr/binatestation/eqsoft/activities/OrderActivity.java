@@ -1,8 +1,10 @@
 package rkr.binatestation.eqsoft.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.LinearLayoutManager;
@@ -24,11 +26,14 @@ import rkr.binatestation.eqsoft.models.CustomerModel;
 import rkr.binatestation.eqsoft.models.OrderItemModel;
 import rkr.binatestation.eqsoft.models.OrderModel;
 import rkr.binatestation.eqsoft.models.ProductModel;
+import rkr.binatestation.eqsoft.models.ReceiptModel;
 import rkr.binatestation.eqsoft.utils.Constants;
+import rkr.binatestation.eqsoft.utils.Util;
 
 public class OrderActivity extends AppCompatActivity {
     RecyclerView selectedProductsRecyclerView;
     TextView customerLedgerName, previousBalance;
+    TextInputEditText receivedAmount;
     AppCompatTextView totalAmount;
     CustomerModel customerModel;
     ProductAdapter productAdapter;
@@ -47,6 +52,7 @@ public class OrderActivity extends AppCompatActivity {
         customerLedgerName = (TextView) findViewById(R.id.AO_customerLedgerName);
         previousBalance = (TextView) findViewById(R.id.AO_previousBalance);
         totalAmount = (AppCompatTextView) findViewById(R.id.AO_totalAmount);
+        receivedAmount = (TextInputEditText) findViewById(R.id.AO_receivedAmount);
 
         selectedProductsRecyclerView.setLayoutManager(new LinearLayoutManager(selectedProductsRecyclerView.getContext()));
         setCustomerDetails();
@@ -123,6 +129,73 @@ public class OrderActivity extends AppCompatActivity {
         startActivity(new Intent(getBaseContext(), ProductsActivity.class)
                 .putExtra(Constants.KEY_CUSTOMER, customerModel));
     }
+
+    public void proceedOrder(View view) {
+        saveOrder(view.getContext(), receivedAmount.getText().toString().trim());
+    }
+
+    private void saveOrder(final Context context, final String receivedAmount) {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                OrderModel orderModelDB = new OrderModel(context);
+                orderModelDB.open();
+                OrderModel orderModel = orderModelDB.getCustomersRow(customerModel.getCode());
+                orderModelDB.close();
+
+                if (orderModel != null && receivedAmount.length() > 0) {
+                    orderModelDB.open();
+                    orderModelDB.updateRow(new OrderModel(
+                            orderModel.getOrderId(),
+                            orderModel.getDocDate(),
+                            orderModel.getCustomerCode(),
+                            orderModel.getAmount(),
+                            "" + (Double.parseDouble(orderModel.getReceivedAmount()) + Double.parseDouble(receivedAmount)),
+                            orderModel.getDueDate(),
+                            orderModel.getRemarks(),
+                            orderModel.getUserId()
+                    ));
+                    orderModelDB.close();
+                    CustomerModel customerModelDB = new CustomerModel(context);
+                    customerModelDB.open();
+                    try {
+                        if (customerModel != null) {
+                            customerModel.setBalance("" + (
+                                    Double.parseDouble(customerModel.getBalance()) -
+                                            (Double.parseDouble(orderModel.getReceivedAmount()) + Double.parseDouble(receivedAmount)))
+                            );
+                            customerModelDB.updateRow(customerModel);
+                        }
+                    } catch (NumberFormatException e) {
+                        e.printStackTrace();
+                    }
+                    customerModelDB.close();
+
+                    ReceiptModel receiptModelDB = new ReceiptModel(context);
+                    receiptModelDB.open();
+                    receiptModelDB.insert(new ReceiptModel(
+                            Long.parseLong("0"),
+                            Util.getCurrentDate("yyyy-MM-dd HH:mm:ss"),
+                            customerModel.getCode(),
+                            receivedAmount,
+                            Util.getStringFromSharedPreferences(context, Constants.KEY_USER_ID)
+                    ));
+                    receiptModelDB.close();
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+                startActivity(new Intent(
+                        getBaseContext(),
+                        HomeActivity.class
+                ).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
+            }
+        }.execute();
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();

@@ -119,6 +119,7 @@
                 android:theme="@style/AppTheme.EditText">
 
                 <android.support.design.widget.TextInputEditText
+                    android:id="@+id/AO_receivedAmount"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:focusableInTouchMode="true"
@@ -127,13 +128,14 @@
 
             </android.support.design.widget.TextInputLayout>
 
-            <android.support.v7.widget.AppCompatButton
+            <Button
                 style="@style/Base.TextAppearance.AppCompat.Widget.Button.Inverse"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
                 android:layout_margin="@dimen/fab_margin"
                 android:background="@drawable/bg_button_dark"
+                android:onClick="proceedOrder"
                 android:text="@string/proceed" />
         </android.support.v7.widget.LinearLayoutCompat>
 

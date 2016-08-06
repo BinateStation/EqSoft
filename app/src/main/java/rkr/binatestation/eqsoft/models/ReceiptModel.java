@@ -95,7 +95,6 @@ public class ReceiptModel implements Serializable {
 
     public void insert(ReceiptModel obj) {
         ContentValues values = new ContentValues();
-        values.put(ReceiptsTable.COLUMN_NAME_RECEIPT_ID, obj.getReceiptId());
         values.put(ReceiptsTable.COLUMN_NAME_RECEIPT_DATE, obj.getReceiptDateTime());
         values.put(ReceiptsTable.COLUMN_NAME_CUSTOMER_CODE, obj.getCustomerCode());
         values.put(ReceiptsTable.COLUMN_NAME_AMOUNT, obj.getAmount());
@@ -117,15 +116,13 @@ public class ReceiptModel implements Serializable {
         for (List<ReceiptModel> masterList : Lists.partition(productModelList, 500)) {
             String query = "REPLACE INTO '" +
                     ReceiptsTable.TABLE_NAME + "' ('" +
-                    ReceiptsTable.COLUMN_NAME_RECEIPT_ID + "','" +
                     ReceiptsTable.COLUMN_NAME_RECEIPT_DATE + "','" +
                     ReceiptsTable.COLUMN_NAME_CUSTOMER_CODE + "','" +
                     ReceiptsTable.COLUMN_NAME_AMOUNT + "','" +
                     ReceiptsTable.COLUMN_NAME_USER_ID + "') VALUES ('";
             for (int i = 0; i < masterList.size(); i++) {
                 ReceiptModel master = masterList.get(i);
-                query += master.getReceiptId() + "' , '" +
-                        master.getReceiptDateTime() + "' , '" +
+                query += master.getReceiptDateTime() + "' , '" +
                         master.getCustomerCode() + "' , '" +
                         master.getAmount() + "' , '" +
                         master.getUserId() + "')";
@@ -142,7 +139,6 @@ public class ReceiptModel implements Serializable {
     public void updateRow(ReceiptModel obj, String id) {
 
         ContentValues values = new ContentValues();
-        values.put(ReceiptsTable.COLUMN_NAME_RECEIPT_ID, obj.getReceiptId());
         values.put(ReceiptsTable.COLUMN_NAME_RECEIPT_DATE, obj.getReceiptDateTime());
         values.put(ReceiptsTable.COLUMN_NAME_CUSTOMER_CODE, obj.getCustomerCode());
         values.put(ReceiptsTable.COLUMN_NAME_AMOUNT, obj.getAmount());
@@ -153,7 +149,7 @@ public class ReceiptModel implements Serializable {
     }
 
     public void deleteRow(String receiptId) {
-        database.delete(ReceiptsTable.TABLE_NAME, ReceiptsTable.COLUMN_NAME_RECEIPT_ID + " = ?", new String[]{receiptId});
+        database.delete(ReceiptsTable.TABLE_NAME, ReceiptsTable._ID + " = ?", new String[]{receiptId});
         System.out.println("Categories Row deleted with id: " + receiptId);
     }
 
@@ -177,7 +173,7 @@ public class ReceiptModel implements Serializable {
 
 
     public ReceiptModel getRow(String receiptId) {
-        Cursor cursor = database.query(ReceiptsTable.TABLE_NAME, null, ReceiptsTable.COLUMN_NAME_RECEIPT_ID + " = ?", new String[]{receiptId}, null, null, null);
+        Cursor cursor = database.query(ReceiptsTable.TABLE_NAME, null, ReceiptsTable._ID + " = ?", new String[]{receiptId}, null, null, null);
         ReceiptModel productModel = null;
         if (cursor.moveToFirst()) {
             productModel = cursorToProductModel(cursor);
@@ -203,7 +199,7 @@ public class ReceiptModel implements Serializable {
     @Contract("_ -> !null")
     private ReceiptModel cursorToProductModel(Cursor cursor) {
         return new ReceiptModel(
-                cursor.getLong(ReceiptsTable.COLUMN_INDEX_RECEIPT_ID),
+                cursor.getLong(0),
                 cursor.getString(ReceiptsTable.COLUMN_INDEX_RECEIPT_DATE),
                 cursor.getString(ReceiptsTable.COLUMN_INDEX_CUSTOMER_CODE),
                 cursor.getString(ReceiptsTable.COLUMN_INDEX_AMOUNT),
@@ -213,23 +209,20 @@ public class ReceiptModel implements Serializable {
 
     protected class ReceiptsTable implements BaseColumns {
         public static final String TABLE_NAME = "receipts";
-        public static final String COLUMN_NAME_RECEIPT_ID = "receipt_id";
         public static final String COLUMN_NAME_RECEIPT_DATE = "receipt_date";
         public static final String COLUMN_NAME_CUSTOMER_CODE = "customer_code";
         public static final String COLUMN_NAME_AMOUNT = "amount";
         public static final String COLUMN_NAME_USER_ID = "user_id";
-        public static final int COLUMN_INDEX_RECEIPT_ID = 1;
-        public static final int COLUMN_INDEX_RECEIPT_DATE = 2;
-        public static final int COLUMN_INDEX_CUSTOMER_CODE = 3;
-        public static final int COLUMN_INDEX_AMOUNT = 4;
-        public static final int COLUMN_INDEX_USER_ID = 5;
+        public static final int COLUMN_INDEX_RECEIPT_DATE = 1;
+        public static final int COLUMN_INDEX_CUSTOMER_CODE = 2;
+        public static final int COLUMN_INDEX_AMOUNT = 3;
+        public static final int COLUMN_INDEX_USER_ID = 4;
 
         private static final String TEXT_TYPE = " TEXT";
         private static final String COMMA_SEP = ",";
         public static final String SQL_CREATE_USER_DETAILS =
                 "CREATE TABLE " + TABLE_NAME + " (" +
                         _ID + " INTEGER PRIMARY KEY," +
-                        COLUMN_NAME_RECEIPT_ID + TEXT_TYPE + COMMA_SEP +
                         COLUMN_NAME_RECEIPT_DATE + TEXT_TYPE + COMMA_SEP +
                         COLUMN_NAME_CUSTOMER_CODE + TEXT_TYPE + COMMA_SEP +
                         COLUMN_NAME_AMOUNT + TEXT_TYPE + COMMA_SEP +
