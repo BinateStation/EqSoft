@@ -13,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
@@ -27,6 +28,7 @@ import rkr.binatestation.eqsoft.models.OrderItemModel;
 import rkr.binatestation.eqsoft.models.OrderModel;
 import rkr.binatestation.eqsoft.models.ProductModel;
 import rkr.binatestation.eqsoft.models.ReceiptModel;
+import rkr.binatestation.eqsoft.network.DataSync;
 import rkr.binatestation.eqsoft.utils.Constants;
 import rkr.binatestation.eqsoft.utils.Util;
 
@@ -202,4 +204,28 @@ public class OrderActivity extends AppCompatActivity {
         inflater.inflate(R.menu.global_menu, menu);
         return true;
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.GM_usbSync:
+                new DataSync(getBaseContext()) {
+                    @Override
+                    protected void onPostExecute(Boolean aBoolean) {
+                        super.onPostExecute(aBoolean);
+                        if (aBoolean) {
+                            Util.showAlert(OrderActivity.this, "Alert", "Successfully synced", false);
+                        } else {
+                            Util.showAlert(OrderActivity.this, "Alert", "Some thing went wrong please contact administrator", false);
+                        }
+                    }
+                }.execute(0);
+                break;
+            case R.id.GM_logout:
+                Util.logoutAlert(OrderActivity.this, "Alert", "Are you sure you want to logout.?");
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
 }

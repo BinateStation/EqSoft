@@ -11,6 +11,7 @@ import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 
@@ -19,7 +20,9 @@ import java.util.List;
 import rkr.binatestation.eqsoft.R;
 import rkr.binatestation.eqsoft.adapters.CustomerAdapter;
 import rkr.binatestation.eqsoft.models.CustomerModel;
+import rkr.binatestation.eqsoft.network.DataSync;
 import rkr.binatestation.eqsoft.utils.Constants;
+import rkr.binatestation.eqsoft.utils.Util;
 
 public class CustomersActivity extends AppCompatActivity {
 
@@ -101,6 +104,29 @@ public class CustomersActivity extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.global_menu, menu);
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.GM_usbSync:
+                new DataSync(getBaseContext()) {
+                    @Override
+                    protected void onPostExecute(Boolean aBoolean) {
+                        super.onPostExecute(aBoolean);
+                        if (aBoolean) {
+                            Util.showAlert(CustomersActivity.this, "Alert", "Successfully synced", false);
+                        } else {
+                            Util.showAlert(CustomersActivity.this, "Alert", "Some thing went wrong please contact administrator", false);
+                        }
+                    }
+                }.execute(0);
+                break;
+            case R.id.GM_logout:
+                Util.logoutAlert(CustomersActivity.this, "Alert", "Are you sure you want to logout.?");
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
 }
