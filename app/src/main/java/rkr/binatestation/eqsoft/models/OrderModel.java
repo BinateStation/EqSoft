@@ -11,6 +11,9 @@ import android.util.Log;
 import com.google.common.collect.Lists;
 
 import org.jetbrains.annotations.Contract;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -24,7 +27,7 @@ import java.util.Map;
  */
 public class OrderModel implements Serializable {
 
-    Long orderId;
+    String orderId;
     String docDate;
     String customerCode;
     String amount;
@@ -37,7 +40,7 @@ public class OrderModel implements Serializable {
     private SQLiteDatabase database;
     private RKRsEqSoftSQLiteHelper dbHelper;
 
-    public OrderModel(Long orderId, String docDate, String customerCode, String amount, String receivedAmount, String dueDate, String remarks, String userId) {
+    public OrderModel(String orderId, String docDate, String customerCode, String amount, String receivedAmount, String dueDate, String remarks, String userId) {
         this.orderId = orderId;
         this.docDate = docDate;
         this.customerCode = customerCode;
@@ -53,11 +56,11 @@ public class OrderModel implements Serializable {
         dbHelper = new RKRsEqSoftSQLiteHelper(context);
     }
 
-    public Long getOrderId() {
+    public String getOrderId() {
         return orderId;
     }
 
-    public void setOrderId(Long orderId) {
+    public void setOrderId(String orderId) {
         this.orderId = orderId;
     }
 
@@ -216,6 +219,19 @@ public class OrderModel implements Serializable {
         return list;
     }
 
+    public JSONArray getAllRowsAsJSONArray() {
+        JSONArray jsonArray = new JSONArray();
+        Cursor cursor = database.query(OrdersTable.TABLE_NAME, null, null, null, null, null, null);
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            JSONObject obj = cursorToJSONObject(cursor);
+            jsonArray.put(obj);
+            cursor.moveToNext();
+        }
+        cursor.close();
+        return jsonArray;
+    }
+
     public Map<String, String> getTotalAmountReceivedAndPendingAmount() {
         Map<String, String> stringMap = new LinkedHashMap<>();
         Cursor cursor = database.query(OrdersTable.TABLE_NAME, null, null, null, null, null, null);
@@ -272,7 +288,7 @@ public class OrderModel implements Serializable {
     @Contract("_ -> !null")
     private OrderModel cursorToProductModel(Cursor cursor) {
         return new OrderModel(
-                cursor.getLong(0),
+                cursor.getString(0),
                 cursor.getString(OrdersTable.COLUMN_INDEX_DOC_DATE),
                 cursor.getString(OrdersTable.COLUMN_INDEX_CUSTOMER_CODE),
                 cursor.getString(OrdersTable.COLUMN_INDEX_AMOUNT),
@@ -281,6 +297,23 @@ public class OrderModel implements Serializable {
                 cursor.getString(OrdersTable.COLUMN_INDEX_REMARKS),
                 cursor.getString(OrdersTable.COLUMN_INDEX_USER_ID)
         );
+    }
+
+    private JSONObject cursorToJSONObject(Cursor cursor) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("order_id", cursor.getString(0));
+            jsonObject.put("doc_date", cursor.getString(OrdersTable.COLUMN_INDEX_DOC_DATE));
+            jsonObject.put("customer_code", cursor.getString(OrdersTable.COLUMN_INDEX_CUSTOMER_CODE));
+            jsonObject.put("amount", cursor.getString(OrdersTable.COLUMN_INDEX_AMOUNT));
+            jsonObject.put("received_amount", cursor.getString(OrdersTable.COLUMN_INDEX_RECEIVED_AMOUNT));
+            jsonObject.put("due_date", cursor.getString(OrdersTable.COLUMN_INDEX_DUE_DATE));
+            jsonObject.put("remarks", cursor.getString(OrdersTable.COLUMN_INDEX_REMARKS));
+            jsonObject.put("user_id", cursor.getString(OrdersTable.COLUMN_INDEX_USER_ID));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return jsonObject;
     }
 
     protected class OrdersTable implements BaseColumns {

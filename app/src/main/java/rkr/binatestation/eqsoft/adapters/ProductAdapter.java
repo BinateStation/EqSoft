@@ -228,7 +228,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
                     totalAmount = amount;
                     orderModelDB.open();
                     Long orderId = orderModelDB.insert(new OrderModel(
-                            Long.parseLong("0"),
+                            "0",
                             Util.getCurrentDate("yyyy-MM-dd HH:mm:ss"),
                             customerModel.getCode(),
                             amount,
@@ -240,7 +240,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
                     orderModelDB.close();
                     if (orderId != -1) {
                         orderItemModel = new OrderItemModel(
-                                orderId,
+                                "" + orderId,
                                 item.getCode(),
                                 item.getSellingRate(),
                                 quantity,

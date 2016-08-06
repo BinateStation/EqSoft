@@ -39,7 +39,9 @@
         <activity
             android:name=".activities.ReceiptsActivity"
             android:label="@string/receipts" />
-        <activity android:name=".activities.SettingsActivity"></activity>
+        <activity
+            android:name=".activities.SettingsActivity"
+            android:label="@string/settings" />
     </application>
 
 </manifest>

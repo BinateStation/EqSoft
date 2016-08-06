@@ -11,6 +11,9 @@ import android.util.Log;
 import com.google.common.collect.Lists;
 
 import org.jetbrains.annotations.Contract;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -275,9 +278,22 @@ public class CustomerModel implements Serializable {
         return list;
     }
 
+    public JSONArray getAllRowsAsJSONArray() {
+        JSONArray jsonArray = new JSONArray();
+        Cursor cursor = database.query(CustomersTable.TABLE_NAME, null, null, null, null, null, null);
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            JSONObject obj = cursorToJSONObject(cursor);
+            jsonArray.put(obj);
+            cursor.moveToNext();
+        }
+        cursor.close();
+        return jsonArray;
+    }
+
     public List<CustomerModel> getAllRows(String query, int sortType) {
         List<CustomerModel> list = new ArrayList<>();
-        String sortBy = null;
+        String sortBy;
         switch (sortType) {
             case 1:
                 sortBy = CustomersTable.COLUMN_NAME_ROUTE;
@@ -338,6 +354,27 @@ public class CustomerModel implements Serializable {
                 cursor.getString(CustomersTable.COLUMN_INDEX_ROUTE),
                 cursor.getString(CustomersTable.COLUMN_INDEX_ROUTE_INDEX)
         );
+    }
+
+    private JSONObject cursorToJSONObject(Cursor cursor) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("address1", cursor.getString(CustomersTable.COLUMN_INDEX_ADDRESS_1));
+            jsonObject.put("address2", cursor.getString(CustomersTable.COLUMN_INDEX_ADDRESS_2));
+            jsonObject.put("address3", cursor.getString(CustomersTable.COLUMN_INDEX_ADDRESS_3));
+            jsonObject.put("balance", cursor.getString(CustomersTable.COLUMN_INDEX_BALANCE));
+            jsonObject.put("code", cursor.getString(CustomersTable.COLUMN_INDEX_CODE));
+            jsonObject.put("email", cursor.getString(CustomersTable.COLUMN_INDEX_EMAIL));
+            jsonObject.put("ledger_name", cursor.getString(CustomersTable.COLUMN_INDEX_LEDGER_NAME));
+            jsonObject.put("mobile", cursor.getString(CustomersTable.COLUMN_INDEX_MOBILE));
+            jsonObject.put("name", cursor.getString(CustomersTable.COLUMN_INDEX_NAME));
+            jsonObject.put("phone", cursor.getString(CustomersTable.COLUMN_INDEX_PHONE));
+            jsonObject.put("route", cursor.getString(CustomersTable.COLUMN_INDEX_ROUTE));
+            jsonObject.put("route_index", cursor.getString(CustomersTable.COLUMN_INDEX_ROUTE_INDEX));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return jsonObject;
     }
 
     protected class CustomersTable implements BaseColumns {

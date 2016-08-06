@@ -11,6 +11,9 @@ import android.util.Log;
 import com.google.common.collect.Lists;
 
 import org.jetbrains.annotations.Contract;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -22,7 +25,7 @@ import java.util.List;
  */
 public class ReceiptModel implements Serializable {
 
-    Long receiptId;
+    String receiptId;
     String receiptDateTime;
     String customerCode;
     String amount;
@@ -32,7 +35,7 @@ public class ReceiptModel implements Serializable {
     private SQLiteDatabase database;
     private RKRsEqSoftSQLiteHelper dbHelper;
 
-    public ReceiptModel(Long receiptId, String receiptDateTime, String customerCode, String amount, String userId) {
+    public ReceiptModel(String receiptId, String receiptDateTime, String customerCode, String amount, String userId) {
         this.receiptId = receiptId;
         this.receiptDateTime = receiptDateTime;
         this.customerCode = customerCode;
@@ -45,11 +48,11 @@ public class ReceiptModel implements Serializable {
         dbHelper = new RKRsEqSoftSQLiteHelper(context);
     }
 
-    public Long getReceiptId() {
+    public String getReceiptId() {
         return receiptId;
     }
 
-    public void setReceiptId(Long receiptId) {
+    public void setReceiptId(String receiptId) {
         this.receiptId = receiptId;
     }
 
@@ -171,6 +174,19 @@ public class ReceiptModel implements Serializable {
         return list;
     }
 
+    public JSONArray getAllRowsAsJSONArray() {
+        JSONArray jsonArray = new JSONArray();
+        Cursor cursor = database.query(ReceiptsTable.TABLE_NAME, null, null, null, null, null, null);
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            JSONObject obj = cursorToJSONObject(cursor);
+            jsonArray.put(obj);
+            cursor.moveToNext();
+        }
+        cursor.close();
+        return jsonArray;
+    }
+
 
     public ReceiptModel getRow(String receiptId) {
         Cursor cursor = database.query(ReceiptsTable.TABLE_NAME, null, ReceiptsTable._ID + " = ?", new String[]{receiptId}, null, null, null);
@@ -199,12 +215,26 @@ public class ReceiptModel implements Serializable {
     @Contract("_ -> !null")
     private ReceiptModel cursorToProductModel(Cursor cursor) {
         return new ReceiptModel(
-                cursor.getLong(0),
+                cursor.getString(0),
                 cursor.getString(ReceiptsTable.COLUMN_INDEX_RECEIPT_DATE),
                 cursor.getString(ReceiptsTable.COLUMN_INDEX_CUSTOMER_CODE),
                 cursor.getString(ReceiptsTable.COLUMN_INDEX_AMOUNT),
                 cursor.getString(ReceiptsTable.COLUMN_INDEX_USER_ID)
         );
+    }
+
+    private JSONObject cursorToJSONObject(Cursor cursor) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("receipt_id", cursor.getString(0));
+            jsonObject.put("receipt_date", cursor.getString(ReceiptsTable.COLUMN_INDEX_RECEIPT_DATE));
+            jsonObject.put("customer_code", cursor.getString(ReceiptsTable.COLUMN_INDEX_CUSTOMER_CODE));
+            jsonObject.put("amount", cursor.getString(ReceiptsTable.COLUMN_INDEX_AMOUNT));
+            jsonObject.put("user_id", cursor.getString(ReceiptsTable.COLUMN_INDEX_USER_ID));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return jsonObject;
     }
 
     protected class ReceiptsTable implements BaseColumns {

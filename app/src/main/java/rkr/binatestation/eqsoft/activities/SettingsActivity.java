@@ -1,5 +1,6 @@
 package rkr.binatestation.eqsoft.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatRadioButton;
@@ -8,7 +9,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import rkr.binatestation.eqsoft.R;
-import rkr.binatestation.eqsoft.network.DataSyncUSB;
+import rkr.binatestation.eqsoft.network.DataSync;
 import rkr.binatestation.eqsoft.utils.Constants;
 
 public class SettingsActivity extends AppCompatActivity {
@@ -30,16 +31,18 @@ public class SettingsActivity extends AppCompatActivity {
     public void actionDone(View view) {
         if (syncByUSB.isChecked()) {
             getSharedPreferences(getPackageName(), MODE_PRIVATE).edit().putString(Constants.KEY_SYNC_TYPE, "syncByUsb").apply();
-            new DataSyncUSB() {
+            new DataSync(view.getContext()) {
                 @Override
                 protected void onPostExecute(Boolean aBoolean) {
                     super.onPostExecute(aBoolean);
-                    onBackPressed();
+                    startActivity(new Intent(getBaseContext(), LoginActivity.class));
+                    finish();
                 }
-            }.execute(view.getContext());
+            }.execute(2);
         } else {
             getSharedPreferences(getPackageName(), MODE_PRIVATE).edit().putString(Constants.KEY_SYNC_TYPE, "syncByWeb").apply();
-            onBackPressed();
+            startActivity(new Intent(getBaseContext(), LoginActivity.class));
+            finish();
         }
     }
 

@@ -95,7 +95,7 @@ public class ReceiptsActivity extends AppCompatActivity {
                     ReceiptModel receiptModelDB = new ReceiptModel(context);
                     receiptModelDB.open();
                     receiptModelDB.insert(new ReceiptModel(
-                            Long.parseLong("0"),
+                            "0",
                             Util.getCurrentDate("yyyy-MM-dd HH:mm:ss"),
                             customerModel.getCode(),
                             receivedAmount,

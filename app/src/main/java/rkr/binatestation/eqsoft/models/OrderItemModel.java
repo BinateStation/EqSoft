@@ -11,6 +11,9 @@ import android.util.Log;
 import com.google.common.collect.Lists;
 
 import org.jetbrains.annotations.Contract;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -24,7 +27,7 @@ import java.util.Map;
  */
 public class OrderItemModel implements Serializable {
 
-    Long orderId;
+    String orderId;
     String productCode;
     String rate;
     String quantity;
@@ -34,7 +37,7 @@ public class OrderItemModel implements Serializable {
     private SQLiteDatabase database;
     private RKRsEqSoftSQLiteHelper dbHelper;
 
-    public OrderItemModel(Long orderId, String productCode, String rate, String quantity, String amount) {
+    public OrderItemModel(String orderId, String productCode, String rate, String quantity, String amount) {
         this.orderId = orderId;
         this.productCode = productCode;
         this.rate = rate;
@@ -47,11 +50,11 @@ public class OrderItemModel implements Serializable {
         dbHelper = new RKRsEqSoftSQLiteHelper(context);
     }
 
-    public Long getOrderId() {
+    public String getOrderId() {
         return orderId;
     }
 
-    public void setOrderId(Long orderId) {
+    public void setOrderId(String orderId) {
         this.orderId = orderId;
     }
 
@@ -183,9 +186,22 @@ public class OrderItemModel implements Serializable {
         return list;
     }
 
-    public Map<String, OrderItemModel> getAllRows(Long orderId) {
+    public JSONArray getAllRowsAsJSONArray() {
+        JSONArray jsonArray = new JSONArray();
+        Cursor cursor = database.query(OrderItemsTable.TABLE_NAME, null, null, null, null, null, null);
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            JSONObject obj = cursorToJSONObject(cursor);
+            jsonArray.put(obj);
+            cursor.moveToNext();
+        }
+        cursor.close();
+        return jsonArray;
+    }
+
+    public Map<String, OrderItemModel> getAllRows(String orderId) {
         Map<String, OrderItemModel> list = new LinkedHashMap<>();
-        Cursor cursor = database.query(OrderItemsTable.TABLE_NAME, null, OrderItemsTable.COLUMN_NAME_ORDER_ID + " = ?", new String[]{"" + orderId}, null, null, null);
+        Cursor cursor = database.query(OrderItemsTable.TABLE_NAME, null, OrderItemsTable.COLUMN_NAME_ORDER_ID + " = ?", new String[]{orderId}, null, null, null);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             OrderItemModel obj = cursorToProductModel(cursor);
@@ -197,10 +213,10 @@ public class OrderItemModel implements Serializable {
     }
 
 
-    public OrderItemModel getRow(String productCode, Long orderId) {
+    public OrderItemModel getRow(String productCode, String orderId) {
         Cursor cursor = database.query(OrderItemsTable.TABLE_NAME, null,
                 OrderItemsTable.COLUMN_NAME_PRODUCT_CODE + " = ? and " +
-                        OrderItemsTable.COLUMN_NAME_ORDER_ID + " = ? ", new String[]{productCode, "" + orderId}, null, null, null);
+                        OrderItemsTable.COLUMN_NAME_ORDER_ID + " = ? ", new String[]{productCode, orderId}, null, null, null);
         OrderItemModel productModel = null;
         if (cursor.moveToFirst()) {
             productModel = cursorToProductModel(cursor);
@@ -212,12 +228,27 @@ public class OrderItemModel implements Serializable {
     @Contract("_ -> !null")
     private OrderItemModel cursorToProductModel(Cursor cursor) {
         return new OrderItemModel(
-                cursor.getLong(OrderItemsTable.COLUMN_INDEX_ORDER_ID),
+                cursor.getString(OrderItemsTable.COLUMN_INDEX_ORDER_ID),
                 cursor.getString(OrderItemsTable.COLUMN_INDEX_PRODUCT_CODE),
                 cursor.getString(OrderItemsTable.COLUMN_INDEX_RATE),
                 cursor.getString(OrderItemsTable.COLUMN_INDEX_QUANTITY),
                 cursor.getString(OrderItemsTable.COLUMN_INDEX_AMOUNT)
         );
+    }
+
+    private JSONObject cursorToJSONObject(Cursor cursor) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("order_item_id", cursor.getString(0));
+            jsonObject.put("order_id", cursor.getString(OrderItemsTable.COLUMN_INDEX_ORDER_ID));
+            jsonObject.put("product_code", cursor.getString(OrderItemsTable.COLUMN_INDEX_PRODUCT_CODE));
+            jsonObject.put("rate", cursor.getString(OrderItemsTable.COLUMN_INDEX_RATE));
+            jsonObject.put("quantity", cursor.getString(OrderItemsTable.COLUMN_INDEX_QUANTITY));
+            jsonObject.put("amount", cursor.getString(OrderItemsTable.COLUMN_INDEX_AMOUNT));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return jsonObject;
     }
 
     protected class OrderItemsTable implements BaseColumns {

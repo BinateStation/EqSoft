@@ -20,12 +20,14 @@ import rkr.binatestation.eqsoft.models.CustomerModel;
 import rkr.binatestation.eqsoft.models.OrderModel;
 import rkr.binatestation.eqsoft.models.ProductModel;
 import rkr.binatestation.eqsoft.models.ReceiptModel;
+import rkr.binatestation.eqsoft.network.DataSync;
 import rkr.binatestation.eqsoft.utils.Constants;
 
 public class HomeActivity extends AppCompatActivity {
 
     TextView totalSales, amountReceived, amountPending, noOfReceipts, noOfProducts, noOfCustomers;
     CustomerSearchFragment customerSearchFragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -123,7 +125,14 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-
+            case R.id.GM_usbSync:
+                new DataSync(getBaseContext()) {
+                    @Override
+                    protected void onPostExecute(Boolean aBoolean) {
+                        super.onPostExecute(aBoolean);
+                    }
+                }.execute(0);
+                break;
         }
         return super.onOptionsItemSelected(item);
     }

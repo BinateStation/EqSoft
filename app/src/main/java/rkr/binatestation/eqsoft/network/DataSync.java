@@ -4,34 +4,100 @@ import android.content.Context;
 import android.os.AsyncTask;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import rkr.binatestation.eqsoft.models.CustomerModel;
+import rkr.binatestation.eqsoft.models.OrderItemModel;
+import rkr.binatestation.eqsoft.models.OrderModel;
 import rkr.binatestation.eqsoft.models.ProductModel;
+import rkr.binatestation.eqsoft.models.ReceiptModel;
 import rkr.binatestation.eqsoft.models.UserDetailsModel;
 import rkr.binatestation.eqsoft.utils.Util;
 
 /**
  * Created by RKR on 2/8/2016.
- * DataSyncUSB.
+ * DataSync.
  */
-public class DataSyncUSB extends AsyncTask<Context, Integer, Boolean> {
+public class DataSync extends AsyncTask<Integer, Integer, Boolean> {
+    Context context;
+
+    public DataSync(Context context) {
+        this.context = context;
+    }
+
     @Override
-    protected Boolean doInBackground(Context... contexts) {
-        readFromFile(contexts[0]);
+    protected Boolean doInBackground(Integer... integers) {
+        switch (integers[0]) {
+            case 1:
+                writeToFile(getCompleteJsonStringFromDB());
+                break;
+            case 2:
+                readFromFile(context);
+                break;
+            default:
+                writeToFile(getCompleteJsonStringFromDB());
+                readFromFile(context);
+                break;
+        }
         return null;
+    }
+
+    private String getCompleteJsonStringFromDB() {
+        CustomerModel customerModelDB = new CustomerModel(context);
+        customerModelDB.open();
+        JSONArray customersJsonArray = customerModelDB.getAllRowsAsJSONArray();
+        customerModelDB.close();
+
+        OrderModel orderModelDB = new OrderModel(context);
+        orderModelDB.open();
+        JSONArray ordersJsonArray = orderModelDB.getAllRowsAsJSONArray();
+        orderModelDB.close();
+
+        OrderItemModel orderItemModelDB = new OrderItemModel(context);
+        orderItemModelDB.open();
+        JSONArray orderItemsJsonArray = orderItemModelDB.getAllRowsAsJSONArray();
+        orderItemModelDB.close();
+
+        ReceiptModel receiptModelDB = new ReceiptModel(context);
+        receiptModelDB.open();
+        JSONArray receiptsJsonArray = receiptModelDB.getAllRowsAsJSONArray();
+        receiptModelDB.close();
+
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("customers", customersJsonArray);
+            jsonObject.put("orders", ordersJsonArray);
+            jsonObject.put("order_items", orderItemsJsonArray);
+            jsonObject.put("receipts", receiptsJsonArray);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return jsonObject.toString();
+    }
+
+    private void writeToFile(String data) {
+        FileOutputStream outputStream;
+        try {
+            outputStream = new FileOutputStream(new File(Util.getDatabasePath() + "output.json"));
+            outputStream.write(data.getBytes());
+            outputStream.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void readFromFile(Context context) {
         try {
-            File jsonFile = new File(Util.getDatabasePath() + "sample data.json");
+            File jsonFile = new File(Util.getDatabasePath() + "input.json");
             if (jsonFile.exists()) {
                 //Read text from file
                 StringBuilder text = new StringBuilder();
@@ -75,6 +141,7 @@ public class DataSyncUSB extends AsyncTask<Context, Integer, Boolean> {
 
                 CustomerModel customerModelDB = new CustomerModel(context);
                 customerModelDB.open();
+                customerModelDB.deleteAll();
                 customerModelDB.insertMultipleRows(customerModelList);
                 customerModelDB.close();
 
@@ -98,6 +165,7 @@ public class DataSyncUSB extends AsyncTask<Context, Integer, Boolean> {
 
                 ProductModel productModelDB = new ProductModel(context);
                 productModelDB.open();
+                productModelDB.deleteAll();
                 productModelDB.insertMultipleRows(productModelList);
                 productModelDB.close();
 
