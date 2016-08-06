@@ -1,6 +1,7 @@
 package rkr.binatestation.eqsoft.adapters;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatDialog;
 import android.support.v7.widget.AppCompatButton;
@@ -15,12 +16,17 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import rkr.binatestation.eqsoft.R;
 import rkr.binatestation.eqsoft.models.CustomerModel;
+import rkr.binatestation.eqsoft.models.OrderItemModel;
+import rkr.binatestation.eqsoft.models.OrderModel;
 import rkr.binatestation.eqsoft.models.ProductModel;
+import rkr.binatestation.eqsoft.utils.Util;
 
 /**
  * Created by RKR on 20/7/2016.
@@ -29,6 +35,7 @@ import rkr.binatestation.eqsoft.models.ProductModel;
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView> {
     List<ProductModel> productModelList;
     CustomerModel customerModel;
+    Map<String, OrderItemModel> orderItemModelMap = new LinkedHashMap<>();
     OnAdapterInteractionListener onAdapterInteractionListener;
 
     public ProductAdapter(List<ProductModel> productModelList, CustomerModel customerModel, OnAdapterInteractionListener onAdapterInteractionListener) {
@@ -39,6 +46,10 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
 
     public void setCustomerModel(CustomerModel customerModel) {
         this.customerModel = customerModel;
+    }
+
+    public void setOrderItemModelMap(Map<String, OrderItemModel> orderItemModelMap) {
+        this.orderItemModelMap = orderItemModelMap;
     }
 
     @Override
@@ -54,7 +65,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
             @Override
             public void onClick(View view) {
                 if (customerModel != null) {
-                    popupEnterQuantity(view.getContext(), getItem(holder.getAdapterPosition()));
+                    popupEnterQuantity(view.getContext(), getItem(holder.getAdapterPosition()), holder.getAdapterPosition());
                 } else {
                     if (onAdapterInteractionListener != null) {
                         onAdapterInteractionListener.onItemClicked();
@@ -67,6 +78,11 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
         holder.productCode.setText(getItem(position).getCode());
         holder.stock.setText(getItem(position).getStock());
         holder.sellingPrice.setText(getItem(position).getSellingRate());
+        if (orderItemModelMap.containsKey(getItem(position).getCode())) {
+            holder.selectedView.setVisibility(View.VISIBLE);
+        } else {
+            holder.selectedView.setVisibility(View.GONE);
+        }
     }
 
     private ProductModel getItem(Integer position) {
@@ -78,7 +94,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
         return productModelList.size();
     }
 
-    private void popupEnterQuantity(Context context, final ProductModel item) {
+    private void popupEnterQuantity(Context context, final ProductModel item, final int adapterPosition) {
         final AppCompatDialog appCompatDialog = new AppCompatDialog(context);
         appCompatDialog.setContentView(R.layout.popup_enter_product_quantity);
 
@@ -96,7 +112,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
         TextView productCode = (TextView) appCompatDialog.findViewById(R.id.PEPQ_productCode);
         TextView stock = (TextView) appCompatDialog.findViewById(R.id.PEPQ_stock);
         TextView sellingPrice = (TextView) appCompatDialog.findViewById(R.id.PEPQ_sellingPrice);
-        TextInputEditText quantity = (TextInputEditText) appCompatDialog.findViewById(R.id.PEPQ_quantity);
+        final TextInputEditText quantity = (TextInputEditText) appCompatDialog.findViewById(R.id.PEPQ_quantity);
         final AppCompatTextView amount = (AppCompatTextView) appCompatDialog.findViewById(R.id.PEPQ_amount);
         AppCompatButton okay = (AppCompatButton) appCompatDialog.findViewById(R.id.PEPQ_ok);
 
@@ -118,6 +134,10 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
                     sellingPrice.setText(item.getSellingRate());
                 }
                 if (quantity != null) {
+                    if (orderItemModelMap.containsKey(item.getCode())) {
+                        quantity.setText(orderItemModelMap.get(item.getCode()).getQuantity());
+                        quantity.setSelection(quantity.getText().length());
+                    }
                     quantity.addTextChangedListener(new TextWatcher() {
                         @Override
                         public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -143,7 +163,16 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
                     okay.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            appCompatDialog.dismiss();
+                            if (quantity != null && amount != null) {
+                                addOrder(
+                                        view.getContext(),
+                                        item,
+                                        quantity.getText().toString().trim(),
+                                        amount.getText().toString().trim(),
+                                        appCompatDialog,
+                                        adapterPosition
+                                );
+                            }
                         }
                     });
                 }
@@ -152,6 +181,82 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
             e.printStackTrace();
         }
         appCompatDialog.show();
+    }
+
+    private void addOrder(final Context context, final ProductModel item, final String quantity, final String amount, final AppCompatDialog appCompatDialog, final int adapterPosition) {
+        new AsyncTask<Void, Void, OrderItemModel>() {
+            @Override
+            protected OrderItemModel doInBackground(Void... voids) {
+                OrderModel orderModelDB = new OrderModel(context);
+                orderModelDB.open();
+                OrderModel orderModel = orderModelDB.getCustomersRow(customerModel.getCode());
+                orderModelDB.close();
+
+                OrderItemModel orderItemModel = null;
+                if (orderModel != null) {
+                    orderModelDB.open();
+                    orderModelDB.updateRow(new OrderModel(
+                            orderModel.getOrderId(),
+                            orderModel.getDocDate(),
+                            orderModel.getCustomerCode(),
+                            "" + (Double.parseDouble(orderModel.getAmount()) + Double.parseDouble(amount)),
+                            orderModel.getReceivedAmount(),
+                            orderModel.getDueDate(),
+                            orderModel.getRemarks()
+                    ));
+                    orderModelDB.close();
+                    orderItemModel = new OrderItemModel(
+                            orderModel.getOrderId(),
+                            item.getCode(),
+                            item.getSellingRate(),
+                            quantity,
+                            amount
+                    );
+                    OrderItemModel orderItemModelDB = new OrderItemModel(context);
+                    orderItemModelDB.open();
+                    orderItemModelDB.insert(orderItemModel);
+                    orderItemModelDB.close();
+                } else {
+                    orderModelDB.open();
+                    Long orderId = orderModelDB.insert(new OrderModel(
+                            Long.parseLong("0"),
+                            Util.getCurrentDate("yyyy-MM-dd HH:mm:ss"),
+                            customerModel.getCode(),
+                            amount,
+                            "0",
+                            "",
+                            ""
+                    ));
+                    orderModelDB.close();
+                    if (orderId != -1) {
+                        orderItemModel = new OrderItemModel(
+                                orderId,
+                                item.getCode(),
+                                item.getSellingRate(),
+                                quantity,
+                                amount
+                        );
+                        OrderItemModel orderItemModelDB = new OrderItemModel(context);
+                        orderItemModelDB.open();
+                        orderItemModelDB.insert(orderItemModel);
+                        orderItemModelDB.close();
+                    }
+                }
+                return orderItemModel;
+            }
+
+            @Override
+            protected void onPostExecute(OrderItemModel orderItemModel) {
+                super.onPostExecute(orderItemModel);
+                if (appCompatDialog != null && appCompatDialog.isShowing()) {
+                    appCompatDialog.dismiss();
+                }
+                if (orderItemModel != null) {
+                    orderItemModelMap.put(orderItemModel.getProductCode(), orderItemModel);
+                    notifyItemChanged(adapterPosition);
+                }
+            }
+        }.execute();
     }
 
     public interface OnAdapterInteractionListener {

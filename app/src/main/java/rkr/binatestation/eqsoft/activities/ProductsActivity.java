@@ -13,12 +13,16 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.widget.TextView;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import rkr.binatestation.eqsoft.R;
 import rkr.binatestation.eqsoft.adapters.ProductAdapter;
 import rkr.binatestation.eqsoft.fragments.CustomerSearchFragment;
 import rkr.binatestation.eqsoft.models.CustomerModel;
+import rkr.binatestation.eqsoft.models.OrderItemModel;
+import rkr.binatestation.eqsoft.models.OrderModel;
 import rkr.binatestation.eqsoft.models.ProductModel;
 import rkr.binatestation.eqsoft.utils.Constants;
 
@@ -29,6 +33,7 @@ public class ProductsActivity extends AppCompatActivity {
     CustomerModel customerModel;
     ProductAdapter productAdapter;
     CustomerSearchFragment customerSearchFragment;
+    Map<String, OrderItemModel> orderItemModelMap = new LinkedHashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +72,40 @@ public class ProductsActivity extends AppCompatActivity {
     public void setCustomerName() {
         if (customerModel != null) {
             customerName.setText(customerModel.getLedgerName());
+            setOrderItemModelMap();
         }
+    }
+
+    private void setOrderItemModelMap() {
+        new AsyncTask<Void, Void, OrderModel>() {
+            @Override
+            protected OrderModel doInBackground(Void... voids) {
+                OrderModel orderModelDB = new OrderModel(getBaseContext());
+                orderModelDB.open();
+                OrderModel orderModel = orderModelDB.getCustomersRow(customerModel.getCode());
+                orderModelDB.close();
+
+                if (orderModel != null) {
+                    OrderItemModel orderItemModelDB = new OrderItemModel(getBaseContext());
+                    orderItemModelDB.open();
+                    orderItemModelMap = orderItemModelDB.getAllRows(orderModel.getOrderId());
+                    orderItemModelDB.close();
+                }
+                return orderModel;
+            }
+
+            @Override
+            protected void onPostExecute(OrderModel orderModel) {
+                super.onPostExecute(orderModel);
+                if (orderModel != null) {
+                    totalAmount.setText(orderModel.getAmount());
+                }
+                if (productAdapter != null) {
+                    productAdapter.setOrderItemModelMap(orderItemModelMap);
+                    productAdapter.notifyDataSetChanged();
+                }
+            }
+        }.execute();
     }
 
     private void getProducts(final String query) {
@@ -101,7 +139,6 @@ public class ProductsActivity extends AppCompatActivity {
                             }
                         });
                         customerSearchFragment.show(getSupportFragmentManager(), CustomerSearchFragment.tag);
-
                     }
                 }));
             }

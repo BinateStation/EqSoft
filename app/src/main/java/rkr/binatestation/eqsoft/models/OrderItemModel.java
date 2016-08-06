@@ -14,7 +14,9 @@ import org.jetbrains.annotations.Contract;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by RKR on 1/8/2016.
@@ -94,17 +96,21 @@ public class OrderItemModel implements Serializable {
     }
 
     public void insert(OrderItemModel obj) {
-        ContentValues values = new ContentValues();
-        values.put(OrderItemsTable.COLUMN_NAME_ORDER_ID, obj.getOrderId());
-        values.put(OrderItemsTable.COLUMN_NAME_PRODUCT_CODE, obj.getProductCode());
-        values.put(OrderItemsTable.COLUMN_NAME_RATE, obj.getRate());
-        values.put(OrderItemsTable.COLUMN_NAME_QUANTITY, obj.getQuantity());
-        values.put(OrderItemsTable.COLUMN_NAME_AMOUNT, obj.getAmount());
+        if (getRow(obj.getProductCode()) == null) {
+            ContentValues values = new ContentValues();
+            values.put(OrderItemsTable.COLUMN_NAME_ORDER_ID, obj.getOrderId());
+            values.put(OrderItemsTable.COLUMN_NAME_PRODUCT_CODE, obj.getProductCode());
+            values.put(OrderItemsTable.COLUMN_NAME_RATE, obj.getRate());
+            values.put(OrderItemsTable.COLUMN_NAME_QUANTITY, obj.getQuantity());
+            values.put(OrderItemsTable.COLUMN_NAME_AMOUNT, obj.getAmount());
 
-        long insertId;
-        insertId = database.insert(OrderItemsTable.TABLE_NAME, null, values);
+            long insertId;
+            insertId = database.insert(OrderItemsTable.TABLE_NAME, null, values);
 
-        Log.i("InsertID", "Categories : " + insertId);
+            Log.i("InsertID", "Categories : " + insertId);
+        } else {
+            updateRow(obj);
+        }
     }
 
     /**
@@ -139,7 +145,7 @@ public class OrderItemModel implements Serializable {
         }
     }
 
-    public void updateRow(OrderItemModel obj, String id) {
+    public void updateRow(OrderItemModel obj) {
 
         ContentValues values = new ContentValues();
         values.put(OrderItemsTable.COLUMN_NAME_ORDER_ID, obj.getOrderId());
@@ -148,8 +154,8 @@ public class OrderItemModel implements Serializable {
         values.put(OrderItemsTable.COLUMN_NAME_QUANTITY, obj.getQuantity());
         values.put(OrderItemsTable.COLUMN_NAME_AMOUNT, obj.getAmount());
 
-        database.update(OrderItemsTable.TABLE_NAME, values, OrderItemsTable._ID + " = ?", new String[]{id});
-        System.out.println("Categories Row Updated with id: " + id);
+        database.update(OrderItemsTable.TABLE_NAME, values, OrderItemsTable.COLUMN_NAME_PRODUCT_CODE + " = ?", new String[]{obj.getProductCode()});
+        System.out.println("Categories Row Updated with id: " + obj.getProductCode());
     }
 
     public void deleteRow(String id) {
@@ -175,9 +181,22 @@ public class OrderItemModel implements Serializable {
         return list;
     }
 
+    public Map<String, OrderItemModel> getAllRows(Long orderId) {
+        Map<String, OrderItemModel> list = new LinkedHashMap<>();
+        Cursor cursor = database.query(OrderItemsTable.TABLE_NAME, null, OrderItemsTable.COLUMN_NAME_ORDER_ID + " = ?", new String[]{"" + orderId}, null, null, null);
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            OrderItemModel obj = cursorToProductModel(cursor);
+            list.put(obj.getProductCode(), obj);
+            cursor.moveToNext();
+        }
+        cursor.close();
+        return list;
+    }
 
-    public OrderItemModel getRow(String id) {
-        Cursor cursor = database.query(OrderItemsTable.TABLE_NAME, null, OrderItemsTable._ID + " = ?", new String[]{id}, null, null, null);
+
+    public OrderItemModel getRow(String productCode) {
+        Cursor cursor = database.query(OrderItemsTable.TABLE_NAME, null, OrderItemsTable.COLUMN_NAME_PRODUCT_CODE + " = ?", new String[]{productCode}, null, null, null);
         OrderItemModel productModel = null;
         if (cursor.moveToFirst()) {
             productModel = cursorToProductModel(cursor);

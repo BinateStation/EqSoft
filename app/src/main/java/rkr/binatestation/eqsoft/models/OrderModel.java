@@ -115,7 +115,7 @@ public class OrderModel implements Serializable {
         dbHelper.close();
     }
 
-    public void insert(OrderModel obj) {
+    public Long insert(OrderModel obj) {
         ContentValues values = new ContentValues();
         values.put(OrdersTable.COLUMN_NAME_DOC_DATE, obj.getDocDate());
         values.put(OrdersTable.COLUMN_NAME_CUSTOMER_CODE, obj.getCustomerCode());
@@ -128,6 +128,7 @@ public class OrderModel implements Serializable {
         insertId = database.insert(OrdersTable.TABLE_NAME, null, values);
 
         Log.i("InsertID", "Categories : " + insertId);
+        return insertId;
     }
 
     /**
@@ -164,7 +165,7 @@ public class OrderModel implements Serializable {
         }
     }
 
-    public void updateRow(OrderModel obj, String id) {
+    public void updateRow(OrderModel obj) {
 
         ContentValues values = new ContentValues();
         values.put(OrdersTable.COLUMN_NAME_DOC_DATE, obj.getDocDate());
@@ -174,8 +175,8 @@ public class OrderModel implements Serializable {
         values.put(OrdersTable.COLUMN_NAME_DUE_DATE, obj.getDueDate());
         values.put(OrdersTable.COLUMN_NAME_REMARKS, obj.getRemarks());
 
-        database.update(OrdersTable.TABLE_NAME, values, OrdersTable._ID + " = ?", new String[]{id});
-        System.out.println("Categories Row Updated with id: " + id);
+        database.update(OrdersTable.TABLE_NAME, values, OrdersTable._ID + " = ?", new String[]{"" + obj.getOrderId()});
+        System.out.println("Categories Row Updated with id: " + obj.getOrderId());
     }
 
     public void deleteRow(String id) {
@@ -222,12 +223,22 @@ public class OrderModel implements Serializable {
 
     public OrderModel getRow(String id) {
         Cursor cursor = database.query(OrdersTable.TABLE_NAME, null, OrdersTable._ID + " = ?", new String[]{id}, null, null, null);
-        OrderModel productModel = null;
+        OrderModel orderModel = null;
         if (cursor.moveToFirst()) {
-            productModel = cursorToProductModel(cursor);
+            orderModel = cursorToProductModel(cursor);
         }
         cursor.close();
-        return productModel;
+        return orderModel;
+    }
+
+    public OrderModel getCustomersRow(String customerCode) {
+        Cursor cursor = database.query(OrdersTable.TABLE_NAME, null, OrdersTable.COLUMN_NAME_CUSTOMER_CODE + " = ?", new String[]{customerCode}, null, null, null);
+        OrderModel orderModel = null;
+        if (cursor.moveToFirst()) {
+            orderModel = cursorToProductModel(cursor);
+        }
+        cursor.close();
+        return orderModel;
     }
 
     /**
@@ -274,11 +285,12 @@ public class OrderModel implements Serializable {
 
         private static final String TEXT_TYPE = " TEXT";
         private static final String COMMA_SEP = ",";
+        private static final String UNIQUE = " UNIQUE ";
         public static final String SQL_CREATE_USER_DETAILS =
                 "CREATE TABLE " + TABLE_NAME + " (" +
                         _ID + " INTEGER PRIMARY KEY," +
                         COLUMN_NAME_DOC_DATE + TEXT_TYPE + COMMA_SEP +
-                        COLUMN_NAME_CUSTOMER_CODE + TEXT_TYPE + COMMA_SEP +
+                        COLUMN_NAME_CUSTOMER_CODE + TEXT_TYPE + UNIQUE + COMMA_SEP +
                         COLUMN_NAME_AMOUNT + TEXT_TYPE + COMMA_SEP +
                         COLUMN_NAME_RECEIVED_AMOUNT + TEXT_TYPE + COMMA_SEP +
                         COLUMN_NAME_DUE_DATE + TEXT_TYPE + COMMA_SEP +

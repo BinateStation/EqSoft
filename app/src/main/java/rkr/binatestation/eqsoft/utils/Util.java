@@ -108,6 +108,9 @@ public class Util {
         return postFixDate;
     }
 
+    public static String getCurrentDate(String dateFormat) {
+        return new SimpleDateFormat(dateFormat, Locale.getDefault()).format(new Date());
+    }
     /**
      * static method used to get the path from uri
      */
