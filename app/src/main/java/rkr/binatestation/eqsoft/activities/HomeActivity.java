@@ -22,6 +22,7 @@ import rkr.binatestation.eqsoft.models.ProductModel;
 import rkr.binatestation.eqsoft.models.ReceiptModel;
 import rkr.binatestation.eqsoft.network.DataSync;
 import rkr.binatestation.eqsoft.utils.Constants;
+import rkr.binatestation.eqsoft.utils.Util;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -130,8 +131,16 @@ public class HomeActivity extends AppCompatActivity {
                     @Override
                     protected void onPostExecute(Boolean aBoolean) {
                         super.onPostExecute(aBoolean);
+                        if (aBoolean) {
+                            Util.showAlert(HomeActivity.this, "Alert", "Successfully synced", false);
+                        } else {
+                            Util.showAlert(HomeActivity.this, "Alert", "Some thing went wrong please contact administrator", false);
+                        }
                     }
                 }.execute(0);
+                break;
+            case R.id.GM_logout:
+                Util.logoutAlert(HomeActivity.this, "Alert", "Are you sure you want to logout.?");
                 break;
         }
         return super.onOptionsItemSelected(item);

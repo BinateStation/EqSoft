@@ -38,17 +38,16 @@ public class DataSync extends AsyncTask<Integer, Integer, Boolean> {
     protected Boolean doInBackground(Integer... integers) {
         switch (integers[0]) {
             case 1:
-                writeToFile(getCompleteJsonStringFromDB());
-                break;
+                return writeToFile(getCompleteJsonStringFromDB());
             case 2:
-                readFromFile(context);
-                break;
+                return readFromFile(context);
             default:
-                writeToFile(getCompleteJsonStringFromDB());
-                readFromFile(context);
-                break;
+                if (writeToFile(getCompleteJsonStringFromDB())) {
+                    return readFromFile(context);
+                } else {
+                    return false;
+                }
         }
-        return null;
     }
 
     private String getCompleteJsonStringFromDB() {
@@ -84,18 +83,20 @@ public class DataSync extends AsyncTask<Integer, Integer, Boolean> {
         return jsonObject.toString();
     }
 
-    private void writeToFile(String data) {
+    private Boolean writeToFile(String data) {
         FileOutputStream outputStream;
         try {
             outputStream = new FileOutputStream(new File(Util.getDatabasePath() + "output.json"));
             outputStream.write(data.getBytes());
             outputStream.close();
+            return true;
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return false;
     }
 
-    private void readFromFile(Context context) {
+    private Boolean readFromFile(Context context) {
         try {
             File jsonFile = new File(Util.getDatabasePath() + "input.json");
             if (jsonFile.exists()) {
@@ -177,7 +178,7 @@ public class DataSync extends AsyncTask<Integer, Integer, Boolean> {
                         "password"
                 ));
                 userDetailsTable.close();
-
+                return true;
             } else {
                 Util.showAlert(context, "Alert", "File doesn't exists, please copy the file to specified folder and sync.");
             }
@@ -185,6 +186,7 @@ public class DataSync extends AsyncTask<Integer, Integer, Boolean> {
             e.printStackTrace();
             Util.showAlert(context, "Alert", "File doesn't exists, please copy the file to specified folder and sync.");
         }
+        return false;
     }
 
 }

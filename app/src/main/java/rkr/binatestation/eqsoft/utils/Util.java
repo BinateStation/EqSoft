@@ -3,6 +3,7 @@ package rkr.binatestation.eqsoft.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Typeface;
@@ -19,6 +20,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
+
+import rkr.binatestation.eqsoft.activities.LoginActivity;
 
 /**
  * Created by RKR on 27-01-2016.
@@ -113,6 +116,7 @@ public class Util {
     public static String getCurrentDate(String dateFormat) {
         return new SimpleDateFormat(dateFormat, Locale.getDefault()).format(new Date());
     }
+
     /**
      * static method used to get the path from uri
      */
@@ -211,6 +215,35 @@ public class Util {
                             }
                         }
                     }).show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void logoutAlert(final Activity activity, String title, String message) {
+        try {
+            new AlertDialog.Builder(activity)
+                    .setTitle(title)
+                    .setMessage(message)
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            activity.getSharedPreferences(activity.getPackageName(), Context.MODE_PRIVATE)
+                                    .edit().putBoolean(Constants.KEY_IS_LOGGED_IN, false).apply();
+                            activity.startActivity(new Intent(
+                                    activity,
+                                    LoginActivity.class
+                            ).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
+
+                        }
+                    })
+                    .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                        }
+                    })
+                    .show();
         } catch (Exception e) {
             e.printStackTrace();
         }
