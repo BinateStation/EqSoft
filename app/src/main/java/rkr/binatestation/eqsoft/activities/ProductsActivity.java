@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -12,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.TextView;
 
 import java.util.LinkedHashMap;
@@ -20,7 +22,6 @@ import java.util.Map;
 
 import rkr.binatestation.eqsoft.R;
 import rkr.binatestation.eqsoft.adapters.ProductAdapter;
-import rkr.binatestation.eqsoft.fragments.CustomerSearchFragment;
 import rkr.binatestation.eqsoft.models.CustomerModel;
 import rkr.binatestation.eqsoft.models.OrderItemModel;
 import rkr.binatestation.eqsoft.models.OrderModel;
@@ -33,9 +34,10 @@ public class ProductsActivity extends AppCompatActivity {
     SearchView productSearch;
     RecyclerView productsRecyclerView;
     TextView customerName, totalAmount;
+    AppCompatSpinner sort;
+
     CustomerModel customerModel;
     ProductAdapter productAdapter;
-    CustomerSearchFragment customerSearchFragment;
     Map<String, OrderItemModel> orderItemModelMap = new LinkedHashMap<>();
 
     @Override
@@ -52,23 +54,34 @@ public class ProductsActivity extends AppCompatActivity {
         productsRecyclerView = (RecyclerView) findViewById(R.id.Ap_productsRecyclerView);
         customerName = (TextView) findViewById(R.id.AP_customerLedgerName);
         totalAmount = (TextView) findViewById(R.id.AP_totalAmount);
+        sort = (AppCompatSpinner) findViewById(R.id.AP_sort);
 
         productSearch.setQueryHint(getString(R.string.type_to_search));
         productsRecyclerView.setLayoutManager(new LinearLayoutManager(productsRecyclerView.getContext()));
         productSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                getProducts(query);
+                getProducts(query, sort.getSelectedItemPosition());
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                getProducts(newText);
+                getProducts(newText, sort.getSelectedItemPosition());
                 return true;
             }
         });
-        getProducts("");
+        sort.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                getProducts("", sort.getSelectedItemPosition());
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
         setCustomerName();
     }
 
@@ -118,13 +131,13 @@ public class ProductsActivity extends AppCompatActivity {
         }.execute();
     }
 
-    private void getProducts(final String query) {
+    private void getProducts(final String query, final int sortType) {
         new AsyncTask<Void, Void, List<ProductModel>>() {
             @Override
             protected List<ProductModel> doInBackground(Void... voids) {
                 ProductModel productModelDB = new ProductModel(getBaseContext());
                 productModelDB.open();
-                List<ProductModel> productModelList = productModelDB.getAllRows(query);
+                List<ProductModel> productModelList = productModelDB.getAllRows(query, sortType);
                 productModelDB.close();
                 return productModelList;
             }
@@ -135,20 +148,7 @@ public class ProductsActivity extends AppCompatActivity {
                 productsRecyclerView.setAdapter(productAdapter = new ProductAdapter(productModels, customerModel, orderItemModelMap, true, new ProductAdapter.OnAdapterInteractionListener() {
                     @Override
                     public void onItemClicked() {
-                        customerSearchFragment = CustomerSearchFragment.newInstance(new CustomerSearchFragment.OnCustomerSearchFragmentInteractionListener() {
-                            @Override
-                            public void onItemSelected(CustomerModel customerModel) {
-                                ProductsActivity.this.customerModel = customerModel;
-                                if (productAdapter != null) {
-                                    productAdapter.setCustomerModel(customerModel);
-                                }
-                                setCustomerName();
-                                if (customerSearchFragment != null) {
-                                    customerSearchFragment.dismiss();
-                                }
-                            }
-                        });
-                        customerSearchFragment.show(getSupportFragmentManager(), CustomerSearchFragment.tag);
+                        startActivityForResult(new Intent(getBaseContext(), CustomersActivity.class), Constants.REQUEST_CODE_CUSTOMER);
                     }
 
                     @Override
@@ -168,20 +168,7 @@ public class ProductsActivity extends AppCompatActivity {
     }
 
     public void selectCustomer(View view) {
-        customerSearchFragment = CustomerSearchFragment.newInstance(new CustomerSearchFragment.OnCustomerSearchFragmentInteractionListener() {
-            @Override
-            public void onItemSelected(CustomerModel customerModel) {
-                ProductsActivity.this.customerModel = customerModel;
-                if (productAdapter != null) {
-                    productAdapter.setCustomerModel(customerModel);
-                }
-                setCustomerName();
-                if (customerSearchFragment != null) {
-                    customerSearchFragment.dismiss();
-                }
-            }
-        });
-        customerSearchFragment.show(getSupportFragmentManager(), CustomerSearchFragment.tag);
+        startActivityForResult(new Intent(view.getContext(), CustomersActivity.class), Constants.REQUEST_CODE_CUSTOMER);
     }
 
     @Override
@@ -214,4 +201,15 @@ public class ProductsActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK && requestCode == Constants.REQUEST_CODE_CUSTOMER && data.hasExtra(Constants.KEY_CUSTOMER)) {
+            customerModel = (CustomerModel) data.getSerializableExtra(Constants.KEY_CUSTOMER);
+            if (productAdapter != null && customerModel != null) {
+                productAdapter.setCustomerModel(customerModel);
+            }
+            setCustomerName();
+        }
+    }
 }

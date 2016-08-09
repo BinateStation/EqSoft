@@ -205,11 +205,19 @@ public class ProductModel implements Serializable {
         return list;
     }
 
-    public List<ProductModel> getAllRows(String query) {
+    public List<ProductModel> getAllRows(String query, int sortType) {
         List<ProductModel> list = new ArrayList<>();
-        Cursor cursor = database.query(ProductsTable.TABLE_NAME, null, ProductsTable.COLUMN_NAME_NAME + " LIKE '" + query + "%' OR " +
-                ProductsTable.COLUMN_NAME_CODE + " LIKE '" + query + "%' OR " +
-                ProductsTable.COLUMN_NAME_CATEGORY + " LIKE '" + query + "%' ", null, null, null, ProductsTable.COLUMN_NAME_CATEGORY);
+        String sortBy;
+        switch (sortType) {
+            case 1:
+                sortBy = ProductsTable.COLUMN_NAME_CATEGORY;
+                break;
+            default:
+                sortBy = ProductsTable.COLUMN_NAME_NAME;
+        }
+        Cursor cursor = database.query(ProductsTable.TABLE_NAME, null, ProductsTable.COLUMN_NAME_NAME + " LIKE '%" + query + "%' OR " +
+                ProductsTable.COLUMN_NAME_CODE + " LIKE '%" + query + "%' OR " +
+                ProductsTable.COLUMN_NAME_CATEGORY + " LIKE '%" + query + "%' ", null, null, null, sortBy);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             ProductModel obj = cursorToProductModel(cursor);

@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.List;
+import java.util.Locale;
 
 import rkr.binatestation.eqsoft.R;
 import rkr.binatestation.eqsoft.models.CustomerModel;
@@ -39,7 +40,7 @@ public class CustomerAdapter extends RecyclerView.Adapter<CustomerAdapter.ItemVi
     public void onBindViewHolder(final ItemView holder, int position) {
         holder.ledgerName.setText(getItem(position).getLedgerName());
         holder.phone.setText(getItem(position).getMobile());
-        holder.balance.setText(getItem(position).getBalance());
+        holder.balance.setText(String.format(Locale.getDefault(), "%s", Double.parseDouble(getItem(position).getBalance())));
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

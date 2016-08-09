@@ -37,13 +37,16 @@
         <item>Sort By</item>
         <item>Route</item>
     </string-array>
+    <string-array name="product_sort">
+        <item>Sort By</item>
+        <item>Category</item>
+    </string-array>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="select_sync_type">Select sync type</string>
     <string name="select_your_customer">Select your customer</string>
     <string name="upload">Upload</string>
     <string name="download">Download</string>
     <string name="sync">Sync</string>
     <string name="settings">Settings</string>
+    <string name="total_orders">Total Orders</string>
 </resources>

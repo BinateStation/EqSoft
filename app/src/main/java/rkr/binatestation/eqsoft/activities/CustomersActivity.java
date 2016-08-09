@@ -1,5 +1,6 @@
 package rkr.binatestation.eqsoft.activities;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -91,8 +92,10 @@ public class CustomersActivity extends AppCompatActivity {
                 customersRecyclerView.setAdapter(new CustomerAdapter(customerModelList, new CustomerAdapter.OnAdapterInteractionListener() {
                     @Override
                     public void onItemSelected(CustomerModel customerModel) {
-                        startActivity(new Intent(getBaseContext(), ProductsActivity.class)
-                                .putExtra(Constants.KEY_CUSTOMER, customerModel));
+                        Intent returnIntent = new Intent();
+                        returnIntent.putExtra(Constants.KEY_CUSTOMER, customerModel);
+                        setResult(Activity.RESULT_OK, returnIntent);
+                        finish();
                     }
                 }));
             }

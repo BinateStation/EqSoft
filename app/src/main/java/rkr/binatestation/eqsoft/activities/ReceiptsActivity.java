@@ -7,14 +7,15 @@ import android.os.Bundle;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
 
 import rkr.binatestation.eqsoft.R;
-import rkr.binatestation.eqsoft.fragments.CustomerSearchFragment;
 import rkr.binatestation.eqsoft.models.CustomerModel;
 import rkr.binatestation.eqsoft.models.ReceiptModel;
 import rkr.binatestation.eqsoft.network.DataSync;
@@ -22,7 +23,6 @@ import rkr.binatestation.eqsoft.utils.Constants;
 import rkr.binatestation.eqsoft.utils.Util;
 
 public class ReceiptsActivity extends AppCompatActivity {
-    CustomerSearchFragment customerSearchFragment;
     CustomerModel customerModel;
 
     TextView customerLedgerName, mobile, balance;
@@ -39,6 +39,17 @@ public class ReceiptsActivity extends AppCompatActivity {
         mobile = (TextView) findViewById(R.id.AR_customerMobile);
         balance = (TextView) findViewById(R.id.AR_balance);
         receivedAmount = (TextInputEditText) findViewById(R.id.AR_receivedAmount);
+        receivedAmount.requestFocus();
+        receivedAmount.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    done(textView);
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
     @Override
@@ -72,17 +83,7 @@ public class ReceiptsActivity extends AppCompatActivity {
     }
 
     public void showSearchDialog(View view) {
-        customerSearchFragment = CustomerSearchFragment.newInstance(new CustomerSearchFragment.OnCustomerSearchFragmentInteractionListener() {
-            @Override
-            public void onItemSelected(CustomerModel customerModel) {
-                ReceiptsActivity.this.customerModel = customerModel;
-                setCustomerDetails();
-                if (customerSearchFragment != null) {
-                    customerSearchFragment.dismiss();
-                }
-            }
-        });
-        customerSearchFragment.show(getSupportFragmentManager(), CustomerSearchFragment.tag);
+        startActivityForResult(new Intent(getBaseContext(), CustomersActivity.class), Constants.REQUEST_CODE_CUSTOMER);
     }
 
     public void setCustomerDetails() {
@@ -94,7 +95,11 @@ public class ReceiptsActivity extends AppCompatActivity {
     }
 
     public void done(View view) {
-        saveReceipts(view.getContext(), receivedAmount.getText().toString().trim());
+        if (customerModel != null) {
+            saveReceipts(view.getContext(), receivedAmount.getText().toString().trim());
+        } else {
+            Util.showAlert(view.getContext(), "Alert", "Please select the customer.!");
+        }
     }
 
     private void saveReceipts(final Context context, final String receivedAmount) {
@@ -141,5 +146,14 @@ public class ReceiptsActivity extends AppCompatActivity {
                 ).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
             }
         }.execute();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK && requestCode == Constants.REQUEST_CODE_CUSTOMER && data.hasExtra(Constants.KEY_CUSTOMER)) {
+            customerModel = (CustomerModel) data.getSerializableExtra(Constants.KEY_CUSTOMER);
+            setCustomerDetails();
+        }
     }
 }

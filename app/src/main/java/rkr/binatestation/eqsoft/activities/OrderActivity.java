@@ -11,10 +11,12 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
 
 import java.util.LinkedHashMap;
@@ -55,6 +57,17 @@ public class OrderActivity extends AppCompatActivity {
         previousBalance = (TextView) findViewById(R.id.AO_previousBalance);
         totalAmount = (AppCompatTextView) findViewById(R.id.AO_totalAmount);
         receivedAmount = (TextInputEditText) findViewById(R.id.AO_receivedAmount);
+        receivedAmount.requestFocus();
+        receivedAmount.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    proceedOrder(textView);
+                    return true;
+                }
+                return false;
+            }
+        });
 
         selectedProductsRecyclerView.setLayoutManager(new LinearLayoutManager(selectedProductsRecyclerView.getContext()));
         setCustomerDetails();
@@ -133,7 +146,9 @@ public class OrderActivity extends AppCompatActivity {
     }
 
     public void proceedOrder(View view) {
-        saveOrder(view.getContext(), receivedAmount.getText().toString().trim());
+        if (customerModel != null) {
+            saveOrder(view.getContext(), receivedAmount.getText().toString().trim());
+        }
     }
 
     private void saveOrder(final Context context, final String receivedAmount) {

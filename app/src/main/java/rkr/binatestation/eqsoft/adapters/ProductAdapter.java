@@ -9,11 +9,13 @@ import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
 
 import java.util.LinkedHashMap;
@@ -80,10 +82,10 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
             });
         }
         holder.productName.setText(getItem(position).getName());
-        holder.productMRP.setText(String.format(Locale.getDefault(), "MRP - %s", getItem(position).getMRP()));
+        holder.productMRP.setText(String.format(Locale.getDefault(), "MRP - %s", Double.parseDouble(getItem(position).getMRP())));
         holder.productCode.setText(getItem(position).getCode());
         holder.stock.setText(getItem(position).getStock());
-        holder.sellingPrice.setText(getItem(position).getSellingRate());
+        holder.sellingPrice.setText(String.format(Locale.getDefault(), "%s", Double.parseDouble(getItem(position).getSellingRate())));
         if (orderItemModelMap.containsKey(getItem(position).getCode())) {
             holder.selectedView.setVisibility(View.VISIBLE);
         } else {
@@ -120,7 +122,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
         TextView sellingPrice = (TextView) appCompatDialog.findViewById(R.id.PEPQ_sellingPrice);
         final TextInputEditText quantity = (TextInputEditText) appCompatDialog.findViewById(R.id.PEPQ_quantity);
         final AppCompatTextView amount = (AppCompatTextView) appCompatDialog.findViewById(R.id.PEPQ_amount);
-        AppCompatButton okay = (AppCompatButton) appCompatDialog.findViewById(R.id.PEPQ_ok);
+        final AppCompatButton okay = (AppCompatButton) appCompatDialog.findViewById(R.id.PEPQ_ok);
 
         try {
             if (item != null) {
@@ -168,6 +170,27 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
                             }
                         }
                     });
+                    quantity.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                        @Override
+                        public void onFocusChange(View view, boolean b) {
+                            if (b) {
+                                appCompatDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+                            }
+                        }
+                    });
+                    quantity.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                        @Override
+                        public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+                            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                                if (okay != null) {
+                                    okay.performClick();
+                                }
+                                return true;
+                            }
+                            return false;
+                        }
+                    });
+                    quantity.requestFocus();
                 }
                 if (okay != null) {
                     okay.setOnClickListener(new View.OnClickListener() {

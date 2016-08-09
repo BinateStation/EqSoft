@@ -38,5 +38,6 @@ public final class Constants {
     /**
      ***********************************************************************************************
      */
+    public static final Integer REQUEST_CODE_CUSTOMER = 100;
 
 }

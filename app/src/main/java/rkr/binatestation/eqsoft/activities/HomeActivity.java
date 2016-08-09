@@ -15,7 +15,6 @@ import android.widget.TextView;
 import java.util.Map;
 
 import rkr.binatestation.eqsoft.R;
-import rkr.binatestation.eqsoft.fragments.CustomerSearchFragment;
 import rkr.binatestation.eqsoft.models.CustomerModel;
 import rkr.binatestation.eqsoft.models.OrderModel;
 import rkr.binatestation.eqsoft.models.ProductModel;
@@ -26,8 +25,7 @@ import rkr.binatestation.eqsoft.utils.Util;
 
 public class HomeActivity extends AppCompatActivity {
 
-    TextView totalSales, amountReceived, amountPending, noOfReceipts, noOfProducts, noOfCustomers;
-    CustomerSearchFragment customerSearchFragment;
+    TextView username, totalOrders, totalAmount, amountReceived, amountPending, noOfReceipts, noOfProducts, noOfCustomers;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,12 +34,16 @@ public class HomeActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        totalSales = (TextView) findViewById(R.id.AH_totalSales);
+        username = (TextView) findViewById(R.id.AH_username);
+        totalOrders = (TextView) findViewById(R.id.AH_totalOrders);
+        totalAmount = (TextView) findViewById(R.id.AH_totalAmount);
         amountReceived = (TextView) findViewById(R.id.AH_amountReceived);
         amountPending = (TextView) findViewById(R.id.AH_amountPending);
         noOfReceipts = (TextView) findViewById(R.id.AH_noOfReceipts);
         noOfProducts = (TextView) findViewById(R.id.AH_noOfProducts);
         noOfCustomers = (TextView) findViewById(R.id.AH_noOfCustomers);
+
+        username.setText(Util.getStringFromSharedPreferences(username.getContext(), Constants.KEY_USER_NAME));
     }
 
     @Override
@@ -84,7 +86,8 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             protected void onPostExecute(Map<String, String> stringStringMap) {
                 super.onPostExecute(stringStringMap);
-                totalSales.setText(stringStringMap.get("KEY_TOTAL_SALES"));
+                totalOrders.setText(stringStringMap.get("KEY_TOTAL_SALES"));
+                totalAmount.setText(stringStringMap.get("KEY_TOTAL_AMOUNT"));
                 amountReceived.setText(stringStringMap.get("KEY_TOTAL_AMOUNT_RECEIVED"));
                 amountPending.setText(stringStringMap.get("KEY_TOTAL_PENDING_AMOUNT"));
                 noOfReceipts.setText(stringStringMap.get("KEY_TOTAL_RECEIPTS"));
@@ -95,7 +98,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     public void onCustomerClick(View view) {
-        startActivity(new Intent(view.getContext(), CustomersActivity.class));
+        startActivityForResult(new Intent(view.getContext(), CustomersActivity.class), Constants.REQUEST_CODE_CUSTOMER);
     }
 
     public void onProductsClick(View view) {
@@ -107,19 +110,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     public void order(View view) {
-        customerSearchFragment = CustomerSearchFragment.newInstance(new CustomerSearchFragment.OnCustomerSearchFragmentInteractionListener() {
-            @Override
-            public void onItemSelected(CustomerModel customerModel) {
-                if (customerSearchFragment != null) {
-                    customerSearchFragment.dismiss();
-                }
-                startActivity(
-                        new Intent(getBaseContext(), OrderActivity.class)
-                                .putExtra(Constants.KEY_CUSTOMER, customerModel)
-                );
-            }
-        });
-        customerSearchFragment.show(getSupportFragmentManager(), CustomerSearchFragment.tag);
+        startActivityForResult(new Intent(view.getContext(), CustomersActivity.class), Constants.REQUEST_CODE_CUSTOMER);
     }
 
 
@@ -132,6 +123,7 @@ public class HomeActivity extends AppCompatActivity {
                     protected void onPostExecute(Boolean aBoolean) {
                         super.onPostExecute(aBoolean);
                         if (aBoolean) {
+                            initializeDashboard(getBaseContext());
                             Util.showAlert(HomeActivity.this, "Alert", "Successfully synced", false);
                         } else {
                             Util.showAlert(HomeActivity.this, "Alert", "Some thing went wrong please contact administrator", false);
@@ -144,5 +136,15 @@ public class HomeActivity extends AppCompatActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK && requestCode == Constants.REQUEST_CODE_CUSTOMER && data.hasExtra(Constants.KEY_CUSTOMER)) {
+            startActivity(new Intent(getBaseContext(), OrderActivity.class)
+                    .putExtra(Constants.KEY_CUSTOMER, data.getSerializableExtra(Constants.KEY_CUSTOMER))
+            );
+        }
     }
 }

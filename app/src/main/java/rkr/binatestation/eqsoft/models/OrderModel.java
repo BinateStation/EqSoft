@@ -246,6 +246,7 @@ public class OrderModel implements Serializable {
         }
         cursor.close();
         stringMap.put("KEY_TOTAL_AMOUNT_RECEIVED", "" + totalAmountReceived);
+        stringMap.put("KEY_TOTAL_AMOUNT", "" + (totalAmount));
         stringMap.put("KEY_TOTAL_PENDING_AMOUNT", "" + (totalAmount - totalAmountReceived));
         return stringMap;
     }

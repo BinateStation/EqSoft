@@ -17,7 +17,17 @@
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
             android:gravity="end"
-            app:popupTheme="@style/AppTheme.Light.PopupOverlay" />
+            app:popupTheme="@style/AppTheme.Light.PopupOverlay">
+
+            <android.support.v7.widget.AppCompatSpinner
+                android:id="@+id/AP_sort"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:entries="@array/product_sort"
+                app:popupTheme="@style/AppTheme.Light.PopupOverlay" />
+
+        </android.support.v7.widget.Toolbar>
     </android.support.design.widget.AppBarLayout>
 
     <android.support.v7.widget.LinearLayoutCompat
@@ -69,6 +79,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:onClick="selectCustomer" />
+
                     <TextView
                         style="@style/Base.TextAppearance.AppCompat.Caption"
                         android:layout_width="match_parent"
@@ -96,6 +107,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:textStyle="bold" />
+
                     <TextView
                         style="@style/Base.TextAppearance.AppCompat.Caption"
                         android:layout_width="match_parent"

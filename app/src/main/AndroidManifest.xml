@@ -14,6 +14,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".activities.SplashActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Dark">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,25 +24,34 @@
         </activity>
         <activity
             android:name=".activities.LoginActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Dark" />
         <activity
             android:name=".activities.HomeActivity"
-            android:label="@string/dashboard" />
+            android:label="@string/dashboard"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".activities.CustomersActivity"
-            android:label="@string/customers" />
+            android:label="@string/customers"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".activities.ProductsActivity"
-            android:label="@string/products" />
+            android:label="@string/products"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".activities.OrderActivity"
-            android:label="@string/order" />
+            android:label="@string/order"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateVisible" />
         <activity
             android:name=".activities.ReceiptsActivity"
-            android:label="@string/receipts" />
+            android:label="@string/receipts"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateVisible" />
         <activity
             android:name=".activities.SettingsActivity"
-            android:label="@string/settings" />
+            android:label="@string/settings"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>
