@@ -25,18 +25,23 @@
             android:layout_height="wrap_content"
             android:layout_weight="2"
             android:orientation="vertical"
-            android:padding="2dp">
+            android:paddingBottom="4dp"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:paddingTop="4dp">
 
             <TextView
                 android:id="@+id/AP_productName"
                 style="@style/Base.TextAppearance.AppCompat.Subhead"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Prod. Name" />
+                android:singleLine="true"
+                android:text="Prod. Name"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/AP_productMRP"
-                style="@style/Base.TextAppearance.AppCompat.Title"
+                style="@style/Base.TextAppearance.AppCompat.Subhead"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="MRP - 580.50" />
@@ -47,7 +52,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="end"
-                android:padding="@dimen/activity_widget_margin"
+                android:paddingBottom="@dimen/activity_top_padding"
+                android:paddingEnd="@dimen/activity_widget_margin"
+                android:paddingLeft="@dimen/activity_widget_margin"
+                android:paddingRight="@dimen/activity_widget_margin"
+                android:paddingStart="@dimen/activity_widget_margin"
+                android:paddingTop="@dimen/activity_top_padding"
                 android:text="Product code" />
         </android.support.v7.widget.LinearLayoutCompat>
 

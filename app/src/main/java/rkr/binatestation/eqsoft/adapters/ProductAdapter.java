@@ -158,8 +158,12 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
                         @Override
                         public void afterTextChanged(Editable editable) {
                             if (editable.length() > 0) {
-                                if (amount != null) {
-                                    amount.setText(String.format("%s", Integer.parseInt(editable.toString()) * Double.parseDouble(item.getSellingRate())));
+                                try {
+                                    if (amount != null) {
+                                        amount.setText(String.format("%s", Integer.parseInt(editable.toString()) * Double.parseDouble(item.getSellingRate())));
+                                    }
+                                } catch (NumberFormatException e) {
+                                    e.printStackTrace();
                                 }
                             }
                         }
@@ -169,7 +173,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
                     okay.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            if (quantity != null && amount != null) {
+                            if (quantity != null && amount != null && quantity.getText().length() > 0 && amount.getText().length() > 0) {
                                 addOrder(
                                         view.getContext(),
                                         item,
@@ -178,6 +182,8 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
                                         appCompatDialog,
                                         adapterPosition
                                 );
+                            } else {
+                                appCompatDialog.dismiss();
                             }
                         }
                     });

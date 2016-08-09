@@ -72,6 +72,11 @@ public class ProductsActivity extends AppCompatActivity {
         setCustomerName();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
     public void setCustomerName() {
         if (customerModel != null) {
             customerName.setText(customerModel.getLedgerName());
@@ -201,10 +206,10 @@ public class ProductsActivity extends AppCompatActivity {
                         }
                     }
                 }.execute(0);
-                break;
+                return true;
             case R.id.GM_logout:
                 Util.logoutAlert(ProductsActivity.this, "Alert", "Are you sure you want to logout.?");
-                break;
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }

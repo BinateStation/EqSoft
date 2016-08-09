@@ -11,6 +11,7 @@ import android.view.View;
 import rkr.binatestation.eqsoft.R;
 import rkr.binatestation.eqsoft.network.DataSync;
 import rkr.binatestation.eqsoft.utils.Constants;
+import rkr.binatestation.eqsoft.utils.Util;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -30,13 +31,17 @@ public class SettingsActivity extends AppCompatActivity {
 
     public void actionDone(View view) {
         if (syncByUSB.isChecked()) {
-            getSharedPreferences(getPackageName(), MODE_PRIVATE).edit().putString(Constants.KEY_SYNC_TYPE, "syncByUsb").apply();
             new DataSync(view.getContext()) {
                 @Override
                 protected void onPostExecute(Boolean aBoolean) {
                     super.onPostExecute(aBoolean);
-                    startActivity(new Intent(getBaseContext(), LoginActivity.class));
-                    finish();
+                    if (aBoolean) {
+                        getSharedPreferences(getPackageName(), MODE_PRIVATE).edit().putString(Constants.KEY_SYNC_TYPE, "syncByUsb").apply();
+                        startActivity(new Intent(getBaseContext(), LoginActivity.class));
+                        finish();
+                    } else {
+                        Util.showAlert(SettingsActivity.this, "Alert", "Please ensure the file is copied in the folder");
+                    }
                 }
             }.execute(2);
         } else {

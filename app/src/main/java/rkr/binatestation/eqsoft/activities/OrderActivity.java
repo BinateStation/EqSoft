@@ -220,10 +220,10 @@ public class OrderActivity extends AppCompatActivity {
                         }
                     }
                 }.execute(0);
-                break;
+                return true;
             case R.id.GM_logout:
                 Util.logoutAlert(OrderActivity.this, "Alert", "Are you sure you want to logout.?");
-                break;
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }

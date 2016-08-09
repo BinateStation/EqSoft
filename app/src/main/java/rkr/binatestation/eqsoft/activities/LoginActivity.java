@@ -6,6 +6,9 @@ import android.os.Bundle;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 
 import rkr.binatestation.eqsoft.R;
@@ -24,6 +27,25 @@ public class LoginActivity extends AppCompatActivity {
 
         username = (TextInputEditText) findViewById(R.id.AL_username);
         password = (TextInputEditText) findViewById(R.id.AL_password);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.settings, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.S_actionSettings:
+                startActivity(new Intent(getBaseContext(), SettingsActivity.class));
+                finish();
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     public void login(View view) {

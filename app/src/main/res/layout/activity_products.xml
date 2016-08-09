@@ -64,18 +64,18 @@
                     android:orientation="vertical">
 
                     <TextView
+                        android:id="@+id/AP_customerLedgerName"
                         style="@style/Base.TextAppearance.AppCompat.Subhead"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:onClick="selectCustomer" />
+                    <TextView
+                        style="@style/Base.TextAppearance.AppCompat.Caption"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:onClick="selectCustomer"
                         android:text="@string/customer" />
 
-                    <TextView
-                        android:id="@+id/AP_customerLedgerName"
-                        style="@style/Base.TextAppearance.AppCompat.Caption"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:onClick="selectCustomer" />
                 </android.support.v7.widget.LinearLayoutCompat>
 
                 <View
@@ -91,16 +91,17 @@
                     android:orientation="vertical">
 
                     <TextView
+                        android:id="@+id/AP_totalAmount"
                         style="@style/Base.TextAppearance.AppCompat.Subhead"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textStyle="bold" />
+                    <TextView
+                        style="@style/Base.TextAppearance.AppCompat.Caption"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/total_amount" />
 
-                    <TextView
-                        android:id="@+id/AP_totalAmount"
-                        style="@style/Base.TextAppearance.AppCompat.Title"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
                 </android.support.v7.widget.LinearLayoutCompat>
 
             </android.support.v7.widget.LinearLayoutCompat>
