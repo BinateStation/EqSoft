@@ -1,5 +1,6 @@
 package rkr.binatestation.eqsoft.activities;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -42,6 +43,7 @@ public class OrderActivity extends AppCompatActivity {
     CustomerModel customerModel;
     ProductAdapter productAdapter;
     Map<String, OrderItemModel> orderItemModelMap = new LinkedHashMap<>();
+    ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,34 +78,76 @@ public class OrderActivity extends AppCompatActivity {
     public void setCustomerDetails() {
         if (customerModel != null) {
             customerLedgerName.setText(customerModel.getLedgerName());
-            previousBalance.setText(customerModel.getBalance());
+            setCustomerBalance(previousBalance.getContext(), customerModel.getCode(), previousBalance);
             setOrderItemModelMap();
         }
     }
 
-    private void setOrderItemModelMap() {
-        new AsyncTask<Void, Void, OrderModel>() {
+    private void setCustomerBalance(final Context context, final String customerCode, final TextView balanceTextView) {
+        new AsyncTask<Void, Void, String>() {
             @Override
-            protected OrderModel doInBackground(Void... voids) {
+            protected String doInBackground(Void... voids) {
+                CustomerModel customerModelDB = new CustomerModel(context);
+                customerModelDB.open();
+                String balance = customerModelDB.getCustomerBalance(customerCode);
+                customerModelDB.close();
+                return balance;
+            }
+
+            @Override
+            protected void onPostExecute(String balance) {
+                super.onPostExecute(balance);
+                balanceTextView.setText(balance);
+            }
+        }.execute();
+    }
+
+    private void setOrderItemModelMap() {
+        new AsyncTask<Void, Void, String[]>() {
+            @Override
+            protected String[] doInBackground(Void... voids) {
                 OrderModel orderModelDB = new OrderModel(getBaseContext());
                 orderModelDB.open();
                 OrderModel orderModel = orderModelDB.getCustomersRow(customerModel.getCode());
                 orderModelDB.close();
 
+                String[] result = new String[2];
                 if (orderModel != null) {
+                    result[0] = orderModel.getAmount();
                     OrderItemModel orderItemModelDB = new OrderItemModel(getBaseContext());
                     orderItemModelDB.open();
                     orderItemModelMap = orderItemModelDB.getAllRows(orderModel.getOrderId());
                     orderItemModelDB.close();
+                } else {
+                    result[0] = "";
                 }
-                return orderModel;
+
+                ReceiptModel receiptModelDB = new ReceiptModel(getBaseContext());
+                receiptModelDB.open();
+                ReceiptModel receiptModel = receiptModelDB.getRow(customerModel.getCode());
+                receiptModelDB.close();
+
+                if (receiptModel != null) {
+                    result[1] = receiptModel.getAmount();
+                } else {
+                    result[1] = "";
+                }
+                return result;
             }
 
             @Override
-            protected void onPostExecute(OrderModel orderModel) {
-                super.onPostExecute(orderModel);
-                if (orderModel != null) {
-                    totalAmount.setText(orderModel.getAmount());
+            protected void onPostExecute(String[] result) {
+                super.onPostExecute(result);
+                try {
+                    if (result != null) {
+                        totalAmount.setText(result[0]);
+                    }
+                    if (result != null) {
+                        receivedAmount.setText(result[1]);
+                        receivedAmount.setSelection(receivedAmount.getText().length());
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
                 if (orderItemModelMap.size() > 0) {
                     getProducts(TextUtils.join(",", orderItemModelMap.keySet()));
@@ -226,8 +270,20 @@ public class OrderActivity extends AppCompatActivity {
             case R.id.GM_usbSync:
                 new DataSync(getBaseContext()) {
                     @Override
+                    protected void onPreExecute() {
+                        super.onPreExecute();
+                        progressDialog = new ProgressDialog(OrderActivity.this);
+                        progressDialog.setMessage("Please wait ...");
+                        progressDialog.setCancelable(false);
+                        progressDialog.show();
+                    }
+
+                    @Override
                     protected void onPostExecute(Boolean aBoolean) {
                         super.onPostExecute(aBoolean);
+                        if (progressDialog != null && progressDialog.isShowing()) {
+                            progressDialog.dismiss();
+                        }
                         if (aBoolean) {
                             Util.showAlert(OrderActivity.this, "Alert", "Successfully synced", false);
                         } else {

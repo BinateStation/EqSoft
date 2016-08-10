@@ -11,43 +11,72 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".activities.LoginActivity">
 
-    <TextView
-        style="@style/Base.TextAppearance.AppCompat.Display3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginBottom="@dimen/activity_horizontal_margin"
-        android:drawableLeft="@drawable/ic_login_white_40dp"
-        android:drawablePadding="@dimen/activity_horizontal_margin"
-        android:drawableStart="@drawable/ic_login_white_40dp"
-        android:text="@string/login" />
-
-    <android.support.design.widget.TextInputEditText
-        android:id="@+id/AL_username"
-        style="@style/AppTheme.EditText"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginTop="@dimen/activity_vertical_margin"
-        android:focusableInTouchMode="true"
-        android:hint="@string/username"
-        android:inputType="text" />
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
-    <android.support.design.widget.TextInputEditText
-        android:id="@+id/AL_password"
-        style="@style/AppTheme.EditText"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginBottom="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="@dimen/activity_vertical_margin"
-        android:focusableInTouchMode="true"
-        android:hint="@string/password"
-        android:inputType="textPassword" />
+        <ImageButton
+            android:id="@+id/AL_settings"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:background="@drawable/bg_button_oval_dark"
+            android:contentDescription="@string/settings"
+            android:onClick="settings"
+            android:src="@drawable/ic_settings" />
 
-    <Button
-        style="@style/AppTheme.Button"
+        <TextView
+            style="@style/Base.TextAppearance.AppCompat.Display3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center"
+            android:layout_marginBottom="48dp"
+            android:drawableLeft="@drawable/ic_login_white_40dp"
+            android:drawablePadding="@dimen/activity_horizontal_margin"
+            android:drawableStart="@drawable/ic_login_white_40dp"
+            android:text="@string/login" />
+    </RelativeLayout>
+
+
+    <android.support.v7.widget.LinearLayoutCompat
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginTop="@dimen/activity_vertical_margin"
-        android:onClick="login"
-        android:text="@string/login" />
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <android.support.design.widget.TextInputEditText
+            android:id="@+id/AL_username"
+            style="@style/AppTheme.EditText"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:focusableInTouchMode="true"
+            android:hint="@string/username"
+            android:inputType="text" />
+
+        <android.support.design.widget.TextInputEditText
+            android:id="@+id/AL_password"
+            style="@style/AppTheme.EditText"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginBottom="@dimen/activity_horizontal_margin"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:focusableInTouchMode="true"
+            android:hint="@string/password"
+            android:inputType="textPassword" />
+
+        <Button
+            style="@style/AppTheme.Button"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:onClick="login"
+            android:text="@string/login" />
+    </android.support.v7.widget.LinearLayoutCompat>
+
 </android.support.v7.widget.LinearLayoutCompat>

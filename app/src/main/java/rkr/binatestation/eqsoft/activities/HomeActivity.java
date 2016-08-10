@@ -1,5 +1,6 @@
 package rkr.binatestation.eqsoft.activities;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -26,6 +27,7 @@ import rkr.binatestation.eqsoft.utils.Util;
 public class HomeActivity extends AppCompatActivity {
 
     TextView username, totalOrders, totalAmount, amountReceived, amountPending, noOfReceipts, noOfProducts, noOfCustomers;
+    ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,8 +122,20 @@ public class HomeActivity extends AppCompatActivity {
             case R.id.GM_usbSync:
                 new DataSync(getBaseContext()) {
                     @Override
+                    protected void onPreExecute() {
+                        super.onPreExecute();
+                        progressDialog = new ProgressDialog(HomeActivity.this);
+                        progressDialog.setMessage("Please wait ...");
+                        progressDialog.setCancelable(false);
+                        progressDialog.show();
+                    }
+
+                    @Override
                     protected void onPostExecute(Boolean aBoolean) {
                         super.onPostExecute(aBoolean);
+                        if (progressDialog != null && progressDialog.isShowing()) {
+                            progressDialog.dismiss();
+                        }
                         if (aBoolean) {
                             initializeDashboard(getBaseContext());
                             Util.showAlert(HomeActivity.this, "Alert", "Successfully synced", false);

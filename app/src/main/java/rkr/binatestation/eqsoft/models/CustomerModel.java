@@ -324,6 +324,39 @@ public class CustomerModel implements Serializable {
         return customerModel;
     }
 
+    public String getCustomerBalance(String code) {
+        Cursor customerCursor = database.query(CustomersTable.TABLE_NAME,
+                new String[]{CustomersTable.COLUMN_NAME_BALANCE}, CustomersTable.COLUMN_NAME_CODE + " = ?", new String[]{code}, null, null, null);
+        Double balance = 0.0;
+        if (customerCursor.moveToFirst()) {
+            balance = customerCursor.getDouble(0);
+        }
+        customerCursor.close();
+        Cursor orderCursor = database.query(OrderModel.OrdersTable.TABLE_NAME,
+                new String[]{OrderModel.OrdersTable._ID}, OrderModel.OrdersTable.COLUMN_NAME_CUSTOMER_CODE + " = ?", new String[]{code}, null, null, null);
+        if (orderCursor.moveToFirst()) {
+            String orderID = orderCursor.getString(0);
+            Cursor orderItemCursor = database.query(OrderItemModel.OrderItemsTable.TABLE_NAME,
+                    new String[]{OrderItemModel.OrderItemsTable.COLUMN_NAME_AMOUNT}, OrderItemModel.OrderItemsTable.COLUMN_NAME_ORDER_ID + " = ?", new String[]{orderID}, null, null, null);
+            orderItemCursor.moveToFirst();
+            while (!orderItemCursor.isAfterLast()) {
+                balance += orderItemCursor.getDouble(0);
+                orderItemCursor.moveToNext();
+            }
+            orderItemCursor.close();
+        }
+        orderCursor.close();
+        Cursor receiptsCursor = database.query(ReceiptModel.ReceiptsTable.TABLE_NAME,
+                new String[]{ReceiptModel.ReceiptsTable.COLUMN_NAME_AMOUNT}, ReceiptModel.ReceiptsTable.COLUMN_NAME_CUSTOMER_CODE + " = ?", new String[]{code}, null, null, null);
+        receiptsCursor.moveToFirst();
+        while (!receiptsCursor.isAfterLast()) {
+            balance -= receiptsCursor.getDouble(0);
+            receiptsCursor.moveToNext();
+        }
+        receiptsCursor.close();
+        return "" + balance;
+    }
+
     /**
      * This method will counts how many rows available in this table
      *

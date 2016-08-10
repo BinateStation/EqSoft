@@ -1,5 +1,7 @@
 package rkr.binatestation.eqsoft.adapters;
 
+import android.content.Context;
+import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,7 +9,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.List;
-import java.util.Locale;
 
 import rkr.binatestation.eqsoft.R;
 import rkr.binatestation.eqsoft.models.CustomerModel;
@@ -40,7 +41,7 @@ public class CustomerAdapter extends RecyclerView.Adapter<CustomerAdapter.ItemVi
     public void onBindViewHolder(final ItemView holder, int position) {
         holder.ledgerName.setText(getItem(position).getLedgerName());
         holder.phone.setText(getItem(position).getMobile());
-        holder.balance.setText(String.format(Locale.getDefault(), "%s", Double.parseDouble(getItem(position).getBalance())));
+        setCustomerBalance(holder.balance.getContext(), getItem(position).getCode(), holder.balance);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -49,6 +50,25 @@ public class CustomerAdapter extends RecyclerView.Adapter<CustomerAdapter.ItemVi
                 }
             }
         });
+    }
+
+    private void setCustomerBalance(final Context context, final String customerCode, final TextView balanceTextView) {
+        new AsyncTask<Void, Void, String>() {
+            @Override
+            protected String doInBackground(Void... voids) {
+                CustomerModel customerModelDB = new CustomerModel(context);
+                customerModelDB.open();
+                String balance = customerModelDB.getCustomerBalance(customerCode);
+                customerModelDB.close();
+                return balance;
+            }
+
+            @Override
+            protected void onPostExecute(String balance) {
+                super.onPostExecute(balance);
+                balanceTextView.setText(balance);
+            }
+        }.execute();
     }
 
     @Override

@@ -125,13 +125,29 @@
         android:hint="@string/amount"
         android:minHeight="50dp" />
 
-    <android.support.v7.widget.AppCompatButton
-        android:id="@+id/PEPQ_ok"
-        style="@style/Base.TextAppearance.AppCompat.Widget.Button.Inverse"
-        android:layout_width="wrap_content"
+    <android.support.v7.widget.ButtonBarLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:layout_margin="@dimen/fab_margin"
-        android:background="@drawable/bg_button_dark"
-        android:text="@android:string/ok" />
+        android:gravity="end">
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/PEPQ_remove"
+            style="@style/Base.TextAppearance.AppCompat.Widget.Button.Inverse"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_margin="@dimen/fab_margin"
+            android:background="@drawable/bg_button_dark"
+            android:text="@string/remove_item" />
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/PEPQ_ok"
+            style="@style/Base.TextAppearance.AppCompat.Widget.Button.Inverse"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_margin="@dimen/fab_margin"
+            android:background="@drawable/bg_button_dark"
+            android:text="@android:string/ok" />
+    </android.support.v7.widget.ButtonBarLayout>
 </android.support.v7.widget.LinearLayoutCompat>

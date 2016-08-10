@@ -51,11 +51,6 @@ public class DataSync extends AsyncTask<Integer, Integer, Boolean> {
     }
 
     private String getCompleteJsonStringFromDB() {
-        CustomerModel customerModelDB = new CustomerModel(context);
-        customerModelDB.open();
-        JSONArray customersJsonArray = customerModelDB.getAllRowsAsJSONArray();
-        customerModelDB.close();
-
         OrderModel orderModelDB = new OrderModel(context);
         orderModelDB.open();
         JSONArray ordersJsonArray = orderModelDB.getAllRowsAsJSONArray();
@@ -73,7 +68,6 @@ public class DataSync extends AsyncTask<Integer, Integer, Boolean> {
 
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("customers", customersJsonArray);
             jsonObject.put("orders", ordersJsonArray);
             jsonObject.put("order_items", orderItemsJsonArray);
             jsonObject.put("receipts", receiptsJsonArray);

@@ -123,6 +123,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
         final TextInputEditText quantity = (TextInputEditText) appCompatDialog.findViewById(R.id.PEPQ_quantity);
         final AppCompatTextView amount = (AppCompatTextView) appCompatDialog.findViewById(R.id.PEPQ_amount);
         final AppCompatButton okay = (AppCompatButton) appCompatDialog.findViewById(R.id.PEPQ_ok);
+        final AppCompatButton remove = (AppCompatButton) appCompatDialog.findViewById(R.id.PEPQ_remove);
 
         try {
             if (item != null) {
@@ -211,6 +212,15 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
                         }
                     });
                 }
+
+                if (remove != null) {
+                    remove.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            removeOrder(view.getContext(), item, appCompatDialog, adapterPosition);
+                        }
+                    });
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -229,19 +239,6 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
                 String totalAmount;
                 OrderItemModel orderItemModel = null;
                 if (orderModel != null) {
-                    totalAmount = "" + (Double.parseDouble(orderModel.getAmount()) + Double.parseDouble(amount));
-                    orderModelDB.open();
-                    orderModelDB.updateRow(new OrderModel(
-                            orderModel.getOrderId(),
-                            orderModel.getDocDate(),
-                            orderModel.getCustomerCode(),
-                            totalAmount,
-                            orderModel.getReceivedAmount(),
-                            orderModel.getDueDate(),
-                            orderModel.getRemarks(),
-                            orderModel.getUserId()
-                    ));
-                    orderModelDB.close();
                     orderItemModel = new OrderItemModel(
                             orderModel.getOrderId(),
                             item.getCode(),
@@ -254,7 +251,6 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
                     orderItemModelDB.insert(orderItemModel);
                     orderItemModelDB.close();
                 } else {
-                    totalAmount = amount;
                     orderModelDB.open();
                     Long orderId = orderModelDB.insert(new OrderModel(
                             "0",
@@ -281,21 +277,26 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
                         orderItemModelDB.close();
                     }
                 }
-
-                CustomerModel customerModelDB = new CustomerModel(context);
-                customerModelDB.open();
-                try {
-                    if (customerModel != null) {
-                        customerModel.setBalance("" +
-                                (Double.parseDouble(customerModel.getBalance()) +
-                                        Double.parseDouble(totalAmount))
-                        );
-                        customerModelDB.updateRow(customerModel);
-                    }
-                } catch (NumberFormatException e) {
-                    e.printStackTrace();
+                orderModelDB.open();
+                orderModel = orderModelDB.getCustomersRow(customerModel.getCode());
+                if (orderModel != null) {
+                    OrderItemModel orderItemModelDB = new OrderItemModel(context);
+                    orderItemModelDB.open();
+                    totalAmount = orderItemModelDB.getTotalAmount(orderModel.getOrderId());
+                    orderItemModelDB.close();
+                    orderModelDB.updateRow(new OrderModel(
+                            orderModel.getOrderId(),
+                            orderModel.getDocDate(),
+                            orderModel.getCustomerCode(),
+                            totalAmount,
+                            orderModel.getReceivedAmount(),
+                            orderModel.getDueDate(),
+                            orderModel.getRemarks(),
+                            orderModel.getUserId()
+                    ));
                 }
-                customerModelDB.close();
+                orderModelDB.close();
+
                 return orderItemModel;
             }
 
@@ -311,6 +312,53 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
                     if (onAdapterInteractionListener != null) {
                         onAdapterInteractionListener.onProductSelected();
                     }
+                }
+            }
+        }.execute();
+    }
+
+    private void removeOrder(final Context context, final ProductModel item, final AppCompatDialog appCompatDialog, final int adapterPosition) {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                OrderModel orderModelDB = new OrderModel(context);
+                orderModelDB.open();
+                OrderModel orderModel = orderModelDB.getCustomersRow(customerModel.getCode());
+                orderModelDB.close();
+                String totalAmount;
+                if (orderModel != null) {
+                    OrderItemModel orderItemModelDB = new OrderItemModel(context);
+                    orderItemModelDB.open();
+                    orderItemModelDB.deleteRow(item.getCode(), orderModel.getOrderId());
+                    totalAmount = orderItemModelDB.getTotalAmount(orderModel.getOrderId());
+                    orderItemModelDB.close();
+                    orderModelDB.open();
+                    orderModelDB.updateRow(new OrderModel(
+                            orderModel.getOrderId(),
+                            orderModel.getDocDate(),
+                            orderModel.getCustomerCode(),
+                            totalAmount,
+                            orderModel.getReceivedAmount(),
+                            orderModel.getDueDate(),
+                            orderModel.getRemarks(),
+                            orderModel.getUserId()
+                    ));
+                    orderModelDB.close();
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void orderItemModel) {
+                super.onPostExecute(orderItemModel);
+                if (appCompatDialog != null && appCompatDialog.isShowing()) {
+                    appCompatDialog.dismiss();
+                }
+                orderItemModelMap.remove(item.getCode());
+                productModelList.remove(adapterPosition);
+                notifyDataSetChanged();
+                if (onAdapterInteractionListener != null) {
+                    onAdapterInteractionListener.onProductSelected();
                 }
             }
         }.execute();

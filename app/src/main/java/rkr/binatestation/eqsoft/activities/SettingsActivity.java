@@ -1,5 +1,6 @@
 package rkr.binatestation.eqsoft.activities;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -16,6 +17,7 @@ import rkr.binatestation.eqsoft.utils.Util;
 public class SettingsActivity extends AppCompatActivity {
 
     AppCompatRadioButton syncByUSB;
+    ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,8 +35,20 @@ public class SettingsActivity extends AppCompatActivity {
         if (syncByUSB.isChecked()) {
             new DataSync(view.getContext()) {
                 @Override
+                protected void onPreExecute() {
+                    super.onPreExecute();
+                    progressDialog = new ProgressDialog(SettingsActivity.this);
+                    progressDialog.setMessage("Please wait ...");
+                    progressDialog.setCancelable(false);
+                    progressDialog.show();
+                }
+
+                @Override
                 protected void onPostExecute(Boolean aBoolean) {
                     super.onPostExecute(aBoolean);
+                    if (progressDialog != null && progressDialog.isShowing()) {
+                        progressDialog.dismiss();
+                    }
                     if (aBoolean) {
                         getSharedPreferences(getPackageName(), MODE_PRIVATE).edit().putString(Constants.KEY_SYNC_TYPE, "syncByUsb").apply();
                         startActivity(new Intent(getBaseContext(), LoginActivity.class));

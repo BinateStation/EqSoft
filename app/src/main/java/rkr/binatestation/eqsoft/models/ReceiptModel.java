@@ -97,16 +97,20 @@ public class ReceiptModel implements Serializable {
     }
 
     public void insert(ReceiptModel obj) {
-        ContentValues values = new ContentValues();
-        values.put(ReceiptsTable.COLUMN_NAME_RECEIPT_DATE, obj.getReceiptDateTime());
-        values.put(ReceiptsTable.COLUMN_NAME_CUSTOMER_CODE, obj.getCustomerCode());
-        values.put(ReceiptsTable.COLUMN_NAME_AMOUNT, obj.getAmount());
-        values.put(ReceiptsTable.COLUMN_NAME_USER_ID, obj.getUserId());
+        if (getRow(obj.getCustomerCode()) == null) {
+            ContentValues values = new ContentValues();
+            values.put(ReceiptsTable.COLUMN_NAME_RECEIPT_DATE, obj.getReceiptDateTime());
+            values.put(ReceiptsTable.COLUMN_NAME_CUSTOMER_CODE, obj.getCustomerCode());
+            values.put(ReceiptsTable.COLUMN_NAME_AMOUNT, obj.getAmount());
+            values.put(ReceiptsTable.COLUMN_NAME_USER_ID, obj.getUserId());
 
-        long insertId;
-        insertId = database.insert(ReceiptsTable.TABLE_NAME, null, values);
+            long insertId;
+            insertId = database.insert(ReceiptsTable.TABLE_NAME, null, values);
 
-        Log.i("InsertID", "Categories : " + insertId);
+            Log.i("InsertID", "Categories : " + insertId);
+        } else {
+            updateRow(obj);
+        }
     }
 
     /**
@@ -139,7 +143,7 @@ public class ReceiptModel implements Serializable {
         }
     }
 
-    public void updateRow(ReceiptModel obj, String id) {
+    public void updateRow(ReceiptModel obj) {
 
         ContentValues values = new ContentValues();
         values.put(ReceiptsTable.COLUMN_NAME_RECEIPT_DATE, obj.getReceiptDateTime());
@@ -147,8 +151,8 @@ public class ReceiptModel implements Serializable {
         values.put(ReceiptsTable.COLUMN_NAME_AMOUNT, obj.getAmount());
         values.put(ReceiptsTable.COLUMN_NAME_USER_ID, obj.getUserId());
 
-        database.update(ReceiptsTable.TABLE_NAME, values, ReceiptsTable._ID + " = ?", new String[]{id});
-        System.out.println("Categories Row Updated with id: " + id);
+        database.update(ReceiptsTable.TABLE_NAME, values, ReceiptsTable.COLUMN_NAME_CUSTOMER_CODE + " = ?", new String[]{obj.getCustomerCode()});
+        System.out.println("Categories Row Updated with id: " + obj.getCustomerCode());
     }
 
     public void deleteRow(String receiptId) {
@@ -188,8 +192,8 @@ public class ReceiptModel implements Serializable {
     }
 
 
-    public ReceiptModel getRow(String receiptId) {
-        Cursor cursor = database.query(ReceiptsTable.TABLE_NAME, null, ReceiptsTable._ID + " = ?", new String[]{receiptId}, null, null, null);
+    public ReceiptModel getRow(String customerCode) {
+        Cursor cursor = database.query(ReceiptsTable.TABLE_NAME, null, ReceiptsTable.COLUMN_NAME_CUSTOMER_CODE + " = ?", new String[]{customerCode}, null, null, null);
         ReceiptModel productModel = null;
         if (cursor.moveToFirst()) {
             productModel = cursorToProductModel(cursor);
@@ -250,11 +254,12 @@ public class ReceiptModel implements Serializable {
 
         private static final String TEXT_TYPE = " TEXT";
         private static final String COMMA_SEP = ",";
+        private static final String UNIQUE = " UNIQUE ";
         public static final String SQL_CREATE_USER_DETAILS =
                 "CREATE TABLE " + TABLE_NAME + " (" +
                         _ID + " INTEGER PRIMARY KEY," +
                         COLUMN_NAME_RECEIPT_DATE + TEXT_TYPE + COMMA_SEP +
-                        COLUMN_NAME_CUSTOMER_CODE + TEXT_TYPE + COMMA_SEP +
+                        COLUMN_NAME_CUSTOMER_CODE + TEXT_TYPE + UNIQUE + COMMA_SEP +
                         COLUMN_NAME_AMOUNT + TEXT_TYPE + COMMA_SEP +
                         COLUMN_NAME_USER_ID + TEXT_TYPE +
                         " )";

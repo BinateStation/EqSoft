@@ -163,9 +163,10 @@ public class OrderItemModel implements Serializable {
         System.out.println("Categories Row Updated with id: " + obj.getProductCode());
     }
 
-    public void deleteRow(String id) {
-        database.delete(OrderItemsTable.TABLE_NAME, OrderItemsTable._ID + " = ?", new String[]{id});
-        System.out.println("Categories Row deleted with id: " + id);
+    public void deleteRow(String productCode, String orderId) {
+        database.delete(OrderItemsTable.TABLE_NAME, OrderItemsTable.COLUMN_NAME_PRODUCT_CODE + " = ? AND " +
+                OrderItemsTable.COLUMN_NAME_ORDER_ID + " = ? ", new String[]{productCode, orderId});
+        System.out.println("Categories Row deleted with id: " + productCode + " , " + orderId);
     }
 
     public void deleteAll() {
@@ -210,6 +211,19 @@ public class OrderItemModel implements Serializable {
         }
         cursor.close();
         return list;
+    }
+
+    public String getTotalAmount(String orderId) {
+        Double totalAmount = 0.0;
+        Cursor cursor = database.query(OrderItemsTable.TABLE_NAME, null, OrderItemsTable.COLUMN_NAME_ORDER_ID + " = ?", new String[]{orderId}, null, null, null);
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            OrderItemModel obj = cursorToProductModel(cursor);
+            totalAmount += Double.parseDouble(obj.getAmount());
+            cursor.moveToNext();
+        }
+        cursor.close();
+        return "" + totalAmount;
     }
 
 

@@ -1,6 +1,7 @@
 package rkr.binatestation.eqsoft.activities;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -26,9 +27,11 @@ import rkr.binatestation.eqsoft.utils.Constants;
 import rkr.binatestation.eqsoft.utils.Util;
 
 public class CustomersActivity extends AppCompatActivity {
+    ProgressDialog progressDialog;
 
     SearchView customerSearch;
     RecyclerView customersRecyclerView;
+    LinearLayoutManager linearLayoutManager;
     AppCompatSpinner sort;
 
     @Override
@@ -43,7 +46,9 @@ public class CustomersActivity extends AppCompatActivity {
         sort = (AppCompatSpinner) findViewById(R.id.AC_sort);
 
         customerSearch.setQueryHint(getString(R.string.type_to_search));
-        customersRecyclerView.setLayoutManager(new LinearLayoutManager(customersRecyclerView.getContext()));
+        customersRecyclerView.setLayoutManager(linearLayoutManager = new LinearLayoutManager(customersRecyclerView.getContext()));
+
+        linearLayoutManager.scrollToPosition(10);
 
         customerSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -92,14 +97,32 @@ public class CustomersActivity extends AppCompatActivity {
                 customersRecyclerView.setAdapter(new CustomerAdapter(customerModelList, new CustomerAdapter.OnAdapterInteractionListener() {
                     @Override
                     public void onItemSelected(CustomerModel customerModel) {
+                        if (customerModel != null) {
+                            getSharedPreferences(getPackageName(), MODE_PRIVATE).edit()
+                                    .putString(Constants.KEY_LAST_SELECTED_CUSTOMER, customerModel.getCode()).apply();
+                        }
                         Intent returnIntent = new Intent();
                         returnIntent.putExtra(Constants.KEY_CUSTOMER, customerModel);
                         setResult(Activity.RESULT_OK, returnIntent);
                         finish();
                     }
                 }));
+                if (linearLayoutManager != null) {
+                    linearLayoutManager.scrollToPosition(findLastSelectedCustomerPosition(customerModelList));
+                }
             }
         }.execute();
+    }
+
+    private int findLastSelectedCustomerPosition(List<CustomerModel> customerModelList) {
+        for (int i = 0; i < customerModelList.size(); i++) {
+            if (customerModelList.get(i).getCode().equalsIgnoreCase(
+                    Util.getStringFromSharedPreferences(getBaseContext(), Constants.KEY_LAST_SELECTED_CUSTOMER)
+            )) {
+                return i;
+            }
+        }
+        return 0;
     }
 
     @Override
@@ -115,8 +138,20 @@ public class CustomersActivity extends AppCompatActivity {
             case R.id.GM_usbSync:
                 new DataSync(getBaseContext()) {
                     @Override
+                    protected void onPreExecute() {
+                        super.onPreExecute();
+                        progressDialog = new ProgressDialog(CustomersActivity.this);
+                        progressDialog.setMessage("Please wait ...");
+                        progressDialog.setCancelable(false);
+                        progressDialog.show();
+                    }
+
+                    @Override
                     protected void onPostExecute(Boolean aBoolean) {
                         super.onPostExecute(aBoolean);
+                        if (progressDialog != null && progressDialog.isShowing()) {
+                            progressDialog.dismiss();
+                        }
                         if (aBoolean) {
                             Util.showAlert(CustomersActivity.this, "Alert", "Successfully synced", false);
                         } else {

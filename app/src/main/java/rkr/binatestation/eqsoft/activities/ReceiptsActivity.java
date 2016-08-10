@@ -1,5 +1,6 @@
 package rkr.binatestation.eqsoft.activities;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -24,6 +25,7 @@ import rkr.binatestation.eqsoft.utils.Util;
 
 public class ReceiptsActivity extends AppCompatActivity {
     CustomerModel customerModel;
+    ProgressDialog progressDialog;
 
     TextView customerLedgerName, mobile, balance;
     TextInputEditText receivedAmount;
@@ -65,8 +67,20 @@ public class ReceiptsActivity extends AppCompatActivity {
             case R.id.GM_usbSync:
                 new DataSync(getBaseContext()) {
                     @Override
+                    protected void onPreExecute() {
+                        super.onPreExecute();
+                        progressDialog = new ProgressDialog(ReceiptsActivity.this);
+                        progressDialog.setMessage("Please wait ...");
+                        progressDialog.setCancelable(false);
+                        progressDialog.show();
+                    }
+
+                    @Override
                     protected void onPostExecute(Boolean aBoolean) {
                         super.onPostExecute(aBoolean);
+                        if (progressDialog != null && progressDialog.isShowing()) {
+                            progressDialog.dismiss();
+                        }
                         if (aBoolean) {
                             Util.showAlert(ReceiptsActivity.this, "Alert", "Successfully synced", false);
                         } else {
@@ -90,8 +104,52 @@ public class ReceiptsActivity extends AppCompatActivity {
         if (customerModel != null) {
             customerLedgerName.setText(customerModel.getLedgerName());
             mobile.setText(customerModel.getMobile());
-            balance.setText(customerModel.getBalance());
+            setCustomerBalance(balance.getContext(), customerModel.getCode(), balance);
+            setReceivedAmount();
         }
+    }
+
+    private void setCustomerBalance(final Context context, final String customerCode, final TextView balanceTextView) {
+        new AsyncTask<Void, Void, String>() {
+            @Override
+            protected String doInBackground(Void... voids) {
+                CustomerModel customerModelDB = new CustomerModel(context);
+                customerModelDB.open();
+                String balance = customerModelDB.getCustomerBalance(customerCode);
+                customerModelDB.close();
+                return balance;
+            }
+
+            @Override
+            protected void onPostExecute(String balance) {
+                super.onPostExecute(balance);
+                balanceTextView.setText(balance);
+            }
+        }.execute();
+    }
+
+    private void setReceivedAmount() {
+        new AsyncTask<Void, Void, ReceiptModel>() {
+            @Override
+            protected ReceiptModel doInBackground(Void... voids) {
+                ReceiptModel receiptModelDB = new ReceiptModel(getBaseContext());
+                receiptModelDB.open();
+                ReceiptModel receiptModel = receiptModelDB.getRow(customerModel.getCode());
+                receiptModelDB.close();
+                return receiptModel;
+            }
+
+            @Override
+            protected void onPostExecute(ReceiptModel receiptModel) {
+                super.onPostExecute(receiptModel);
+                if (receiptModel != null) {
+                    receivedAmount.setText(receiptModel.getAmount());
+                    receivedAmount.setSelection(receivedAmount.getText().length());
+                } else {
+                    receivedAmount.setText("");
+                }
+            }
+        }.execute();
     }
 
     public void done(View view) {
@@ -107,21 +165,6 @@ public class ReceiptsActivity extends AppCompatActivity {
             @Override
             protected Void doInBackground(Void... voids) {
                 if (receivedAmount.length() > 0) {
-                    CustomerModel customerModelDB = new CustomerModel(context);
-                    customerModelDB.open();
-                    try {
-                        if (customerModel != null) {
-                            customerModel.setBalance("" + (
-                                    Double.parseDouble(customerModel.getBalance()) -
-                                            Double.parseDouble(receivedAmount))
-                            );
-                            customerModelDB.updateRow(customerModel);
-                        }
-                    } catch (NumberFormatException e) {
-                        e.printStackTrace();
-                    }
-                    customerModelDB.close();
-
                     ReceiptModel receiptModelDB = new ReceiptModel(context);
                     receiptModelDB.open();
                     receiptModelDB.insert(new ReceiptModel(
