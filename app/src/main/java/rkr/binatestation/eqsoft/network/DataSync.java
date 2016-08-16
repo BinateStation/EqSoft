@@ -172,6 +172,21 @@ public class DataSync extends AsyncTask<Integer, Integer, Boolean> {
                         "password"
                 ));
                 userDetailsTable.close();
+
+                OrderModel orderModelDB = new OrderModel(context);
+                orderModelDB.open();
+                orderModelDB.deleteAll();
+                orderModelDB.close();
+
+                OrderItemModel orderItemModelDB = new OrderItemModel(context);
+                orderItemModelDB.open();
+                orderItemModelDB.deleteAll();
+                orderItemModelDB.close();
+
+                ReceiptModel receiptModelDB = new ReceiptModel(context);
+                receiptModelDB.open();
+                receiptModelDB.deleteAll();
+                receiptModelDB.close();
                 return true;
             } else {
                 Util.showAlert(context, "Alert", "File doesn't exists, please copy the file to specified folder and sync.");

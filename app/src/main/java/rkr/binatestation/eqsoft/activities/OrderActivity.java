@@ -2,10 +2,12 @@ package rkr.binatestation.eqsoft.activities;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.TextInputEditText;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.LinearLayoutManager;
@@ -269,39 +271,140 @@ public class OrderActivity extends AppCompatActivity {
         return true;
     }
 
+    private void alertSync() {
+        new AlertDialog.Builder(OrderActivity.this)
+                .setTitle("Alert")
+                .setMessage("Sync will replace the previously sync data. Please ensure that previously synced data is copied to your computer and proceed..")
+                .setPositiveButton("Proceed", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        sync();
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                })
+                .show();
+    }
+
+    private void sync() {
+        new DataSync(getBaseContext()) {
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                progressDialog = new ProgressDialog(OrderActivity.this);
+                progressDialog.setMessage("Please wait ...");
+                progressDialog.setCancelable(false);
+                progressDialog.show();
+            }
+
+            @Override
+            protected void onPostExecute(Boolean aBoolean) {
+                super.onPostExecute(aBoolean);
+                if (progressDialog != null && progressDialog.isShowing()) {
+                    progressDialog.dismiss();
+                }
+                if (aBoolean) {
+                    Util.showAlert(OrderActivity.this, "Alert", "Successfully synced", false);
+                } else {
+                    Util.showAlert(OrderActivity.this, "Alert", "Some thing went wrong please contact administrator", false);
+                }
+            }
+        }.execute(0);
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.GM_usbSync:
-                new DataSync(getBaseContext()) {
-                    @Override
-                    protected void onPreExecute() {
-                        super.onPreExecute();
-                        progressDialog = new ProgressDialog(OrderActivity.this);
-                        progressDialog.setMessage("Please wait ...");
-                        progressDialog.setCancelable(false);
-                        progressDialog.show();
-                    }
-
-                    @Override
-                    protected void onPostExecute(Boolean aBoolean) {
-                        super.onPostExecute(aBoolean);
-                        if (progressDialog != null && progressDialog.isShowing()) {
-                            progressDialog.dismiss();
-                        }
-                        if (aBoolean) {
-                            Util.showAlert(OrderActivity.this, "Alert", "Successfully synced", false);
-                        } else {
-                            Util.showAlert(OrderActivity.this, "Alert", "Some thing went wrong please contact administrator", false);
-                        }
-                    }
-                }.execute(0);
+                alertSync();
                 return true;
             case R.id.GM_logout:
                 Util.logoutAlert(OrderActivity.this, "Alert", "Are you sure you want to logout.?");
                 return true;
+            case R.id.GM_clearAll:
+                alertClearAll();
+                return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void alertClearAll() {
+        new AlertDialog.Builder(OrderActivity.this)
+                .setTitle("Alert")
+                .setMessage("This will clear all the data in your database, and can't able to recollect. Are you sure you need to proceed..?")
+                .setPositiveButton("Proceed", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        clearAll();
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                })
+                .show();
+    }
+
+    private void clearAll() {
+        new AsyncTask<Void, Void, Boolean>() {
+            @Override
+            protected Boolean doInBackground(Void... voids) {
+                ProductModel productModelDB = new ProductModel(getBaseContext());
+                productModelDB.open();
+                productModelDB.deleteAll();
+                productModelDB.close();
+
+                CustomerModel customerModelDB = new CustomerModel(getBaseContext());
+                customerModelDB.open();
+                customerModelDB.deleteAll();
+                customerModelDB.close();
+
+                OrderModel orderModelDB = new OrderModel(getBaseContext());
+                orderModelDB.open();
+                orderModelDB.deleteAll();
+                orderModelDB.close();
+
+                OrderItemModel orderItemModelDB = new OrderItemModel(getBaseContext());
+                orderItemModelDB.open();
+                orderItemModelDB.deleteAll();
+                orderItemModelDB.close();
+
+                ReceiptModel receiptModelDB = new ReceiptModel(getBaseContext());
+                receiptModelDB.open();
+                receiptModelDB.deleteAll();
+                receiptModelDB.close();
+
+                return true;
+            }
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                progressDialog = new ProgressDialog(OrderActivity.this);
+                progressDialog.setMessage("Please wait ...");
+                progressDialog.setCancelable(false);
+                progressDialog.show();
+            }
+
+            @Override
+            protected void onPostExecute(Boolean aBoolean) {
+                super.onPostExecute(aBoolean);
+                if (progressDialog != null && progressDialog.isShowing()) {
+                    progressDialog.dismiss();
+                }
+                if (aBoolean) {
+                    Util.showAlert(OrderActivity.this, "Alert", "Successfully deleted", false);
+                } else {
+                    Util.showAlert(OrderActivity.this, "Alert", "Some thing went wrong please contact administrator", false);
+                }
+            }
+        }.execute();
     }
 
 }

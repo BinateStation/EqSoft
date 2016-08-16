@@ -23,6 +23,10 @@
                 android:id="@+id/GM_logout"
                 android:icon="@drawable/ic_logout_black_24dp"
                 android:title="@string/logout" />
+            <item
+                android:id="@+id/GM_clearAll"
+                android:icon="@drawable/ic_delete_black_24dp"
+                android:title="@string/clear_all" />
         </menu>
     </item>
 </menu>
