@@ -72,6 +72,11 @@ public class OrderActivity extends AppCompatActivity {
         });
 
         selectedProductsRecyclerView.setLayoutManager(new LinearLayoutManager(selectedProductsRecyclerView.getContext()));
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         setCustomerDetails();
     }
 

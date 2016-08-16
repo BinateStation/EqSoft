@@ -67,9 +67,7 @@ public class CustomersActivity extends AppCompatActivity {
         sort.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                if (i != 0) {
-                    getCustomerList("", sort.getSelectedItemPosition());
-                }
+                getCustomerList("", sort.getSelectedItemPosition());
             }
 
             @Override

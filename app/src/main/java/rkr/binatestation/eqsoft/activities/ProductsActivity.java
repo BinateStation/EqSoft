@@ -96,6 +96,8 @@ public class ProductsActivity extends AppCompatActivity {
         if (customerModel != null) {
             customerName.setText(customerModel.getLedgerName());
             setOrderItemModelMap();
+        } else {
+            totalAmount.setText("");
         }
     }
 
@@ -124,6 +126,8 @@ public class ProductsActivity extends AppCompatActivity {
                 super.onPostExecute(orderModel);
                 if (orderModel != null) {
                     totalAmount.setText(orderModel.getAmount());
+                } else {
+                    totalAmount.setText("");
                 }
                 if (productAdapter != null) {
                     productAdapter.setOrderItemModelMap(orderItemModelMap);

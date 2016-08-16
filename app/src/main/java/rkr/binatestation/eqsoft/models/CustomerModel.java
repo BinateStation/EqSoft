@@ -299,7 +299,7 @@ public class CustomerModel implements Serializable {
                 sortBy = CustomersTable.COLUMN_NAME_ROUTE;
                 break;
             default:
-                sortBy = null;
+                sortBy = CustomersTable.COLUMN_NAME_LEDGER_NAME;
         }
         Cursor cursor = database.query(CustomersTable.TABLE_NAME, null, CustomersTable.COLUMN_NAME_LEDGER_NAME + " LIKE '" + query + "%' OR " +
                 CustomersTable.COLUMN_NAME_MOBILE + " LIKE '%" + query + "%' ", null, null, null, sortBy);
