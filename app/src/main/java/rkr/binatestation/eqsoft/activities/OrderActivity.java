@@ -177,14 +177,14 @@ public class OrderActivity extends AppCompatActivity {
             @Override
             protected void onPostExecute(List<ProductModel> productModels) {
                 super.onPostExecute(productModels);
-                selectedProductsRecyclerView.setAdapter(productAdapter = new ProductAdapter(productModels, customerModel, orderItemModelMap, false, new ProductAdapter.OnAdapterInteractionListener() {
+                selectedProductsRecyclerView.setAdapter(productAdapter = new ProductAdapter(productModels, customerModel, orderItemModelMap, true, new ProductAdapter.OnAdapterInteractionListener() {
                     @Override
                     public void onItemClicked() {
                     }
 
                     @Override
                     public void onProductSelected() {
-
+                        setCustomerDetails();
                     }
                 }));
             }

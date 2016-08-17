@@ -87,12 +87,12 @@ public class ProductsActivity extends AppCompatActivity {
 
             }
         });
-        setCustomerName();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        setCustomerName();
     }
 
     public void setCustomerName() {

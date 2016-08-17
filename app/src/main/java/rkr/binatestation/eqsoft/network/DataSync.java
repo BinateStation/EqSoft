@@ -140,11 +140,9 @@ public class DataSync extends AsyncTask<Integer, Integer, Boolean> {
                 customerModelDB.insertMultipleRows(customerModelList);
                 customerModelDB.close();
 
-                // Getting data JSON Array nodes
                 JSONArray productsJsonArray = jsonObj.getJSONArray("Products");
 
                 List<ProductModel> productModelList = new ArrayList<>();
-                // looping through All nodes
                 for (int i = 0; i < productsJsonArray.length(); i++) {
                     JSONObject productJsonObject = productsJsonArray.getJSONObject(i);
                     productModelList.add(new ProductModel(
@@ -164,13 +162,20 @@ public class DataSync extends AsyncTask<Integer, Integer, Boolean> {
                 productModelDB.insertMultipleRows(productModelList);
                 productModelDB.close();
 
+                JSONArray usersJsonArray = jsonObj.getJSONArray("User");
+
+                List<UserDetailsModel> userDetailsModelList = new ArrayList<>();
+                for (int i = 0; i < usersJsonArray.length(); i++) {
+                    JSONObject userJsonObject = usersJsonArray.getJSONObject(i);
+                    userDetailsModelList.add(new UserDetailsModel(
+                            userJsonObject.optString("Userid"),
+                            userJsonObject.optString("Username"),
+                            userJsonObject.optString("Password")
+                    ));
+                }
                 UserDetailsModel userDetailsTable = new UserDetailsModel(context);
                 userDetailsTable.open();
-                userDetailsTable.insert(new UserDetailsModel(
-                        "12345",
-                        "username",
-                        "password"
-                ));
+                userDetailsTable.insertMultipleRows(userDetailsModelList);
                 userDetailsTable.close();
 
                 OrderModel orderModelDB = new OrderModel(context);
