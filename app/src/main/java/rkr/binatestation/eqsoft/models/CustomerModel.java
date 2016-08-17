@@ -18,6 +18,7 @@ import org.json.JSONObject;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by RKR on 1/8/2016.
@@ -354,7 +355,7 @@ public class CustomerModel implements Serializable {
             receiptsCursor.moveToNext();
         }
         receiptsCursor.close();
-        return "" + balance;
+        return String.format(Locale.getDefault(), "%.2f", balance);
     }
 
     /**

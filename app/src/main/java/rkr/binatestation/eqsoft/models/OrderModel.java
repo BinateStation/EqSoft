@@ -19,6 +19,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -245,22 +246,12 @@ public class OrderModel implements Serializable {
             cursor.moveToNext();
         }
         cursor.close();
-        stringMap.put("KEY_TOTAL_AMOUNT_RECEIVED", "" + totalAmountReceived);
-        stringMap.put("KEY_TOTAL_AMOUNT", "" + (totalAmount));
-        stringMap.put("KEY_TOTAL_PENDING_AMOUNT", "" + (totalAmount - totalAmountReceived));
+        stringMap.put("KEY_TOTAL_AMOUNT_RECEIVED", String.format(Locale.getDefault(), "%.2f", totalAmountReceived));
+        stringMap.put("KEY_TOTAL_AMOUNT", String.format(Locale.getDefault(), "%.2f", totalAmount));
+        stringMap.put("KEY_TOTAL_PENDING_AMOUNT", String.format(Locale.getDefault(), "%.2f", (totalAmount - totalAmountReceived)));
         return stringMap;
     }
 
-
-    public OrderModel getRow(String id) {
-        Cursor cursor = database.query(OrdersTable.TABLE_NAME, null, OrdersTable._ID + " = ?", new String[]{id}, null, null, null);
-        OrderModel orderModel = null;
-        if (cursor.moveToFirst()) {
-            orderModel = cursorToProductModel(cursor);
-        }
-        cursor.close();
-        return orderModel;
-    }
 
     public OrderModel getCustomersRow(String customerCode) {
         Cursor cursor = database.query(OrdersTable.TABLE_NAME, null, OrdersTable.COLUMN_NAME_CUSTOMER_CODE + " = ?", new String[]{customerCode}, null, null, null);

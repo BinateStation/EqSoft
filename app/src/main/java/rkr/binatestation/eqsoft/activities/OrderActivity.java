@@ -218,27 +218,12 @@ public class OrderActivity extends AppCompatActivity {
                             orderModel.getDocDate(),
                             orderModel.getCustomerCode(),
                             orderModel.getAmount(),
-                            "" + (Double.parseDouble(orderModel.getReceivedAmount()) + Double.parseDouble(receivedAmount)),
+                            receivedAmount,
                             orderModel.getDueDate(),
                             orderModel.getRemarks(),
                             orderModel.getUserId()
                     ));
                     orderModelDB.close();
-                    CustomerModel customerModelDB = new CustomerModel(context);
-                    customerModelDB.open();
-                    try {
-                        if (customerModel != null) {
-                            customerModel.setBalance("" + (
-                                    Double.parseDouble(customerModel.getBalance()) -
-                                            (Double.parseDouble(orderModel.getReceivedAmount()) + Double.parseDouble(receivedAmount)))
-                            );
-                            customerModelDB.updateRow(customerModel);
-                        }
-                    } catch (NumberFormatException e) {
-                        e.printStackTrace();
-                    }
-                    customerModelDB.close();
-
                     ReceiptModel receiptModelDB = new ReceiptModel(context);
                     receiptModelDB.open();
                     receiptModelDB.insert(new ReceiptModel(
