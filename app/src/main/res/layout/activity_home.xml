@@ -30,6 +30,19 @@
             android:orientation="vertical">
 
             <TextView
+                android:id="@+id/AH_usernameLabel"
+                style="@style/TextAppearance.AppCompat.Caption"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/activity_widget_margin"
+                android:layout_marginLeft="@dimen/activity_widget_margin"
+                android:layout_marginRight="@dimen/activity_widget_margin"
+                android:layout_marginStart="@dimen/activity_widget_margin"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:gravity="end"
+                android:text="@string/username" />
+
+            <TextView
                 android:id="@+id/AH_username"
                 style="@style/TextAppearance.AppCompat.Title"
                 android:layout_width="match_parent"
@@ -39,7 +52,6 @@
                 android:layout_marginLeft="@dimen/activity_widget_margin"
                 android:layout_marginRight="@dimen/activity_widget_margin"
                 android:layout_marginStart="@dimen/activity_widget_margin"
-                android:layout_marginTop="@dimen/activity_vertical_margin"
                 android:gravity="end" />
 
             <android.support.v7.widget.LinearLayoutCompat
@@ -47,10 +59,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/activity_vertical_margin"
-                android:layout_marginEnd="@dimen/activity_widget_margin"
-                android:layout_marginLeft="@dimen/activity_widget_margin"
-                android:layout_marginRight="@dimen/activity_widget_margin"
-                android:layout_marginStart="@dimen/activity_widget_margin"
                 android:layout_marginTop="@dimen/activity_vertical_margin"
                 android:background="@drawable/bg_button_light"
                 android:onClick="order"
@@ -68,10 +76,6 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="2dp"
-                    android:layout_marginEnd="@dimen/activity_horizontal_margin"
-                    android:layout_marginLeft="@dimen/activity_horizontal_margin"
-                    android:layout_marginRight="@dimen/activity_horizontal_margin"
-                    android:layout_marginStart="@dimen/activity_horizontal_margin"
                     android:background="@color/light_shade" />
 
                 <android.support.v7.widget.LinearLayoutCompat
@@ -212,6 +216,19 @@
                         android:layout_marginTop="@dimen/activity_vertical_margin"
                         android:gravity="center" />
 
+                    <android.support.design.widget.FloatingActionButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:background="@drawable/bg_button_oval_dark"
+                        android:contentDescription="@string/receipts"
+                        android:onClick="onReceiptsClick"
+                        android:src="@drawable/ic_add_white_24dp"
+                        app:fabSize="mini"
+                        app:layout_anchor="@id/AH_receiptsLayout"
+                        app:layout_anchorGravity="bottom|center" />
+
+
                 </android.support.v7.widget.LinearLayoutCompat>
 
                 <android.support.v7.widget.LinearLayoutCompat
@@ -243,6 +260,18 @@
                         android:layout_marginTop="@dimen/activity_vertical_margin"
                         android:gravity="center" />
 
+                    <android.support.design.widget.FloatingActionButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:background="@drawable/bg_button_oval_dark"
+                        android:contentDescription="@string/products"
+                        android:onClick="onProductsClick"
+                        android:src="@drawable/ic_add_white_24dp"
+                        app:fabSize="mini"
+                        app:layout_anchor="@id/AH_productsLayout"
+                        app:layout_anchorGravity="bottom|center" />
+
                 </android.support.v7.widget.LinearLayoutCompat>
 
                 <android.support.v7.widget.LinearLayoutCompat
@@ -273,6 +302,20 @@
                         android:layout_marginBottom="@dimen/activity_vertical_margin"
                         android:layout_marginTop="@dimen/activity_vertical_margin"
                         android:gravity="center" />
+
+                    <android.support.design.widget.FloatingActionButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="@dimen/activity_widget_margin"
+                        android:background="@drawable/bg_button_oval_dark"
+                        android:contentDescription="@string/customers"
+                        android:onClick="onCustomerClick"
+                        android:src="@drawable/ic_add_white_24dp"
+                        app:fabSize="mini"
+                        app:layout_anchor="@id/AH_customersLayout"
+                        app:layout_anchorGravity="bottom|center" />
+
                 </android.support.v7.widget.LinearLayoutCompat>
             </android.support.v7.widget.LinearLayoutCompat>
         </android.support.v7.widget.LinearLayoutCompat>
@@ -288,40 +331,5 @@
         app:layout_anchor="@id/AH_orderSummaryLayout"
         app:layout_anchorGravity="bottom|center" />
 
-    <android.support.design.widget.FloatingActionButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@drawable/bg_button_oval_dark"
-        android:contentDescription="@string/receipts"
-        android:onClick="onReceiptsClick"
-        android:src="@drawable/ic_add_white_24dp"
-        app:fabSize="mini"
-        app:layout_anchor="@id/AH_receiptsLayout"
-        app:layout_anchorGravity="bottom|center" />
-
-    <android.support.design.widget.FloatingActionButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:background="@drawable/bg_button_oval_dark"
-        android:contentDescription="@string/products"
-        android:onClick="onProductsClick"
-        android:src="@drawable/ic_add_white_24dp"
-        app:fabSize="mini"
-        app:layout_anchor="@id/AH_productsLayout"
-        app:layout_anchorGravity="bottom|center" />
-
-    <android.support.design.widget.FloatingActionButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="@dimen/activity_widget_margin"
-        android:background="@drawable/bg_button_oval_dark"
-        android:contentDescription="@string/customers"
-        android:onClick="onCustomerClick"
-        android:src="@drawable/ic_add_white_24dp"
-        app:fabSize="mini"
-        app:layout_anchor="@id/AH_customersLayout"
-        app:layout_anchorGravity="bottom|center" />
 
 </android.support.design.widget.CoordinatorLayout>
