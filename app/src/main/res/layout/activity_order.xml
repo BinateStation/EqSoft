@@ -87,18 +87,6 @@
 
             </android.support.v7.widget.LinearLayoutCompat>
 
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/AO_selectedProducts"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="end"
-                android:onClick="addMore"
-                android:padding="@dimen/activity_widget_margin"
-                android:text="@string/add_more" />
 
             <android.support.v7.widget.AppCompatTextView
                 android:id="@+id/AO_totalAmount"
@@ -132,17 +120,32 @@
 
             </android.support.design.widget.TextInputLayout>
 
-            <Button
-                style="@style/Base.TextAppearance.AppCompat.Widget.Button.Inverse"
-                android:layout_width="wrap_content"
+            <TextView
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:layout_margin="@dimen/fab_margin"
-                android:background="@drawable/bg_button_dark"
-                android:onClick="proceedOrder"
-                android:text="@string/proceed" />
+                android:gravity="end"
+                android:onClick="addMore"
+                android:padding="@dimen/activity_widget_margin"
+                android:text="@string/add_more" />
+
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/AO_selectedProducts"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
         </android.support.v7.widget.LinearLayoutCompat>
 
     </android.support.v4.widget.NestedScrollView>
+
+    <android.support.design.widget.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:layout_margin="@dimen/fab_margin"
+        android:onClick="proceedOrder"
+        android:src="@drawable/ic_save_24dp"
+        android:tint="@color/colorPrimary"
+        app:backgroundTint="@color/light_shade"
+        app:fabSize="normal" />
 
 </android.support.design.widget.CoordinatorLayout>

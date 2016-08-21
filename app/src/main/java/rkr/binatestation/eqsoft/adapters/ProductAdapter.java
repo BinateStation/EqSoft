@@ -88,6 +88,8 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
         holder.sellingPrice.setText(String.format(Locale.getDefault(), "%.2f", getItem(position).getSellingRate()));
         if (orderItemModelMap.containsKey(getItem(position).getCode())) {
             holder.selectedView.setVisibility(View.VISIBLE);
+            holder.quantity.setText(String.format(Locale.getDefault(), "Qty: %.2f", orderItemModelMap.get(getItem(position).getCode()).getQuantity()));
+            holder.amount.setText(String.format(Locale.getDefault(), "Amt: %.2f", orderItemModelMap.get(getItem(position).getCode()).getAmount()));
         } else {
             holder.selectedView.setVisibility(View.GONE);
         }
@@ -376,7 +378,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
 
     class ItemView extends RecyclerView.ViewHolder {
         View itemView;
-        TextView productName, productMRP, productCode, stock, sellingPrice;
+        TextView productName, productMRP, productCode, stock, sellingPrice, quantity, amount;
         View selectedView;
 
         public ItemView(View itemView) {
@@ -388,6 +390,8 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
             stock = (TextView) itemView.findViewById(R.id.AP_productStock);
             sellingPrice = (TextView) itemView.findViewById(R.id.AP_productSellingPrice);
             selectedView = itemView.findViewById(R.id.AP_isSelected);
+            quantity = (TextView) itemView.findViewById(R.id.AP_productQty);
+            amount = (TextView) itemView.findViewById(R.id.AP_productAmt);
         }
     }
 }
