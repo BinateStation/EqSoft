@@ -28,7 +28,7 @@ public class CustomerModel implements Serializable {
     String address1;
     String address2;
     String address3;
-    String balance;
+    Double balance;
     String code;
     String email;
     String ledgerName;
@@ -41,7 +41,7 @@ public class CustomerModel implements Serializable {
     private SQLiteDatabase database;
     private RKRsEqSoftSQLiteHelper dbHelper;
 
-    public CustomerModel(String address1, String address2, String address3, String balance, String code, String email, String ledgerName, String mobile, String name, String phone, String route, String routeIndex) {
+    public CustomerModel(String address1, String address2, String address3, Double balance, String code, String email, String ledgerName, String mobile, String name, String phone, String route, String routeIndex) {
         this.address1 = address1;
         this.address2 = address2;
         this.address3 = address3;
@@ -85,11 +85,11 @@ public class CustomerModel implements Serializable {
         this.address3 = address3;
     }
 
-    public String getBalance() {
+    public Double getBalance() {
         return balance;
     }
 
-    public void setBalance(String balance) {
+    public void setBalance(Double balance) {
         this.balance = balance;
     }
 
@@ -333,20 +333,6 @@ public class CustomerModel implements Serializable {
             balance = customerCursor.getDouble(0);
         }
         customerCursor.close();
-        Cursor orderCursor = database.query(OrderModel.OrdersTable.TABLE_NAME,
-                new String[]{OrderModel.OrdersTable._ID}, OrderModel.OrdersTable.COLUMN_NAME_CUSTOMER_CODE + " = ?", new String[]{code}, null, null, null);
-        if (orderCursor.moveToFirst()) {
-            String orderID = orderCursor.getString(0);
-            Cursor orderItemCursor = database.query(OrderItemModel.OrderItemsTable.TABLE_NAME,
-                    new String[]{OrderItemModel.OrderItemsTable.COLUMN_NAME_AMOUNT}, OrderItemModel.OrderItemsTable.COLUMN_NAME_ORDER_ID + " = ?", new String[]{orderID}, null, null, null);
-            orderItemCursor.moveToFirst();
-            while (!orderItemCursor.isAfterLast()) {
-                balance += orderItemCursor.getDouble(0);
-                orderItemCursor.moveToNext();
-            }
-            orderItemCursor.close();
-        }
-        orderCursor.close();
         Cursor receiptsCursor = database.query(ReceiptModel.ReceiptsTable.TABLE_NAME,
                 new String[]{ReceiptModel.ReceiptsTable.COLUMN_NAME_AMOUNT}, ReceiptModel.ReceiptsTable.COLUMN_NAME_CUSTOMER_CODE + " = ?", new String[]{code}, null, null, null);
         receiptsCursor.moveToFirst();
@@ -378,7 +364,7 @@ public class CustomerModel implements Serializable {
                 cursor.getString(CustomersTable.COLUMN_INDEX_ADDRESS_1),
                 cursor.getString(CustomersTable.COLUMN_INDEX_ADDRESS_2),
                 cursor.getString(CustomersTable.COLUMN_INDEX_ADDRESS_3),
-                cursor.getString(CustomersTable.COLUMN_INDEX_BALANCE),
+                cursor.getDouble(CustomersTable.COLUMN_INDEX_BALANCE),
                 cursor.getString(CustomersTable.COLUMN_INDEX_CODE),
                 cursor.getString(CustomersTable.COLUMN_INDEX_EMAIL),
                 cursor.getString(CustomersTable.COLUMN_INDEX_LEDGER_NAME),

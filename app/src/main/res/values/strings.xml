@@ -34,11 +34,11 @@
     <string name="done">Done</string>
     <string name="received_amount">Received Amount</string>
     <string-array name="customer_sort">
-        <item>Sort By</item>
+        <item>Name</item>
         <item>Route</item>
     </string-array>
     <string-array name="product_sort">
-        <item>Sort By</item>
+        <item>Name</item>
         <item>Category</item>
     </string-array>
 

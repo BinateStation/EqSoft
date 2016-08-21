@@ -21,6 +21,7 @@ import android.widget.TextView;
 
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import rkr.binatestation.eqsoft.R;
@@ -128,9 +129,9 @@ public class ProductsActivity extends AppCompatActivity {
             protected void onPostExecute(OrderModel orderModel) {
                 super.onPostExecute(orderModel);
                 if (orderModel != null) {
-                    totalAmount.setText(orderModel.getAmount());
+                    totalAmount.setText(String.format(Locale.getDefault(), "%.2f", orderModel.getAmount()));
                 } else {
-                    totalAmount.setText("");
+                    totalAmount.setText("0.0");
                 }
                 if (productAdapter != null) {
                     productAdapter.setOrderItemModelMap(orderItemModelMap);

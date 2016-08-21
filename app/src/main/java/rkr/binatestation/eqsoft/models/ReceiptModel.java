@@ -28,14 +28,14 @@ public class ReceiptModel implements Serializable {
     String receiptId;
     String receiptDateTime;
     String customerCode;
-    String amount;
+    Double amount;
     String userId;
 
     Context context;
     private SQLiteDatabase database;
     private RKRsEqSoftSQLiteHelper dbHelper;
 
-    public ReceiptModel(String receiptId, String receiptDateTime, String customerCode, String amount, String userId) {
+    public ReceiptModel(String receiptId, String receiptDateTime, String customerCode, Double amount, String userId) {
         this.receiptId = receiptId;
         this.receiptDateTime = receiptDateTime;
         this.customerCode = customerCode;
@@ -72,11 +72,11 @@ public class ReceiptModel implements Serializable {
         this.customerCode = customerCode;
     }
 
-    public String getAmount() {
+    public Double getAmount() {
         return amount;
     }
 
-    public void setAmount(String amount) {
+    public void setAmount(Double amount) {
         this.amount = amount;
     }
 
@@ -222,7 +222,7 @@ public class ReceiptModel implements Serializable {
                 cursor.getString(0),
                 cursor.getString(ReceiptsTable.COLUMN_INDEX_RECEIPT_DATE),
                 cursor.getString(ReceiptsTable.COLUMN_INDEX_CUSTOMER_CODE),
-                cursor.getString(ReceiptsTable.COLUMN_INDEX_AMOUNT),
+                cursor.getDouble(ReceiptsTable.COLUMN_INDEX_AMOUNT),
                 cursor.getString(ReceiptsTable.COLUMN_INDEX_USER_ID)
         );
     }

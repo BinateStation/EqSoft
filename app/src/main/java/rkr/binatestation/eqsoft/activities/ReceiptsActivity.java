@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.SQLException;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.TextInputEditText;
@@ -17,6 +18,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
+
+import java.util.Locale;
 
 import rkr.binatestation.eqsoft.R;
 import rkr.binatestation.eqsoft.models.CustomerModel;
@@ -249,10 +252,10 @@ public class ReceiptsActivity extends AppCompatActivity {
             protected void onPostExecute(ReceiptModel receiptModel) {
                 super.onPostExecute(receiptModel);
                 if (receiptModel != null) {
-                    receivedAmount.setText(receiptModel.getAmount());
+                    receivedAmount.setText(String.format(Locale.getDefault(), "%.2f", receiptModel.getAmount()));
                     receivedAmount.setSelection(receivedAmount.getText().length());
                 } else {
-                    receivedAmount.setText("");
+                    receivedAmount.setText("0.0");
                 }
             }
         }.execute();
@@ -267,32 +270,43 @@ public class ReceiptsActivity extends AppCompatActivity {
     }
 
     private void saveReceipts(final Context context, final String receivedAmount) {
-        new AsyncTask<Void, Void, Void>() {
+        new AsyncTask<Void, Void, String>() {
             @Override
-            protected Void doInBackground(Void... voids) {
+            protected String doInBackground(Void... voids) {
                 if (receivedAmount.length() > 0) {
-                    ReceiptModel receiptModelDB = new ReceiptModel(context);
-                    receiptModelDB.open();
-                    receiptModelDB.insert(new ReceiptModel(
-                            "0",
-                            Util.getCurrentDate("yyyy-MM-dd HH:mm:ss"),
-                            customerModel.getCode(),
-                            receivedAmount,
-                            Util.getStringFromSharedPreferences(context, Constants.KEY_USER_ID)
-                    ));
-                    receiptModelDB.close();
+                    try {
+                        ReceiptModel receiptModelDB = new ReceiptModel(context);
+                        receiptModelDB.open();
+                        receiptModelDB.insert(new ReceiptModel(
+                                "0",
+                                Util.getCurrentDate("yyyy-MM-dd HH:mm:ss"),
+                                customerModel.getCode(),
+                                Double.parseDouble(receivedAmount),
+                                Util.getStringFromSharedPreferences(context, Constants.KEY_USER_ID)
+                        ));
+                        receiptModelDB.close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    } catch (NumberFormatException e) {
+                        e.printStackTrace();
+                        return "Please enter a valid amount.";
+                    }
                 }
 
-                return null;
+                return "1";
             }
 
             @Override
-            protected void onPostExecute(Void aVoid) {
-                super.onPostExecute(aVoid);
-                startActivity(new Intent(
-                        getBaseContext(),
-                        HomeActivity.class
-                ).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
+            protected void onPostExecute(String result) {
+                super.onPostExecute(result);
+                if ("1".equalsIgnoreCase(result)) {
+                    startActivity(new Intent(
+                            getBaseContext(),
+                            HomeActivity.class
+                    ).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
+                } else {
+                    Util.showAlert(context, "Alert", result);
+                }
             }
         }.execute();
     }

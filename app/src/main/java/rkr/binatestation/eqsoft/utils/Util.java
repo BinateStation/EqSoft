@@ -229,7 +229,8 @@ public class Util {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
                             activity.getSharedPreferences(activity.getPackageName(), Context.MODE_PRIVATE)
-                                    .edit().putBoolean(Constants.KEY_IS_LOGGED_IN, false).apply();
+                                    .edit().putBoolean(Constants.KEY_IS_LOGGED_IN, false)
+                                    .putString(Constants.KEY_LAST_SELECTED_CUSTOMER, "").apply();
                             activity.startActivity(new Intent(
                                     activity,
                                     LoginActivity.class

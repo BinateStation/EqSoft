@@ -8,6 +8,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
 
+import java.util.Locale;
+
 import rkr.binatestation.eqsoft.R;
 import rkr.binatestation.eqsoft.models.UserDetailsModel;
 import rkr.binatestation.eqsoft.utils.Constants;
@@ -61,7 +63,7 @@ public class LoginActivity extends AppCompatActivity {
                         Util.showAlert(LoginActivity.this, "Alert", "Username or password mismatch...");
                     }
                 }
-            }.execute(username.getText().toString().trim(), password.getText().toString().trim());
+            }.execute(username.getText().toString().trim().toUpperCase(Locale.getDefault()), password.getText().toString().trim());
         }
     }
 

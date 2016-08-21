@@ -1,7 +1,9 @@
 package rkr.binatestation.eqsoft.network;
 
 import android.content.Context;
+import android.database.SQLException;
 import android.os.AsyncTask;
+import android.text.TextUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -14,6 +16,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import rkr.binatestation.eqsoft.models.CustomerModel;
 import rkr.binatestation.eqsoft.models.OrderItemModel;
@@ -21,6 +24,7 @@ import rkr.binatestation.eqsoft.models.OrderModel;
 import rkr.binatestation.eqsoft.models.ProductModel;
 import rkr.binatestation.eqsoft.models.ReceiptModel;
 import rkr.binatestation.eqsoft.models.UserDetailsModel;
+import rkr.binatestation.eqsoft.utils.Constants;
 import rkr.binatestation.eqsoft.utils.Util;
 
 /**
@@ -122,7 +126,7 @@ public class DataSync extends AsyncTask<Integer, Integer, Boolean> {
                             customerJsonObject.optString("Address1").trim(),
                             customerJsonObject.optString("Address2").trim(),
                             customerJsonObject.optString("Address3").trim(),
-                            customerJsonObject.optString("Balance").trim(),
+                            customerJsonObject.optDouble("Balance"),
                             customerJsonObject.optString("Code").trim(),
                             customerJsonObject.optString("Email").trim(),
                             customerJsonObject.optString("LedgerName").trim(),
@@ -134,11 +138,15 @@ public class DataSync extends AsyncTask<Integer, Integer, Boolean> {
                     ));
                 }
 
-                CustomerModel customerModelDB = new CustomerModel(context);
-                customerModelDB.open();
-                customerModelDB.deleteAll();
-                customerModelDB.insertMultipleRows(customerModelList);
-                customerModelDB.close();
+                try {
+                    CustomerModel customerModelDB = new CustomerModel(context);
+                    customerModelDB.open();
+                    customerModelDB.deleteAll();
+                    customerModelDB.insertMultipleRows(customerModelList);
+                    customerModelDB.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
 
                 JSONArray productsJsonArray = jsonObj.getJSONArray("Products");
 
@@ -148,50 +156,64 @@ public class DataSync extends AsyncTask<Integer, Integer, Boolean> {
                     productModelList.add(new ProductModel(
                             productJsonObject.optString("Category").trim(),
                             productJsonObject.optString("Code").trim(),
-                            productJsonObject.optString("MRP").trim(),
+                            productJsonObject.optDouble("MRP"),
                             productJsonObject.optString("Name").trim(),
-                            productJsonObject.optString("SellingRate").trim(),
+                            productJsonObject.optDouble("SellingRate"),
                             productJsonObject.optString("Stock").trim(),
-                            productJsonObject.optString("TaxRate").trim()
+                            productJsonObject.optDouble("TaxRate")
                     ));
                 }
 
-                ProductModel productModelDB = new ProductModel(context);
-                productModelDB.open();
-                productModelDB.deleteAll();
-                productModelDB.insertMultipleRows(productModelList);
-                productModelDB.close();
+                try {
+                    ProductModel productModelDB = new ProductModel(context);
+                    productModelDB.open();
+                    productModelDB.deleteAll();
+                    productModelDB.insertMultipleRows(productModelList);
+                    productModelDB.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
 
                 JSONArray usersJsonArray = jsonObj.getJSONArray("User");
 
                 List<UserDetailsModel> userDetailsModelList = new ArrayList<>();
                 for (int i = 0; i < usersJsonArray.length(); i++) {
                     JSONObject userJsonObject = usersJsonArray.getJSONObject(i);
-                    userDetailsModelList.add(new UserDetailsModel(
-                            userJsonObject.optString("Userid"),
-                            userJsonObject.optString("Username"),
-                            userJsonObject.optString("Password")
-                    ));
+                    String username = userJsonObject.optString("Username");
+                    if (username != null && !TextUtils.isEmpty(username)) {
+                        userDetailsModelList.add(new UserDetailsModel(
+                                userJsonObject.optString("Userid"),
+                                username.toUpperCase(Locale.getDefault()),
+                                userJsonObject.optString("Password")
+                        ));
+                    }
                 }
-                UserDetailsModel userDetailsTable = new UserDetailsModel(context);
-                userDetailsTable.open();
-                userDetailsTable.insertMultipleRows(userDetailsModelList);
-                userDetailsTable.close();
+                try {
+                    UserDetailsModel userDetailsTable = new UserDetailsModel(context);
+                    userDetailsTable.open();
+                    userDetailsTable.insertMultipleRows(userDetailsModelList);
+                    userDetailsTable.close();
 
-                OrderModel orderModelDB = new OrderModel(context);
-                orderModelDB.open();
-                orderModelDB.deleteAll();
-                orderModelDB.close();
+                    OrderModel orderModelDB = new OrderModel(context);
+                    orderModelDB.open();
+                    orderModelDB.deleteAll();
+                    orderModelDB.close();
 
-                OrderItemModel orderItemModelDB = new OrderItemModel(context);
-                orderItemModelDB.open();
-                orderItemModelDB.deleteAll();
-                orderItemModelDB.close();
+                    OrderItemModel orderItemModelDB = new OrderItemModel(context);
+                    orderItemModelDB.open();
+                    orderItemModelDB.deleteAll();
+                    orderItemModelDB.close();
 
-                ReceiptModel receiptModelDB = new ReceiptModel(context);
-                receiptModelDB.open();
-                receiptModelDB.deleteAll();
-                receiptModelDB.close();
+                    ReceiptModel receiptModelDB = new ReceiptModel(context);
+                    receiptModelDB.open();
+                    receiptModelDB.deleteAll();
+                    receiptModelDB.close();
+
+                    context.getSharedPreferences(context.getPackageName(), Context.MODE_PRIVATE)
+                            .edit().putString(Constants.KEY_LAST_SELECTED_CUSTOMER, "").apply();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
                 return true;
             } else {
                 Util.showAlert(context, "Alert", "File doesn't exists, please copy the file to specified folder and sync.");

@@ -29,15 +29,15 @@ public class OrderItemModel implements Serializable {
 
     String orderId;
     String productCode;
-    String rate;
-    String quantity;
-    String amount;
+    Double rate;
+    Double quantity;
+    Double amount;
 
     Context context;
     private SQLiteDatabase database;
     private RKRsEqSoftSQLiteHelper dbHelper;
 
-    public OrderItemModel(String orderId, String productCode, String rate, String quantity, String amount) {
+    public OrderItemModel(String orderId, String productCode, Double rate, Double quantity, Double amount) {
         this.orderId = orderId;
         this.productCode = productCode;
         this.rate = rate;
@@ -66,27 +66,27 @@ public class OrderItemModel implements Serializable {
         this.productCode = productCode;
     }
 
-    public String getRate() {
+    public Double getRate() {
         return rate;
     }
 
-    public void setRate(String rate) {
+    public void setRate(Double rate) {
         this.rate = rate;
     }
 
-    public String getQuantity() {
+    public Double getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(String quantity) {
+    public void setQuantity(Double quantity) {
         this.quantity = quantity;
     }
 
-    public String getAmount() {
+    public Double getAmount() {
         return amount;
     }
 
-    public void setAmount(String amount) {
+    public void setAmount(Double amount) {
         this.amount = amount;
     }
 
@@ -219,7 +219,7 @@ public class OrderItemModel implements Serializable {
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             OrderItemModel obj = cursorToProductModel(cursor);
-            totalAmount += Double.parseDouble(obj.getAmount());
+            totalAmount += obj.getAmount();
             cursor.moveToNext();
         }
         cursor.close();
@@ -244,9 +244,9 @@ public class OrderItemModel implements Serializable {
         return new OrderItemModel(
                 cursor.getString(OrderItemsTable.COLUMN_INDEX_ORDER_ID),
                 cursor.getString(OrderItemsTable.COLUMN_INDEX_PRODUCT_CODE),
-                cursor.getString(OrderItemsTable.COLUMN_INDEX_RATE),
-                cursor.getString(OrderItemsTable.COLUMN_INDEX_QUANTITY),
-                cursor.getString(OrderItemsTable.COLUMN_INDEX_AMOUNT)
+                cursor.getDouble(OrderItemsTable.COLUMN_INDEX_RATE),
+                cursor.getDouble(OrderItemsTable.COLUMN_INDEX_QUANTITY),
+                cursor.getDouble(OrderItemsTable.COLUMN_INDEX_AMOUNT)
         );
     }
 

@@ -82,10 +82,10 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
             });
         }
         holder.productName.setText(getItem(position).getName());
-        holder.productMRP.setText(String.format(Locale.getDefault(), "MRP - %s", Double.parseDouble(getItem(position).getMRP())));
+        holder.productMRP.setText(String.format(Locale.getDefault(), "MRP - %.2f", getItem(position).getMRP()));
         holder.productCode.setText(getItem(position).getCode());
         holder.stock.setText(getItem(position).getStock());
-        holder.sellingPrice.setText(String.format(Locale.getDefault(), "%s", Double.parseDouble(getItem(position).getSellingRate())));
+        holder.sellingPrice.setText(String.format(Locale.getDefault(), "%.2f", getItem(position).getSellingRate()));
         if (orderItemModelMap.containsKey(getItem(position).getCode())) {
             holder.selectedView.setVisibility(View.VISIBLE);
         } else {
@@ -131,7 +131,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
                     productName.setText(item.getName());
                 }
                 if (MRP != null) {
-                    MRP.setText(String.format(Locale.getDefault(), "MRP - %s", item.getMRP()));
+                    MRP.setText(String.format(Locale.getDefault(), "MRP - %.2f", item.getMRP()));
                 }
                 if (productCode != null) {
                     productCode.setText(item.getCode());
@@ -140,11 +140,11 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
                     stock.setText(item.getStock());
                 }
                 if (sellingPrice != null) {
-                    sellingPrice.setText(item.getSellingRate());
+                    sellingPrice.setText(String.format(Locale.getDefault(), "%.2f", item.getSellingRate()));
                 }
                 if (quantity != null) {
                     if (orderItemModelMap.containsKey(item.getCode())) {
-                        quantity.setText(orderItemModelMap.get(item.getCode()).getQuantity());
+                        quantity.setText(String.format(Locale.getDefault(), "%.2f", orderItemModelMap.get(item.getCode()).getQuantity()));
                         quantity.setSelection(quantity.getText().length());
                     }
                     quantity.addTextChangedListener(new TextWatcher() {
@@ -163,10 +163,11 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
                             if (editable.length() > 0) {
                                 try {
                                     if (amount != null) {
-                                        amount.setText(String.format("%s", Integer.parseInt(editable.toString()) * Double.parseDouble(item.getSellingRate())));
+                                        amount.setText(String.format(Locale.getDefault(), "%.2f", (Integer.parseInt(editable.toString()) * item.getSellingRate())));
                                     }
                                 } catch (NumberFormatException e) {
                                     e.printStackTrace();
+                                    Util.showAlert(amount.getContext(), "Alert", "Please enter a valid quantity.");
                                 }
                             }
                         }
@@ -243,8 +244,8 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
                             orderModel.getOrderId(),
                             item.getCode(),
                             item.getSellingRate(),
-                            quantity,
-                            amount
+                            Double.parseDouble(quantity),
+                            Double.parseDouble(amount)
                     );
                     OrderItemModel orderItemModelDB = new OrderItemModel(context);
                     orderItemModelDB.open();
@@ -256,11 +257,12 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
                             "0",
                             Util.getCurrentDate("yyyy-MM-dd HH:mm:ss"),
                             customerModel.getCode(),
-                            amount,
-                            "0",
+                            Double.parseDouble(amount),
+                            0.0,
                             "",
                             "",
-                            Util.getStringFromSharedPreferences(context, Constants.KEY_USER_ID)
+                            Util.getStringFromSharedPreferences(context, Constants.KEY_USER_ID),
+                            "N"
                     ));
                     orderModelDB.close();
                     if (orderId != -1) {
@@ -268,8 +270,8 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
                                 "" + orderId,
                                 item.getCode(),
                                 item.getSellingRate(),
-                                quantity,
-                                amount
+                                Double.parseDouble(quantity),
+                                Double.parseDouble(amount)
                         );
                         OrderItemModel orderItemModelDB = new OrderItemModel(context);
                         orderItemModelDB.open();
@@ -288,11 +290,12 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
                             orderModel.getOrderId(),
                             orderModel.getDocDate(),
                             orderModel.getCustomerCode(),
-                            totalAmount,
+                            Double.parseDouble(totalAmount),
                             orderModel.getReceivedAmount(),
                             orderModel.getDueDate(),
                             orderModel.getRemarks(),
-                            orderModel.getUserId()
+                            orderModel.getUserId(),
+                            "Y".equalsIgnoreCase(orderModel.getStatus()) ? "Y" : "N"
                     ));
                 }
                 orderModelDB.close();
@@ -337,11 +340,12 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
                             orderModel.getOrderId(),
                             orderModel.getDocDate(),
                             orderModel.getCustomerCode(),
-                            totalAmount,
+                            Double.parseDouble(totalAmount),
                             orderModel.getReceivedAmount(),
                             orderModel.getDueDate(),
                             orderModel.getRemarks(),
-                            orderModel.getUserId()
+                            orderModel.getUserId(),
+                            "Y".equalsIgnoreCase(orderModel.getStatus()) ? "Y" : "N"
                     ));
                     orderModelDB.close();
                 }

@@ -24,6 +24,7 @@ import android.widget.TextView;
 
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import rkr.binatestation.eqsoft.R;
@@ -110,15 +111,15 @@ public class OrderActivity extends AppCompatActivity {
     }
 
     private void setOrderItemModelMap() {
-        new AsyncTask<Void, Void, String[]>() {
+        new AsyncTask<Void, Void, Double[]>() {
             @Override
-            protected String[] doInBackground(Void... voids) {
+            protected Double[] doInBackground(Void... voids) {
                 OrderModel orderModelDB = new OrderModel(getBaseContext());
                 orderModelDB.open();
                 OrderModel orderModel = orderModelDB.getCustomersRow(customerModel.getCode());
                 orderModelDB.close();
 
-                String[] result = new String[2];
+                Double[] result = new Double[2];
                 if (orderModel != null) {
                     result[0] = orderModel.getAmount();
                     OrderItemModel orderItemModelDB = new OrderItemModel(getBaseContext());
@@ -126,7 +127,7 @@ public class OrderActivity extends AppCompatActivity {
                     orderItemModelMap = orderItemModelDB.getAllRows(orderModel.getOrderId());
                     orderItemModelDB.close();
                 } else {
-                    result[0] = "";
+                    result[0] = 0.0;
                 }
 
                 ReceiptModel receiptModelDB = new ReceiptModel(getBaseContext());
@@ -137,20 +138,20 @@ public class OrderActivity extends AppCompatActivity {
                 if (receiptModel != null) {
                     result[1] = receiptModel.getAmount();
                 } else {
-                    result[1] = "";
+                    result[1] = 0.0;
                 }
                 return result;
             }
 
             @Override
-            protected void onPostExecute(String[] result) {
+            protected void onPostExecute(Double[] result) {
                 super.onPostExecute(result);
                 try {
                     if (result != null) {
-                        totalAmount.setText(result[0]);
+                        totalAmount.setText(String.format(Locale.getDefault(), "%.2f", result[0]));
                     }
                     if (result != null) {
-                        receivedAmount.setText(result[1]);
+                        receivedAmount.setText(String.format(Locale.getDefault(), "%.2f", result[1]));
                         receivedAmount.setSelection(receivedAmount.getText().length());
                     }
                 } catch (Exception e) {
@@ -218,10 +219,11 @@ public class OrderActivity extends AppCompatActivity {
                             orderModel.getDocDate(),
                             orderModel.getCustomerCode(),
                             orderModel.getAmount(),
-                            receivedAmount,
+                            Double.parseDouble(receivedAmount),
                             orderModel.getDueDate(),
                             orderModel.getRemarks(),
-                            orderModel.getUserId()
+                            orderModel.getUserId(),
+                            "Y"
                     ));
                     orderModelDB.close();
                     ReceiptModel receiptModelDB = new ReceiptModel(context);
@@ -230,7 +232,7 @@ public class OrderActivity extends AppCompatActivity {
                             "0",
                             Util.getCurrentDate("yyyy-MM-dd HH:mm:ss"),
                             customerModel.getCode(),
-                            receivedAmount,
+                            Double.parseDouble(receivedAmount),
                             Util.getStringFromSharedPreferences(context, Constants.KEY_USER_ID)
                     ));
                     receiptModelDB.close();

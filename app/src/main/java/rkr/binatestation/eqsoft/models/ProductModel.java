@@ -23,16 +23,16 @@ import java.util.List;
 public class ProductModel implements Serializable {
     String category;
     String code;
-    String MRP;
+    Double MRP;
     String name;
-    String sellingRate;
+    Double sellingRate;
     String stock;
-    String taxRate;
+    Double taxRate;
     Context context;
     private SQLiteDatabase database;
     private RKRsEqSoftSQLiteHelper dbHelper;
 
-    public ProductModel(String category, String code, String MRP, String name, String sellingRate, String stock, String taxRate) {
+    public ProductModel(String category, String code, Double MRP, String name, Double sellingRate, String stock, Double taxRate) {
         this.category = category;
         this.code = code;
         this.MRP = MRP;
@@ -63,11 +63,11 @@ public class ProductModel implements Serializable {
         this.code = code;
     }
 
-    public String getMRP() {
+    public Double getMRP() {
         return MRP;
     }
 
-    public void setMRP(String MRP) {
+    public void setMRP(Double MRP) {
         this.MRP = MRP;
     }
 
@@ -79,11 +79,11 @@ public class ProductModel implements Serializable {
         this.name = name;
     }
 
-    public String getSellingRate() {
+    public Double getSellingRate() {
         return sellingRate;
     }
 
-    public void setSellingRate(String sellingRate) {
+    public void setSellingRate(Double sellingRate) {
         this.sellingRate = sellingRate;
     }
 
@@ -95,11 +95,11 @@ public class ProductModel implements Serializable {
         this.stock = stock;
     }
 
-    public String getTaxRate() {
+    public Double getTaxRate() {
         return taxRate;
     }
 
-    public void setTaxRate(String taxRate) {
+    public void setTaxRate(Double taxRate) {
         this.taxRate = taxRate;
     }
 
@@ -271,11 +271,11 @@ public class ProductModel implements Serializable {
         return new ProductModel(
                 cursor.getString(ProductsTable.COLUMN_INDEX_CATEGORY),
                 cursor.getString(ProductsTable.COLUMN_INDEX_CODE),
-                cursor.getString(ProductsTable.COLUMN_INDEX_MRP),
+                cursor.getDouble(ProductsTable.COLUMN_INDEX_MRP),
                 cursor.getString(ProductsTable.COLUMN_INDEX_NAME),
-                cursor.getString(ProductsTable.COLUMN_INDEX_SELLING_RATE),
+                cursor.getDouble(ProductsTable.COLUMN_INDEX_SELLING_RATE),
                 cursor.getString(ProductsTable.COLUMN_INDEX_STOCK),
-                cursor.getString(ProductsTable.COLUMN_INDEX_TAX_RATE)
+                cursor.getDouble(ProductsTable.COLUMN_INDEX_TAX_RATE)
         );
     }
 
