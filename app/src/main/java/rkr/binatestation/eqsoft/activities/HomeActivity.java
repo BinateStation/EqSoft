@@ -261,7 +261,7 @@ public class HomeActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK && requestCode == Constants.REQUEST_CODE_CUSTOMER && data.hasExtra(Constants.KEY_CUSTOMER)) {
-            startActivity(new Intent(getBaseContext(), OrderActivity.class)
+            startActivity(new Intent(getBaseContext(), CheckoutActivity.class)
                     .putExtra(Constants.KEY_CUSTOMER, data.getSerializableExtra(Constants.KEY_CUSTOMER))
             );
         }

@@ -36,13 +36,12 @@ public class OrderModel implements Serializable {
     String dueDate;
     String remarks;
     String userId;
-    String status;
 
     Context context;
     private SQLiteDatabase database;
     private RKRsEqSoftSQLiteHelper dbHelper;
 
-    public OrderModel(String orderId, String docDate, String customerCode, Double amount, Double receivedAmount, String dueDate, String remarks, String userId, String status) {
+    public OrderModel(String orderId, String docDate, String customerCode, Double amount, Double receivedAmount, String dueDate, String remarks, String userId) {
         this.orderId = orderId;
         this.docDate = docDate;
         this.customerCode = customerCode;
@@ -51,7 +50,6 @@ public class OrderModel implements Serializable {
         this.dueDate = dueDate;
         this.remarks = remarks;
         this.userId = userId;
-        this.status = status;
     }
 
     public OrderModel(Context context) {
@@ -123,14 +121,6 @@ public class OrderModel implements Serializable {
         this.userId = userId;
     }
 
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
     public void open() throws SQLException {
         database = dbHelper.getWritableDatabase();
     }
@@ -148,7 +138,6 @@ public class OrderModel implements Serializable {
         values.put(OrdersTable.COLUMN_NAME_DUE_DATE, obj.getDueDate());
         values.put(OrdersTable.COLUMN_NAME_REMARKS, obj.getRemarks());
         values.put(OrdersTable.COLUMN_NAME_USER_ID, obj.getUserId());
-        values.put(OrdersTable.COLUMN_NAME_STATUS, obj.getStatus());
 
         long insertId;
         insertId = database.insert(OrdersTable.TABLE_NAME, null, values);
@@ -173,8 +162,7 @@ public class OrderModel implements Serializable {
                     OrdersTable.COLUMN_NAME_RECEIVED_AMOUNT + "','" +
                     OrdersTable.COLUMN_NAME_DUE_DATE + "','" +
                     OrdersTable.COLUMN_NAME_REMARKS + "','" +
-                    OrdersTable.COLUMN_NAME_USER_ID + "','" +
-                    OrdersTable.COLUMN_NAME_STATUS + "') VALUES ('";
+                    OrdersTable.COLUMN_NAME_USER_ID + "') VALUES ('";
             for (int i = 0; i < masterList.size(); i++) {
                 OrderModel master = masterList.get(i);
                 query += master.getDocDate() + "' , '" +
@@ -183,8 +171,7 @@ public class OrderModel implements Serializable {
                         master.getReceivedAmount() + "' , '" +
                         master.getDueDate() + "' , '" +
                         master.getRemarks() + "' , '" +
-                        master.getUserId() + "' , '" +
-                        master.getStatus() + "')";
+                        master.getUserId() + "')";
                 if (i != (masterList.size() - 1)) {
                     query += ",('";
                 }
@@ -205,7 +192,6 @@ public class OrderModel implements Serializable {
         values.put(OrdersTable.COLUMN_NAME_DUE_DATE, obj.getDueDate());
         values.put(OrdersTable.COLUMN_NAME_REMARKS, obj.getRemarks());
         values.put(OrdersTable.COLUMN_NAME_USER_ID, obj.getUserId());
-        values.put(OrdersTable.COLUMN_NAME_STATUS, obj.getStatus());
 
         database.update(OrdersTable.TABLE_NAME, values, OrdersTable._ID + " = ?", new String[]{"" + obj.getOrderId()});
         System.out.println("Categories Row Updated with id: " + obj.getOrderId());
@@ -223,7 +209,7 @@ public class OrderModel implements Serializable {
 
     public List<OrderModel> getAllRows() {
         List<OrderModel> list = new ArrayList<>();
-        Cursor cursor = database.query(OrdersTable.TABLE_NAME, null, OrdersTable.COLUMN_NAME_STATUS + " = 'Y'", null, null, null, null);
+        Cursor cursor = database.query(OrdersTable.TABLE_NAME, null, null, null, null, null, null);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             OrderModel obj = cursorToOrderModel(cursor);
@@ -236,7 +222,7 @@ public class OrderModel implements Serializable {
 
     public JSONArray getAllRowsAsJSONArray() {
         JSONArray jsonArray = new JSONArray();
-        Cursor cursor = database.query(OrdersTable.TABLE_NAME, null, OrdersTable.COLUMN_NAME_STATUS + " = 'Y'", null, null, null, null);
+        Cursor cursor = database.query(OrdersTable.TABLE_NAME, null, null, null, null, null, null);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             JSONObject obj = cursorToJSONObject(cursor);
@@ -249,7 +235,7 @@ public class OrderModel implements Serializable {
 
     public Map<String, String> getTotalAmountReceivedAndPendingAmount() {
         Map<String, String> stringMap = new LinkedHashMap<>();
-        Cursor cursor = database.query(OrdersTable.TABLE_NAME, null, OrdersTable.COLUMN_NAME_STATUS + " = 'Y'", null, null, null, null);
+        Cursor cursor = database.query(OrdersTable.TABLE_NAME, null, null, null, null, null, null);
         cursor.moveToFirst();
         Double totalAmount = 0.0;
         Double totalAmountReceived = 0.0;
@@ -283,7 +269,7 @@ public class OrderModel implements Serializable {
      * @return the count of the OrdersTable#TABLE_NAME
      */
     public String getCount() {
-        Cursor cursor = database.rawQuery("SELECT count(*) FROM " + OrdersTable.TABLE_NAME + " WHERE " + OrdersTable.COLUMN_NAME_STATUS + " = 'Y'", null);
+        Cursor cursor = database.rawQuery("SELECT count(*) FROM " + OrdersTable.TABLE_NAME, null);
         Integer count = 0;
         if (cursor.moveToFirst())
             count += cursor.getInt(0);
@@ -301,8 +287,7 @@ public class OrderModel implements Serializable {
                 cursor.getDouble(OrdersTable.COLUMN_INDEX_RECEIVED_AMOUNT),
                 cursor.getString(OrdersTable.COLUMN_INDEX_DUE_DATE),
                 cursor.getString(OrdersTable.COLUMN_INDEX_REMARKS),
-                cursor.getString(OrdersTable.COLUMN_INDEX_USER_ID),
-                cursor.getString(OrdersTable.COLUMN_INDEX_STATUS)
+                cursor.getString(OrdersTable.COLUMN_INDEX_USER_ID)
         );
     }
 
@@ -332,7 +317,6 @@ public class OrderModel implements Serializable {
         public static final String COLUMN_NAME_DUE_DATE = "due_date";
         public static final String COLUMN_NAME_REMARKS = "remarks";
         public static final String COLUMN_NAME_USER_ID = "user_id";
-        public static final String COLUMN_NAME_STATUS = "status";
         public static final int COLUMN_INDEX_DOC_DATE = 1;
         public static final int COLUMN_INDEX_CUSTOMER_CODE = 2;
         public static final int COLUMN_INDEX_AMOUNT = 3;
@@ -340,7 +324,6 @@ public class OrderModel implements Serializable {
         public static final int COLUMN_INDEX_DUE_DATE = 5;
         public static final int COLUMN_INDEX_REMARKS = 6;
         public static final int COLUMN_INDEX_USER_ID = 7;
-        public static final int COLUMN_INDEX_STATUS = 8;
 
         private static final String TEXT_TYPE = " TEXT";
         private static final String COMMA_SEP = ",";
@@ -354,8 +337,7 @@ public class OrderModel implements Serializable {
                         COLUMN_NAME_RECEIVED_AMOUNT + TEXT_TYPE + COMMA_SEP +
                         COLUMN_NAME_DUE_DATE + TEXT_TYPE + COMMA_SEP +
                         COLUMN_NAME_REMARKS + TEXT_TYPE + COMMA_SEP +
-                        COLUMN_NAME_USER_ID + TEXT_TYPE + COMMA_SEP +
-                        COLUMN_NAME_STATUS + TEXT_TYPE +
+                        COLUMN_NAME_USER_ID + TEXT_TYPE +
                         " )";
     }
 

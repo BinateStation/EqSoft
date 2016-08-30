@@ -7,7 +7,7 @@ import android.util.Log;
 
 public class RKRsEqSoftSQLiteHelper extends SQLiteOpenHelper {
 
-    private static int DB_VERSION = 2;
+    private static int DB_VERSION = 3;
     Context context;
 
     public RKRsEqSoftSQLiteHelper(Context context) {
@@ -23,6 +23,7 @@ public class RKRsEqSoftSQLiteHelper extends SQLiteOpenHelper {
         database.execSQL(OrderModel.OrdersTable.SQL_CREATE_USER_DETAILS);
         database.execSQL(OrderItemModel.OrderItemsTable.SQL_CREATE_USER_DETAILS);
         database.execSQL(ReceiptModel.ReceiptsTable.SQL_CREATE_USER_DETAILS);
+        database.execSQL(OrderItemModelTemp.OrderItemsTable.SQL_CREATE_USER_DETAILS);
     }
 
     @Override
@@ -35,6 +36,7 @@ public class RKRsEqSoftSQLiteHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + OrderModel.OrdersTable.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + OrderItemModel.OrderItemsTable.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + ReceiptModel.ReceiptsTable.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + OrderItemModelTemp.OrderItemsTable.TABLE_NAME);
         onCreate(db);
     }
 }

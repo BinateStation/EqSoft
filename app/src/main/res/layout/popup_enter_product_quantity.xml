@@ -117,6 +117,14 @@
     </android.support.design.widget.TextInputLayout>
 
     <android.support.v7.widget.AppCompatTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/activity_widget_margin"
+        android:layout_marginRight="@dimen/activity_widget_margin"
+        android:gravity="center_vertical|end"
+        android:text="@string/amount" />
+
+    <android.support.v7.widget.AppCompatTextView
         android:id="@+id/PEPQ_amount"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

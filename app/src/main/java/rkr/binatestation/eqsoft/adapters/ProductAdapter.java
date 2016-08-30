@@ -25,10 +25,8 @@ import java.util.Map;
 
 import rkr.binatestation.eqsoft.R;
 import rkr.binatestation.eqsoft.models.CustomerModel;
-import rkr.binatestation.eqsoft.models.OrderItemModel;
-import rkr.binatestation.eqsoft.models.OrderModel;
+import rkr.binatestation.eqsoft.models.OrderItemModelTemp;
 import rkr.binatestation.eqsoft.models.ProductModel;
-import rkr.binatestation.eqsoft.utils.Constants;
 import rkr.binatestation.eqsoft.utils.Util;
 
 /**
@@ -38,11 +36,11 @@ import rkr.binatestation.eqsoft.utils.Util;
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView> {
     List<ProductModel> productModelList;
     CustomerModel customerModel;
-    Map<String, OrderItemModel> orderItemModelMap = new LinkedHashMap<>();
+    Map<String, OrderItemModelTemp> orderItemModelMap = new LinkedHashMap<>();
     OnAdapterInteractionListener onAdapterInteractionListener;
     Boolean clickable;
 
-    public ProductAdapter(List<ProductModel> productModelList, CustomerModel customerModel, Map<String, OrderItemModel> orderItemModelMap, boolean clickable, OnAdapterInteractionListener onAdapterInteractionListener) {
+    public ProductAdapter(List<ProductModel> productModelList, CustomerModel customerModel, Map<String, OrderItemModelTemp> orderItemModelMap, boolean clickable, OnAdapterInteractionListener onAdapterInteractionListener) {
         this.productModelList = productModelList;
         this.customerModel = customerModel;
         this.onAdapterInteractionListener = onAdapterInteractionListener;
@@ -54,7 +52,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
         this.customerModel = customerModel;
     }
 
-    public void setOrderItemModelMap(Map<String, OrderItemModel> orderItemModelMap) {
+    public void setOrderItemModelMap(Map<String, OrderItemModelTemp> orderItemModelMap) {
         this.orderItemModelMap = orderItemModelMap;
     }
 
@@ -232,81 +230,24 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
     }
 
     private void addOrder(final Context context, final ProductModel item, final String quantity, final String amount, final AppCompatDialog appCompatDialog, final int adapterPosition) {
-        new AsyncTask<Void, Void, OrderItemModel>() {
+        new AsyncTask<Void, Void, OrderItemModelTemp>() {
             @Override
-            protected OrderItemModel doInBackground(Void... voids) {
-                OrderModel orderModelDB = new OrderModel(context);
-                orderModelDB.open();
-                OrderModel orderModel = orderModelDB.getCustomersRow(customerModel.getCode());
-                orderModelDB.close();
-                String totalAmount;
-                OrderItemModel orderItemModel = null;
-                if (orderModel != null) {
-                    orderItemModel = new OrderItemModel(
-                            orderModel.getOrderId(),
-                            item.getCode(),
-                            item.getSellingRate(),
-                            Double.parseDouble(quantity),
-                            Double.parseDouble(amount)
-                    );
-                    OrderItemModel orderItemModelDB = new OrderItemModel(context);
-                    orderItemModelDB.open();
-                    orderItemModelDB.insert(orderItemModel);
-                    orderItemModelDB.close();
-                } else {
-                    orderModelDB.open();
-                    Long orderId = orderModelDB.insert(new OrderModel(
-                            "0",
-                            Util.getCurrentDate("yyyy-MM-dd HH:mm:ss"),
-                            customerModel.getCode(),
-                            Double.parseDouble(amount),
-                            0.0,
-                            "",
-                            "",
-                            Util.getStringFromSharedPreferences(context, Constants.KEY_USER_ID),
-                            "N"
-                    ));
-                    orderModelDB.close();
-                    if (orderId != -1) {
-                        orderItemModel = new OrderItemModel(
-                                "" + orderId,
-                                item.getCode(),
-                                item.getSellingRate(),
-                                Double.parseDouble(quantity),
-                                Double.parseDouble(amount)
-                        );
-                        OrderItemModel orderItemModelDB = new OrderItemModel(context);
-                        orderItemModelDB.open();
-                        orderItemModelDB.insert(orderItemModel);
-                        orderItemModelDB.close();
-                    }
-                }
-                orderModelDB.open();
-                orderModel = orderModelDB.getCustomersRow(customerModel.getCode());
-                if (orderModel != null) {
-                    OrderItemModel orderItemModelDB = new OrderItemModel(context);
-                    orderItemModelDB.open();
-                    totalAmount = orderItemModelDB.getTotalAmount(orderModel.getOrderId());
-                    orderItemModelDB.close();
-                    orderModelDB.updateRow(new OrderModel(
-                            orderModel.getOrderId(),
-                            orderModel.getDocDate(),
-                            orderModel.getCustomerCode(),
-                            Double.parseDouble(totalAmount),
-                            orderModel.getReceivedAmount(),
-                            orderModel.getDueDate(),
-                            orderModel.getRemarks(),
-                            orderModel.getUserId(),
-                            "Y".equalsIgnoreCase(orderModel.getStatus()) ? "Y" : "N"
-                    ));
-                }
-                orderModelDB.close();
-
-                return orderItemModel;
+            protected OrderItemModelTemp doInBackground(Void... voids) {
+                OrderItemModelTemp orderItemModelTemp = new OrderItemModelTemp(
+                        item.getCode(),
+                        item.getSellingRate(),
+                        Double.parseDouble(quantity),
+                        Double.parseDouble(amount)
+                );
+                OrderItemModelTemp orderItemModelTempDB = new OrderItemModelTemp(context);
+                orderItemModelTempDB.open();
+                orderItemModelTempDB.insert(orderItemModelTemp);
+                orderItemModelTempDB.close();
+                return orderItemModelTemp;
             }
 
             @Override
-            protected void onPostExecute(OrderItemModel orderItemModel) {
+            protected void onPostExecute(OrderItemModelTemp orderItemModel) {
                 super.onPostExecute(orderItemModel);
                 if (appCompatDialog != null && appCompatDialog.isShowing()) {
                     appCompatDialog.dismiss();
@@ -326,31 +267,10 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
-                OrderModel orderModelDB = new OrderModel(context);
-                orderModelDB.open();
-                OrderModel orderModel = orderModelDB.getCustomersRow(customerModel.getCode());
-                orderModelDB.close();
-                String totalAmount;
-                if (orderModel != null) {
-                    OrderItemModel orderItemModelDB = new OrderItemModel(context);
-                    orderItemModelDB.open();
-                    orderItemModelDB.deleteRow(item.getCode(), orderModel.getOrderId());
-                    totalAmount = orderItemModelDB.getTotalAmount(orderModel.getOrderId());
-                    orderItemModelDB.close();
-                    orderModelDB.open();
-                    orderModelDB.updateRow(new OrderModel(
-                            orderModel.getOrderId(),
-                            orderModel.getDocDate(),
-                            orderModel.getCustomerCode(),
-                            Double.parseDouble(totalAmount),
-                            orderModel.getReceivedAmount(),
-                            orderModel.getDueDate(),
-                            orderModel.getRemarks(),
-                            orderModel.getUserId(),
-                            "Y".equalsIgnoreCase(orderModel.getStatus()) ? "Y" : "N"
-                    ));
-                    orderModelDB.close();
-                }
+                OrderItemModelTemp orderItemModelTempDB = new OrderItemModelTemp(context);
+                orderItemModelTempDB.open();
+                orderItemModelTempDB.deleteRow(item.getCode());
+                orderItemModelTempDB.close();
                 return null;
             }
 

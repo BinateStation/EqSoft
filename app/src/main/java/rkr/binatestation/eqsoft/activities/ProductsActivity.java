@@ -28,6 +28,7 @@ import rkr.binatestation.eqsoft.R;
 import rkr.binatestation.eqsoft.adapters.ProductAdapter;
 import rkr.binatestation.eqsoft.models.CustomerModel;
 import rkr.binatestation.eqsoft.models.OrderItemModel;
+import rkr.binatestation.eqsoft.models.OrderItemModelTemp;
 import rkr.binatestation.eqsoft.models.OrderModel;
 import rkr.binatestation.eqsoft.models.ProductModel;
 import rkr.binatestation.eqsoft.models.ReceiptModel;
@@ -44,7 +45,7 @@ public class ProductsActivity extends AppCompatActivity {
 
     CustomerModel customerModel;
     ProductAdapter productAdapter;
-    Map<String, OrderItemModel> orderItemModelMap = new LinkedHashMap<>();
+    Map<String, OrderItemModelTemp> orderItemModelMap = new LinkedHashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,33 +107,24 @@ public class ProductsActivity extends AppCompatActivity {
     }
 
     private void setOrderItemModelMap() {
-        new AsyncTask<Void, Void, OrderModel>() {
+        new AsyncTask<Void, Void, Void>() {
             @Override
-            protected OrderModel doInBackground(Void... voids) {
-                OrderModel orderModelDB = new OrderModel(getBaseContext());
-                orderModelDB.open();
-                OrderModel orderModel = orderModelDB.getCustomersRow(customerModel.getCode());
-                orderModelDB.close();
-
-                if (orderModel != null) {
-                    OrderItemModel orderItemModelDB = new OrderItemModel(getBaseContext());
-                    orderItemModelDB.open();
-                    orderItemModelMap = orderItemModelDB.getAllRows(orderModel.getOrderId());
-                    orderItemModelDB.close();
-                } else {
-                    orderItemModelMap.clear();
-                }
-                return orderModel;
+            protected Void doInBackground(Void... voids) {
+                OrderItemModelTemp orderItemModelDB = new OrderItemModelTemp(getBaseContext());
+                orderItemModelDB.open();
+                orderItemModelMap = orderItemModelDB.getAllRowsAsMap();
+                orderItemModelDB.close();
+                return null;
             }
 
             @Override
-            protected void onPostExecute(OrderModel orderModel) {
-                super.onPostExecute(orderModel);
-                if (orderModel != null) {
-                    totalAmount.setText(String.format(Locale.getDefault(), "%.2f", orderModel.getAmount()));
-                } else {
-                    totalAmount.setText("0.0");
+            protected void onPostExecute(Void result) {
+                super.onPostExecute(result);
+                Double total = 0.0;
+                for (OrderItemModelTemp orderItemModelTemp : orderItemModelMap.values()) {
+                    total += orderItemModelTemp.getAmount();
                 }
+                totalAmount.setText(String.format(Locale.getDefault(), "%.2f", total));
                 if (productAdapter != null) {
                     productAdapter.setOrderItemModelMap(orderItemModelMap);
                     productAdapter.notifyDataSetChanged();
@@ -171,8 +163,7 @@ public class ProductsActivity extends AppCompatActivity {
     }
 
     public void checkOut(View view) {
-        startActivity(
-                new Intent(getBaseContext(), OrderActivity.class)
+        startActivity(new Intent(getBaseContext(), CheckoutActivity.class)
                         .putExtra(Constants.KEY_CUSTOMER, customerModel)
         );
     }

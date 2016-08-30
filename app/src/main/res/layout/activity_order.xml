@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="rkr.binatestation.eqsoft.activities.OrderActivity">
+    tools:context=".activities.CheckoutActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -20,122 +20,122 @@
             app:popupTheme="@style/AppTheme.Light.PopupOverlay" />
     </android.support.design.widget.AppBarLayout>
 
-    <android.support.v4.widget.NestedScrollView
+    <android.support.v7.widget.LinearLayoutCompat
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <android.support.v7.widget.LinearLayoutCompat
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="horizontal"
+            android:padding="@dimen/activity_widget_margin">
 
             <android.support.v7.widget.LinearLayoutCompat
-                android:id="@+id/bottomBar"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:minHeight="?attr/actionBarSize"
-                android:orientation="horizontal"
-                android:padding="@dimen/activity_widget_margin"
-                app:popupTheme="@style/AppTheme.Light.PopupOverlay">
+                android:layout_weight="1"
+                android:orientation="vertical">
 
-                <android.support.v7.widget.LinearLayoutCompat
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        style="@style/Base.TextAppearance.AppCompat.Subhead"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/customer" />
-
-                    <TextView
-                        android:id="@+id/AO_customerLedgerName"
-                        style="@style/Base.TextAppearance.AppCompat.Caption"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
-                </android.support.v7.widget.LinearLayoutCompat>
-
-                <View
-                    android:layout_width="1dp"
-                    android:layout_height="match_parent"
-                    android:layout_margin="@dimen/activity_widget_margin"
-                    android:background="@android:color/white" />
-
-                <android.support.v7.widget.LinearLayoutCompat
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        style="@style/Base.TextAppearance.AppCompat.Subhead"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="end"
-                        android:text="@string/previous_balance" />
-
-                    <TextView
-                        android:id="@+id/AO_previousBalance"
-                        style="@style/Base.TextAppearance.AppCompat.Title"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="end" />
-                </android.support.v7.widget.LinearLayoutCompat>
-
-            </android.support.v7.widget.LinearLayoutCompat>
-
-
-            <android.support.v7.widget.AppCompatTextView
-                android:id="@+id/AO_totalAmount"
-                style="@style/Base.TextAppearance.AppCompat.Headline"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/activity_widget_margin"
-                android:background="@drawable/bg_edit_text_light"
-                android:gravity="center_vertical|end"
-                android:hint="@string/total_amount"
-                android:minHeight="50dp" />
-
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/activity_widget_margin"
-                android:focusable="true"
-                android:focusableInTouchMode="true">
-
-                <android.support.design.widget.TextInputEditText
-                    android:id="@+id/AO_receivedAmount"
+                <TextView
+                    style="@style/Base.TextAppearance.AppCompat.Caption"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:focusable="true"
-                    android:focusableInTouchMode="true"
-                    android:gravity="end|center_vertical"
-                    android:hint="@string/advance"
-                    android:imeActionLabel="@string/proceed"
-                    android:imeOptions="actionDone"
-                    android:inputType="number" />
+                    android:text="@string/customer" />
 
-            </android.support.design.widget.TextInputLayout>
+                <TextView
+                    android:id="@+id/AO_customerLedgerName"
+                    style="@style/Base.TextAppearance.AppCompat.Subhead"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </android.support.v7.widget.LinearLayoutCompat>
 
-            <TextView
-                android:layout_width="match_parent"
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_margin="@dimen/activity_widget_margin"
+                android:background="@color/colorPrimary" />
+
+            <android.support.v7.widget.LinearLayoutCompat
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:gravity="end"
-                android:onClick="addMore"
-                android:padding="@dimen/activity_widget_margin"
-                android:text="@string/add_more" />
+                android:layout_weight="1"
+                android:orientation="vertical">
 
+                <TextView
+                    style="@style/Base.TextAppearance.AppCompat.Caption"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="end"
+                    android:text="@string/previous_balance" />
 
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/AO_selectedProducts"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                <TextView
+                    android:id="@+id/AO_previousBalance"
+                    style="@style/Base.TextAppearance.AppCompat.Subhead"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="end" />
+            </android.support.v7.widget.LinearLayoutCompat>
+
         </android.support.v7.widget.LinearLayoutCompat>
 
-    </android.support.v4.widget.NestedScrollView>
+
+        <android.support.v7.widget.AppCompatTextView
+            style="@style/Base.TextAppearance.AppCompat.Caption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/activity_widget_margin"
+            android:layout_marginRight="@dimen/activity_widget_margin"
+            android:gravity="center_vertical|end"
+            android:text="@string/total_amount" />
+
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/AO_totalAmount"
+            style="@style/Base.TextAppearance.AppCompat.Headline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/activity_widget_margin"
+            android:background="@drawable/bg_edit_text_light"
+            android:gravity="center_vertical|end"
+            android:hint="@string/total_amount"
+            android:minHeight="50dp" />
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/activity_widget_margin"
+            android:focusable="true"
+            android:focusableInTouchMode="true">
+
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/AO_receivedAmount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:gravity="end|center_vertical"
+                android:hint="@string/advance"
+                android:imeActionLabel="@string/proceed"
+                android:imeOptions="actionDone"
+                android:inputType="numberDecimal" />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:onClick="addMore"
+            android:padding="@dimen/activity_widget_margin"
+            android:text="@string/add_more" />
+
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/AO_selectedProducts"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </android.support.v7.widget.LinearLayoutCompat>
 
     <android.support.design.widget.FloatingActionButton
         android:layout_width="wrap_content"

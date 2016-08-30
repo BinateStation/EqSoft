@@ -78,6 +78,15 @@
         </android.support.v7.widget.CardView>
 
         <TextView
+            style="@style/Base.TextAppearance.AppCompat.Caption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/activity_widget_margin"
+            android:layout_marginRight="@dimen/activity_widget_margin"
+            android:gravity="center_vertical|end"
+            android:text="@string/balance" />
+
+        <TextView
             android:id="@+id/AR_balance"
             style="@style/Base.TextAppearance.AppCompat.Headline"
             android:layout_width="match_parent"
@@ -106,7 +115,7 @@
                 android:hint="@string/received_amount"
                 android:imeActionLabel="@string/done"
                 android:imeOptions="actionDone"
-                android:inputType="number" />
+                android:inputType="numberDecimal" />
         </android.support.design.widget.TextInputLayout>
 
         <Button

@@ -22,6 +22,7 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -31,6 +32,7 @@ import rkr.binatestation.eqsoft.R;
 import rkr.binatestation.eqsoft.adapters.ProductAdapter;
 import rkr.binatestation.eqsoft.models.CustomerModel;
 import rkr.binatestation.eqsoft.models.OrderItemModel;
+import rkr.binatestation.eqsoft.models.OrderItemModelTemp;
 import rkr.binatestation.eqsoft.models.OrderModel;
 import rkr.binatestation.eqsoft.models.ProductModel;
 import rkr.binatestation.eqsoft.models.ReceiptModel;
@@ -38,14 +40,14 @@ import rkr.binatestation.eqsoft.network.DataSync;
 import rkr.binatestation.eqsoft.utils.Constants;
 import rkr.binatestation.eqsoft.utils.Util;
 
-public class OrderActivity extends AppCompatActivity {
+public class CheckoutActivity extends AppCompatActivity {
     RecyclerView selectedProductsRecyclerView;
     TextView customerLedgerName, previousBalance;
     TextInputEditText receivedAmount;
     AppCompatTextView totalAmount;
     CustomerModel customerModel;
     ProductAdapter productAdapter;
-    Map<String, OrderItemModel> orderItemModelMap = new LinkedHashMap<>();
+    Map<String, OrderItemModelTemp> orderItemModelMap = new LinkedHashMap<>();
     ProgressDialog progressDialog;
 
     @Override
@@ -114,21 +116,17 @@ public class OrderActivity extends AppCompatActivity {
         new AsyncTask<Void, Void, Double[]>() {
             @Override
             protected Double[] doInBackground(Void... voids) {
-                OrderModel orderModelDB = new OrderModel(getBaseContext());
-                orderModelDB.open();
-                OrderModel orderModel = orderModelDB.getCustomersRow(customerModel.getCode());
-                orderModelDB.close();
+                OrderItemModelTemp orderItemModelDB = new OrderItemModelTemp(getBaseContext());
+                orderItemModelDB.open();
+                orderItemModelMap = orderItemModelDB.getAllRowsAsMap();
+                orderItemModelDB.close();
 
                 Double[] result = new Double[2];
-                if (orderModel != null) {
-                    result[0] = orderModel.getAmount();
-                    OrderItemModel orderItemModelDB = new OrderItemModel(getBaseContext());
-                    orderItemModelDB.open();
-                    orderItemModelMap = orderItemModelDB.getAllRows(orderModel.getOrderId());
-                    orderItemModelDB.close();
-                } else {
-                    result[0] = 0.0;
+                Double total = 0.0;
+                for (OrderItemModelTemp orderItemModelTemp : orderItemModelMap.values()) {
+                    total += orderItemModelTemp.getAmount();
                 }
+                result[0] = total;
 
                 ReceiptModel receiptModelDB = new ReceiptModel(getBaseContext());
                 receiptModelDB.open();
@@ -195,37 +193,73 @@ public class OrderActivity extends AppCompatActivity {
     public void addMore(View view) {
         startActivity(new Intent(getBaseContext(), ProductsActivity.class)
                 .putExtra(Constants.KEY_CUSTOMER, customerModel));
+        finish();
     }
 
     public void proceedOrder(View view) {
         if (customerModel != null) {
-            saveOrder(view.getContext(), receivedAmount.getText().toString().trim());
+            saveOrder(view.getContext(), receivedAmount.getText().toString().trim(), totalAmount.getText().toString().trim());
         }
     }
 
-    private void saveOrder(final Context context, final String receivedAmount) {
+    private void saveOrder(final Context context, final String receivedAmount, final String totalAmount) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
                 OrderModel orderModelDB = new OrderModel(context);
                 orderModelDB.open();
                 OrderModel orderModel = orderModelDB.getCustomersRow(customerModel.getCode());
-                orderModelDB.close();
-
-                if (orderModel != null && receivedAmount.length() > 0) {
-                    orderModelDB.open();
+                Long orderId = -1L;
+                if (orderModel == null) {
+                    orderId = orderModelDB.insert(new OrderModel(
+                            "0",
+                            Util.getCurrentDate("yyyy-MM-dd HH:mm:ss"),
+                            customerModel.getCode(),
+                            Double.parseDouble(totalAmount),
+                            Double.parseDouble(receivedAmount),
+                            "",
+                            "",
+                            Util.getStringFromSharedPreferences(context, Constants.KEY_USER_ID)
+                    ));
+                } else {
                     orderModelDB.updateRow(new OrderModel(
                             orderModel.getOrderId(),
                             orderModel.getDocDate(),
                             orderModel.getCustomerCode(),
-                            orderModel.getAmount(),
+                            Double.parseDouble(totalAmount),
                             Double.parseDouble(receivedAmount),
                             orderModel.getDueDate(),
                             orderModel.getRemarks(),
-                            orderModel.getUserId(),
-                            "Y"
+                            orderModel.getUserId()
                     ));
-                    orderModelDB.close();
+                }
+                orderModelDB.close();
+
+                List<OrderItemModel> orderItemModels = new ArrayList<>();
+                for (OrderItemModelTemp temp : orderItemModelMap.values()) {
+                    if (orderModel != null) {
+                        orderItemModels.add(new OrderItemModel(
+                                orderModel.getOrderId(),
+                                temp.getProductCode(),
+                                temp.getRate(),
+                                temp.getQuantity(),
+                                temp.getAmount()
+                        ));
+                    } else if (orderId != -1) {
+                        orderItemModels.add(new OrderItemModel(
+                                orderId + "",
+                                temp.getProductCode(),
+                                temp.getRate(),
+                                temp.getQuantity(),
+                                temp.getAmount()
+                        ));
+                    }
+                }
+                OrderItemModel orderItemModelDB = new OrderItemModel(context);
+                orderItemModelDB.open();
+                orderItemModelDB.insertMultipleRows(orderItemModels);
+                orderItemModelDB.close();
+                if (receivedAmount.length() > 0) {
                     ReceiptModel receiptModelDB = new ReceiptModel(context);
                     receiptModelDB.open();
                     receiptModelDB.insert(new ReceiptModel(
@@ -243,9 +277,7 @@ public class OrderActivity extends AppCompatActivity {
             @Override
             protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
-                startActivity(new Intent(
-                        getBaseContext(),
-                        HomeActivity.class
+                startActivity(new Intent(getBaseContext(), HomeActivity.class
                 ).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
             }
         }.execute();
@@ -259,7 +291,7 @@ public class OrderActivity extends AppCompatActivity {
     }
 
     private void alertSync() {
-        new AlertDialog.Builder(OrderActivity.this)
+        new AlertDialog.Builder(CheckoutActivity.this)
                 .setTitle("Alert")
                 .setMessage("Sync will replace the previously sync data. Please ensure that previously synced data is copied to your computer and proceed..")
                 .setPositiveButton("Proceed", new DialogInterface.OnClickListener() {
@@ -282,7 +314,7 @@ public class OrderActivity extends AppCompatActivity {
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
-                progressDialog = new ProgressDialog(OrderActivity.this);
+                progressDialog = new ProgressDialog(CheckoutActivity.this);
                 progressDialog.setMessage("Please wait ...");
                 progressDialog.setCancelable(false);
                 progressDialog.show();
@@ -295,9 +327,9 @@ public class OrderActivity extends AppCompatActivity {
                     progressDialog.dismiss();
                 }
                 if (aBoolean) {
-                    Util.showAlert(OrderActivity.this, "Alert", "Successfully synced", false);
+                    Util.showAlert(CheckoutActivity.this, "Alert", "Successfully synced", false);
                 } else {
-                    Util.showAlert(OrderActivity.this, "Alert", "Some thing went wrong please contact administrator", false);
+                    Util.showAlert(CheckoutActivity.this, "Alert", "Some thing went wrong please contact administrator", false);
                 }
             }
         }.execute(0);
@@ -310,7 +342,7 @@ public class OrderActivity extends AppCompatActivity {
                 alertSync();
                 return true;
             case R.id.GM_logout:
-                Util.logoutAlert(OrderActivity.this, "Alert", "Are you sure you want to logout.?");
+                Util.logoutAlert(CheckoutActivity.this, "Alert", "Are you sure you want to logout.?");
                 return true;
             case R.id.GM_clearAll:
                 alertClearAll();
@@ -320,7 +352,7 @@ public class OrderActivity extends AppCompatActivity {
     }
 
     private void alertClearAll() {
-        new AlertDialog.Builder(OrderActivity.this)
+        new AlertDialog.Builder(CheckoutActivity.this)
                 .setTitle("Alert")
                 .setMessage("This will clear all the data in your database, and can't able to recollect. Are you sure you need to proceed..?")
                 .setPositiveButton("Proceed", new DialogInterface.OnClickListener() {
@@ -373,7 +405,7 @@ public class OrderActivity extends AppCompatActivity {
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
-                progressDialog = new ProgressDialog(OrderActivity.this);
+                progressDialog = new ProgressDialog(CheckoutActivity.this);
                 progressDialog.setMessage("Please wait ...");
                 progressDialog.setCancelable(false);
                 progressDialog.show();
@@ -386,9 +418,9 @@ public class OrderActivity extends AppCompatActivity {
                     progressDialog.dismiss();
                 }
                 if (aBoolean) {
-                    Util.showAlert(OrderActivity.this, "Alert", "Successfully deleted", false);
+                    Util.showAlert(CheckoutActivity.this, "Alert", "Successfully deleted", false);
                 } else {
-                    Util.showAlert(OrderActivity.this, "Alert", "Some thing went wrong please contact administrator", false);
+                    Util.showAlert(CheckoutActivity.this, "Alert", "Some thing went wrong please contact administrator", false);
                 }
             }
         }.execute();
