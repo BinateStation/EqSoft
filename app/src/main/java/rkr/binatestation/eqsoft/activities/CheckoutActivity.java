@@ -29,7 +29,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import rkr.binatestation.eqsoft.R;
-import rkr.binatestation.eqsoft.adapters.ProductAdapter;
+import rkr.binatestation.eqsoft.adapters.OrderSummaryAdapter;
 import rkr.binatestation.eqsoft.models.CustomerModel;
 import rkr.binatestation.eqsoft.models.OrderItemModel;
 import rkr.binatestation.eqsoft.models.OrderItemModelTemp;
@@ -46,7 +46,7 @@ public class CheckoutActivity extends AppCompatActivity {
     TextInputEditText receivedAmount;
     AppCompatTextView totalAmount;
     CustomerModel customerModel;
-    ProductAdapter productAdapter;
+    OrderSummaryAdapter orderSummaryAdapter;
     Map<String, OrderItemModelTemp> orderItemModelMap = new LinkedHashMap<>();
     ProgressDialog progressDialog;
 
@@ -176,7 +176,7 @@ public class CheckoutActivity extends AppCompatActivity {
             @Override
             protected void onPostExecute(List<ProductModel> productModels) {
                 super.onPostExecute(productModels);
-                selectedProductsRecyclerView.setAdapter(productAdapter = new ProductAdapter(productModels, customerModel, orderItemModelMap, true, new ProductAdapter.OnAdapterInteractionListener() {
+                selectedProductsRecyclerView.setAdapter(orderSummaryAdapter = new OrderSummaryAdapter(productModels, customerModel, orderItemModelMap, true, new OrderSummaryAdapter.OnAdapterInteractionListener() {
                     @Override
                     public void onItemClicked() {
                     }
@@ -271,6 +271,11 @@ public class CheckoutActivity extends AppCompatActivity {
                     ));
                     receiptModelDB.close();
                 }
+
+                OrderItemModelTemp orderItemModelTempDB = new OrderItemModelTemp(context);
+                orderItemModelTempDB.open();
+                orderItemModelTempDB.deleteAll();
+                orderItemModelTempDB.close();
                 return null;
             }
 
