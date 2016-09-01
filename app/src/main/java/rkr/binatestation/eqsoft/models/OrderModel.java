@@ -238,17 +238,13 @@ public class OrderModel implements Serializable {
         Cursor cursor = database.query(OrdersTable.TABLE_NAME, null, null, null, null, null, null);
         cursor.moveToFirst();
         Double totalAmount = 0.0;
-        Double totalAmountReceived = 0.0;
         while (!cursor.isAfterLast()) {
             OrderModel obj = cursorToOrderModel(cursor);
             totalAmount += obj.getAmount();
-            totalAmountReceived += obj.getReceivedAmount();
             cursor.moveToNext();
         }
         cursor.close();
-        stringMap.put("KEY_TOTAL_AMOUNT_RECEIVED", String.format(Locale.getDefault(), "%.2f", totalAmountReceived));
         stringMap.put("KEY_TOTAL_AMOUNT", String.format(Locale.getDefault(), "%.2f", totalAmount));
-        stringMap.put("KEY_TOTAL_PENDING_AMOUNT", String.format(Locale.getDefault(), "%.2f", (totalAmount - totalAmountReceived)));
         return stringMap;
     }
 
@@ -294,14 +290,21 @@ public class OrderModel implements Serializable {
     private JSONObject cursorToJSONObject(Cursor cursor) {
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("order_id", cursor.getString(0));
-            jsonObject.put("doc_date", cursor.getString(OrdersTable.COLUMN_INDEX_DOC_DATE));
-            jsonObject.put("customer_code", cursor.getString(OrdersTable.COLUMN_INDEX_CUSTOMER_CODE));
-            jsonObject.put("amount", cursor.getString(OrdersTable.COLUMN_INDEX_AMOUNT));
-            jsonObject.put("received_amount", cursor.getString(OrdersTable.COLUMN_INDEX_RECEIVED_AMOUNT));
-            jsonObject.put("due_date", cursor.getString(OrdersTable.COLUMN_INDEX_DUE_DATE));
-            jsonObject.put("remarks", cursor.getString(OrdersTable.COLUMN_INDEX_REMARKS));
+            jsonObject.put("DocNo", cursor.getString(0));
+            jsonObject.put("DocDate", cursor.getString(OrdersTable.COLUMN_INDEX_DOC_DATE));
+            jsonObject.put("DocTime", cursor.getString(OrdersTable.COLUMN_INDEX_DOC_DATE));
+            jsonObject.put("CustomerCode", cursor.getString(OrdersTable.COLUMN_INDEX_CUSTOMER_CODE));
+            jsonObject.put("Amount", cursor.getString(OrdersTable.COLUMN_INDEX_AMOUNT));
+            jsonObject.put("Received Amount", cursor.getString(OrdersTable.COLUMN_INDEX_RECEIVED_AMOUNT));
+            jsonObject.put("DueDate", cursor.getString(OrdersTable.COLUMN_INDEX_DUE_DATE));
+            jsonObject.put("Remarks", cursor.getString(OrdersTable.COLUMN_INDEX_REMARKS));
             jsonObject.put("user_id", cursor.getString(OrdersTable.COLUMN_INDEX_USER_ID));
+
+            OrderItemModel orderItemModelDB = new OrderItemModel(context);
+            orderItemModelDB.open();
+            JSONArray orderItemsJsonArray = orderItemModelDB.getAllRowsAsJSONArray(cursor.getString(0));
+            orderItemModelDB.close();
+            jsonObject.put("Items", orderItemsJsonArray);
         } catch (JSONException e) {
             e.printStackTrace();
         }

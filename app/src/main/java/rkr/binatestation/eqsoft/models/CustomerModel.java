@@ -279,6 +279,19 @@ public class CustomerModel implements Serializable {
         return list;
     }
 
+    public Double getTotalBalance() {
+        Double totalBalance = 0.0;
+        Cursor cursor = database.query(CustomersTable.TABLE_NAME, null, null, null, null, null, null);
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            CustomerModel obj = cursorToCustomerModel(cursor);
+            totalBalance += obj.getBalance();
+            cursor.moveToNext();
+        }
+        cursor.close();
+        return totalBalance;
+    }
+
     public JSONArray getAllRowsAsJSONArray() {
         JSONArray jsonArray = new JSONArray();
         Cursor cursor = database.query(CustomersTable.TABLE_NAME, null, null, null, null, null, null);

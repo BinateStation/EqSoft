@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import java.util.Locale;
 import java.util.Map;
 
 import rkr.binatestation.eqsoft.R;
@@ -76,6 +77,8 @@ public class HomeActivity extends AppCompatActivity {
                 ReceiptModel receiptModelDB = new ReceiptModel(context);
                 receiptModelDB.open();
                 stringMap.put("KEY_TOTAL_RECEIPTS", receiptModelDB.getCount());
+                Double totalAmountReceived = receiptModelDB.getTotalAmountReceived();
+                stringMap.put("KEY_TOTAL_AMOUNT_RECEIVED", String.format(Locale.getDefault(), "%.2f", totalAmountReceived));
                 receiptModelDB.close();
                 ProductModel productModelDB = new ProductModel(context);
                 productModelDB.open();
@@ -84,6 +87,8 @@ public class HomeActivity extends AppCompatActivity {
                 CustomerModel customerModelDB = new CustomerModel(context);
                 customerModelDB.open();
                 stringMap.put("KEY_TOTAL_CUSTOMERS", customerModelDB.getCount());
+                Double totalBalance = customerModelDB.getTotalBalance();
+                stringMap.put("KEY_TOTAL_PENDING_AMOUNT", String.format(Locale.getDefault(), "%.2f", (totalBalance - totalAmountReceived)));
                 customerModelDB.close();
                 return stringMap;
             }

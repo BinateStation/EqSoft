@@ -254,8 +254,10 @@ public class ReceiptsActivity extends AppCompatActivity {
                 if (receiptModel != null) {
                     receivedAmount.setText(String.format(Locale.getDefault(), "%.2f", receiptModel.getAmount()));
                     receivedAmount.setSelection(receivedAmount.getText().length());
+                    receivedAmount.requestFocus();
                 } else {
                     receivedAmount.setText("0.0");
+                    receivedAmount.requestFocus();
                 }
             }
         }.execute();

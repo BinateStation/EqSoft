@@ -178,6 +178,19 @@ public class ReceiptModel implements Serializable {
         return list;
     }
 
+    public Double getTotalAmountReceived() {
+        Double totalAmountReceived = 0.0;
+        Cursor cursor = database.query(ReceiptsTable.TABLE_NAME, null, null, null, null, null, null);
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            ReceiptModel obj = cursorToProductModel(cursor);
+            totalAmountReceived += obj.getAmount();
+            cursor.moveToNext();
+        }
+        cursor.close();
+        return totalAmountReceived;
+    }
+
     public JSONArray getAllRowsAsJSONArray() {
         JSONArray jsonArray = new JSONArray();
         Cursor cursor = database.query(ReceiptsTable.TABLE_NAME, null, null, null, null, null, null);
@@ -230,10 +243,11 @@ public class ReceiptModel implements Serializable {
     private JSONObject cursorToJSONObject(Cursor cursor) {
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("receipt_id", cursor.getString(0));
-            jsonObject.put("receipt_date", cursor.getString(ReceiptsTable.COLUMN_INDEX_RECEIPT_DATE));
-            jsonObject.put("customer_code", cursor.getString(ReceiptsTable.COLUMN_INDEX_CUSTOMER_CODE));
-            jsonObject.put("amount", cursor.getString(ReceiptsTable.COLUMN_INDEX_AMOUNT));
+            jsonObject.put("DocNo", cursor.getString(0));
+            jsonObject.put("DocDate", cursor.getString(ReceiptsTable.COLUMN_INDEX_RECEIPT_DATE));
+            jsonObject.put("DocTime", cursor.getString(ReceiptsTable.COLUMN_INDEX_RECEIPT_DATE));
+            jsonObject.put("CustomerCode", cursor.getString(ReceiptsTable.COLUMN_INDEX_CUSTOMER_CODE));
+            jsonObject.put("Amount", cursor.getString(ReceiptsTable.COLUMN_INDEX_AMOUNT));
             jsonObject.put("user_id", cursor.getString(ReceiptsTable.COLUMN_INDEX_USER_ID));
         } catch (JSONException e) {
             e.printStackTrace();

@@ -187,9 +187,9 @@ public class OrderItemModel implements Serializable {
         return list;
     }
 
-    public JSONArray getAllRowsAsJSONArray() {
+    public JSONArray getAllRowsAsJSONArray(String orderId) {
         JSONArray jsonArray = new JSONArray();
-        Cursor cursor = database.query(OrderItemsTable.TABLE_NAME, null, null, null, null, null, null);
+        Cursor cursor = database.query(OrderItemsTable.TABLE_NAME, null, OrderItemsTable.COLUMN_NAME_ORDER_ID + " = ?", new String[]{orderId}, null, null, null);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             JSONObject obj = cursorToJSONObject(cursor);
@@ -259,12 +259,10 @@ public class OrderItemModel implements Serializable {
     private JSONObject cursorToJSONObject(Cursor cursor) {
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("order_item_id", cursor.getString(0));
-            jsonObject.put("order_id", cursor.getString(OrderItemsTable.COLUMN_INDEX_ORDER_ID));
-            jsonObject.put("product_code", cursor.getString(OrderItemsTable.COLUMN_INDEX_PRODUCT_CODE));
-            jsonObject.put("rate", cursor.getString(OrderItemsTable.COLUMN_INDEX_RATE));
-            jsonObject.put("quantity", cursor.getString(OrderItemsTable.COLUMN_INDEX_QUANTITY));
-            jsonObject.put("amount", cursor.getString(OrderItemsTable.COLUMN_INDEX_AMOUNT));
+            jsonObject.put("ProductCode", cursor.getString(OrderItemsTable.COLUMN_INDEX_PRODUCT_CODE));
+            jsonObject.put("Rate", cursor.getString(OrderItemsTable.COLUMN_INDEX_RATE));
+            jsonObject.put("Quantity", cursor.getString(OrderItemsTable.COLUMN_INDEX_QUANTITY));
+            jsonObject.put("Amount", cursor.getString(OrderItemsTable.COLUMN_INDEX_AMOUNT));
         } catch (JSONException e) {
             e.printStackTrace();
         }
