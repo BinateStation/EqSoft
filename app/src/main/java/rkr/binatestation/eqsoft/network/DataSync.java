@@ -154,7 +154,7 @@ public class DataSync extends AsyncTask<Integer, Integer, Boolean> {
                             productJsonObject.optDouble("MRP"),
                             productJsonObject.optString("Name").trim(),
                             productJsonObject.optDouble("SellingRate"),
-                            productJsonObject.optString("Stock").trim(),
+                            productJsonObject.optDouble("Stock"),
                             productJsonObject.optDouble("TaxRate")
                     ));
                 }

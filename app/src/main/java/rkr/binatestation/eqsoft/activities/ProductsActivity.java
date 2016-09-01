@@ -110,10 +110,23 @@ public class ProductsActivity extends AppCompatActivity {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
-                OrderItemModelTemp orderItemModelDB = new OrderItemModelTemp(getBaseContext());
-                orderItemModelDB.open();
-                orderItemModelMap = orderItemModelDB.getAllRowsAsMap();
-                orderItemModelDB.close();
+                OrderItemModelTemp orderItemModelTempDB = new OrderItemModelTemp(getBaseContext());
+                orderItemModelTempDB.open();
+                orderItemModelMap = orderItemModelTempDB.getAllRowsAsMap();
+                orderItemModelTempDB.close();
+
+                OrderModel orderModelDB = new OrderModel(getBaseContext());
+                orderModelDB.open();
+                OrderModel orderModel = orderModelDB.getCustomersRow(customerModel.getCode());
+                orderModelDB.close();
+
+                if (orderModel != null) {
+                    OrderItemModel orderItemModelDB = new OrderItemModel(getBaseContext());
+                    orderItemModelDB.open();
+                    orderItemModelMap.putAll(orderItemModelDB.getAllRows(orderModel.getOrderId()));
+                    orderItemModelDB.close();
+                }
+
                 return null;
             }
 

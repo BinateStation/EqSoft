@@ -26,13 +26,13 @@ public class ProductModel implements Serializable {
     Double MRP;
     String name;
     Double sellingRate;
-    String stock;
+    Double stock;
     Double taxRate;
     Context context;
     private SQLiteDatabase database;
     private RKRsEqSoftSQLiteHelper dbHelper;
 
-    public ProductModel(String category, String code, Double MRP, String name, Double sellingRate, String stock, Double taxRate) {
+    public ProductModel(String category, String code, Double MRP, String name, Double sellingRate, Double stock, Double taxRate) {
         this.category = category;
         this.code = code;
         this.MRP = MRP;
@@ -87,11 +87,11 @@ public class ProductModel implements Serializable {
         this.sellingRate = sellingRate;
     }
 
-    public String getStock() {
+    public Double getStock() {
         return stock;
     }
 
-    public void setStock(String stock) {
+    public void setStock(Double stock) {
         this.stock = stock;
     }
 
@@ -221,6 +221,7 @@ public class ProductModel implements Serializable {
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             ProductModel obj = cursorToProductModel(cursor);
+            obj.setStock(getCurrentStock(obj.getCode()));
             list.add(obj);
             cursor.moveToNext();
         }
@@ -252,6 +253,24 @@ public class ProductModel implements Serializable {
         return productModel;
     }
 
+    public Double getCurrentStock(String code) {
+        Cursor cursor = database.query(ProductsTable.TABLE_NAME, null, ProductsTable.COLUMN_NAME_CODE + " = ?", new String[]{code}, null, null, null);
+        Double currentStock = 0.0;
+        if (cursor.moveToFirst()) {
+            currentStock += cursorToProductModel(cursor).getStock();
+        }
+        cursor.close();
+        Cursor cursorOrderItem = database.query(OrderItemModel.OrderItemsTable.TABLE_NAME, null, OrderItemModel.OrderItemsTable.COLUMN_NAME_PRODUCT_CODE + " = ?", new String[]{code}, null, null, null);
+        cursorOrderItem.moveToFirst();
+        while (!cursorOrderItem.isAfterLast()) {
+            OrderItemModel obj = OrderItemModel.cursorToOrderItemModelStatic(cursorOrderItem);
+            currentStock -= obj.getQuantity();
+            cursorOrderItem.moveToNext();
+        }
+        cursorOrderItem.close();
+        return currentStock;
+    }
+
     /**
      * This method will counts how many rows available in this table
      *
@@ -274,7 +293,7 @@ public class ProductModel implements Serializable {
                 cursor.getDouble(ProductsTable.COLUMN_INDEX_MRP),
                 cursor.getString(ProductsTable.COLUMN_INDEX_NAME),
                 cursor.getDouble(ProductsTable.COLUMN_INDEX_SELLING_RATE),
-                cursor.getString(ProductsTable.COLUMN_INDEX_STOCK),
+                cursor.getDouble(ProductsTable.COLUMN_INDEX_STOCK),
                 cursor.getDouble(ProductsTable.COLUMN_INDEX_TAX_RATE)
         );
     }

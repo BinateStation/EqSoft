@@ -69,12 +69,16 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if (customerModel != null) {
-                        popupEnterQuantity(view.getContext(), getItem(holder.getAdapterPosition()), holder.getAdapterPosition());
-                    } else {
-                        if (onAdapterInteractionListener != null) {
-                            onAdapterInteractionListener.onItemClicked();
+                    if (getItem(holder.getAdapterPosition()).getStock() > 0) {
+                        if (customerModel != null) {
+                            popupEnterQuantity(view.getContext(), getItem(holder.getAdapterPosition()), holder.getAdapterPosition());
+                        } else {
+                            if (onAdapterInteractionListener != null) {
+                                onAdapterInteractionListener.onItemClicked();
+                            }
                         }
+                    } else {
+                        Util.showAlert(holder.itemView.getContext(), "Alert", "No more stock available.!");
                     }
                 }
             });
@@ -82,7 +86,13 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
         holder.productName.setText(getItem(position).getName());
         holder.productMRP.setText(String.format(Locale.getDefault(), "MRP - %.2f", getItem(position).getMRP()));
         holder.productCode.setText(getItem(position).getCode());
-        holder.stock.setText(getItem(position).getStock());
+        Double stock;
+        if (orderItemModelMap.containsKey(getItem(position).getCode()) && orderItemModelMap.get(getItem(position).getCode()).getTemp()) {
+            stock = getItem(position).getStock() - orderItemModelMap.get(getItem(position).getCode()).getQuantity();
+        } else {
+            stock = getItem(position).getStock();
+        }
+        holder.stock.setText(String.format(Locale.getDefault(), "%.2f", stock));
         holder.sellingPrice.setText(String.format(Locale.getDefault(), "%.2f", getItem(position).getSellingRate()));
         if (orderItemModelMap.containsKey(getItem(position).getCode())) {
             holder.selectedView.setVisibility(View.VISIBLE);
@@ -137,7 +147,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
                     productCode.setText(item.getCode());
                 }
                 if (stock != null) {
-                    stock.setText(item.getStock());
+                    stock.setText(String.format(Locale.getDefault(), "%.2f", item.getStock()));
                 }
                 if (sellingPrice != null) {
                     sellingPrice.setText(String.format(Locale.getDefault(), "%.2f", item.getSellingRate()));
@@ -163,7 +173,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
                             if (editable.length() > 0) {
                                 try {
                                     if (amount != null) {
-                                        amount.setText(String.format(Locale.getDefault(), "%.2f", (Integer.parseInt(editable.toString()) * item.getSellingRate())));
+                                        amount.setText(String.format(Locale.getDefault(), "%.2f", (Double.parseDouble(editable.toString()) * item.getSellingRate())));
                                     }
                                 } catch (NumberFormatException e) {
                                     e.printStackTrace();
@@ -199,14 +209,24 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
                         @Override
                         public void onClick(View view) {
                             if (quantity != null && amount != null && quantity.getText().length() > 0 && amount.getText().length() > 0) {
-                                addOrder(
-                                        view.getContext(),
-                                        item,
-                                        quantity.getText().toString().trim(),
-                                        amount.getText().toString().trim(),
-                                        appCompatDialog,
-                                        adapterPosition
-                                );
+                                try {
+                                    Double quantityDouble = Double.parseDouble(quantity.getText().toString().trim());
+                                    if (quantityDouble <= item.getStock()) {
+                                        addOrder(
+                                                view.getContext(),
+                                                item,
+                                                quantityDouble,
+                                                amount.getText().toString().trim(),
+                                                appCompatDialog,
+                                                adapterPosition
+                                        );
+                                    } else {
+                                        Util.showAlert(view.getContext(), "Alert", "There is no such stock available, please enter a lesser quantity.!");
+                                    }
+                                } catch (NumberFormatException e) {
+                                    e.printStackTrace();
+                                    Util.showAlert(okay.getContext(), "Alert", "Please enter a valid quantity.");
+                                }
                             } else {
                                 appCompatDialog.dismiss();
                             }
@@ -229,15 +249,16 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
         appCompatDialog.show();
     }
 
-    private void addOrder(final Context context, final ProductModel item, final String quantity, final String amount, final AppCompatDialog appCompatDialog, final int adapterPosition) {
+    private void addOrder(final Context context, final ProductModel item, final Double quantity, final String amount, final AppCompatDialog appCompatDialog, final int adapterPosition) {
         new AsyncTask<Void, Void, OrderItemModelTemp>() {
             @Override
             protected OrderItemModelTemp doInBackground(Void... voids) {
                 OrderItemModelTemp orderItemModelTemp = new OrderItemModelTemp(
                         item.getCode(),
                         item.getSellingRate(),
-                        Double.parseDouble(quantity),
-                        Double.parseDouble(amount)
+                        quantity,
+                        Double.parseDouble(amount),
+                        true
                 );
                 OrderItemModelTemp orderItemModelTempDB = new OrderItemModelTemp(context);
                 orderItemModelTempDB.open();

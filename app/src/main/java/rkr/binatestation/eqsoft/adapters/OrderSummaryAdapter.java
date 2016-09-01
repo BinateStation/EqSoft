@@ -48,14 +48,6 @@ public class OrderSummaryAdapter extends RecyclerView.Adapter<OrderSummaryAdapte
         this.clickable = clickable;
     }
 
-    public void setCustomerModel(CustomerModel customerModel) {
-        this.customerModel = customerModel;
-    }
-
-    public void setOrderItemModelMap(Map<String, OrderItemModelTemp> orderItemModelMap) {
-        this.orderItemModelMap = orderItemModelMap;
-    }
-
     @Override
     public ItemView onCreateViewHolder(ViewGroup parent, int viewType) {
         return new ItemView(
@@ -136,7 +128,7 @@ public class OrderSummaryAdapter extends RecyclerView.Adapter<OrderSummaryAdapte
                     productCode.setText(item.getCode());
                 }
                 if (stock != null) {
-                    stock.setText(item.getStock());
+                    stock.setText(String.format(Locale.getDefault(), "%.2f", item.getStock()));
                 }
                 if (sellingPrice != null) {
                     sellingPrice.setText(String.format(Locale.getDefault(), "%.2f", item.getSellingRate()));
@@ -236,7 +228,8 @@ public class OrderSummaryAdapter extends RecyclerView.Adapter<OrderSummaryAdapte
                         item.getCode(),
                         item.getSellingRate(),
                         Double.parseDouble(quantity),
-                        Double.parseDouble(amount)
+                        Double.parseDouble(amount),
+                        true
                 );
                 OrderItemModelTemp orderItemModelTempDB = new OrderItemModelTemp(context);
                 orderItemModelTempDB.open();

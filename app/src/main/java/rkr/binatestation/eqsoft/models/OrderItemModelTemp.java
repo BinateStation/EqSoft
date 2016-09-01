@@ -28,21 +28,33 @@ public class OrderItemModelTemp implements Serializable {
     Double rate;
     Double quantity;
     Double amount;
+    Boolean isTemp;
 
     Context context;
     private SQLiteDatabase database;
     private RKRsEqSoftSQLiteHelper dbHelper;
 
-    public OrderItemModelTemp(String productCode, Double rate, Double quantity, Double amount) {
+    public OrderItemModelTemp(String productCode, Double rate, Double quantity, Double amount, Boolean isTemp) {
         this.productCode = productCode;
         this.rate = rate;
         this.quantity = quantity;
         this.amount = amount;
+        this.isTemp = isTemp;
     }
 
     public OrderItemModelTemp(Context context) {
         this.context = context;
         dbHelper = new RKRsEqSoftSQLiteHelper(context);
+    }
+
+    public static OrderItemModelTemp cursorToOrderItemModelTempStatic(Cursor cursor) {
+        return new OrderItemModelTemp(
+                cursor.getString(OrderItemsTable.COLUMN_INDEX_PRODUCT_CODE),
+                cursor.getDouble(OrderItemsTable.COLUMN_INDEX_RATE),
+                cursor.getDouble(OrderItemsTable.COLUMN_INDEX_QUANTITY),
+                cursor.getDouble(OrderItemsTable.COLUMN_INDEX_AMOUNT),
+                true
+        );
     }
 
     public String getProductCode() {
@@ -75,6 +87,14 @@ public class OrderItemModelTemp implements Serializable {
 
     public void setAmount(Double amount) {
         this.amount = amount;
+    }
+
+    public Boolean getTemp() {
+        return isTemp;
+    }
+
+    public void setTemp(Boolean temp) {
+        isTemp = temp;
     }
 
     public void open() throws SQLException {
@@ -160,7 +180,7 @@ public class OrderItemModelTemp implements Serializable {
         Cursor cursor = database.query(OrderItemsTable.TABLE_NAME, null, null, null, null, null, null);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            OrderItemModelTemp obj = cursorToProductModel(cursor);
+            OrderItemModelTemp obj = cursorToOrderItemModelTemp(cursor);
             list.add(obj);
             cursor.moveToNext();
         }
@@ -173,7 +193,7 @@ public class OrderItemModelTemp implements Serializable {
         Cursor cursor = database.query(OrderItemsTable.TABLE_NAME, null, null, null, null, null, null);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            OrderItemModelTemp obj = cursorToProductModel(cursor);
+            OrderItemModelTemp obj = cursorToOrderItemModelTemp(cursor);
             list.put(obj.getProductCode(), obj);
             cursor.moveToNext();
         }
@@ -186,19 +206,20 @@ public class OrderItemModelTemp implements Serializable {
                 OrderItemsTable.COLUMN_NAME_PRODUCT_CODE + " = ? ", new String[]{productCode}, null, null, null);
         OrderItemModelTemp productModel = null;
         if (cursor.moveToFirst()) {
-            productModel = cursorToProductModel(cursor);
+            productModel = cursorToOrderItemModelTemp(cursor);
         }
         cursor.close();
         return productModel;
     }
 
     @Contract("_ -> !null")
-    private OrderItemModelTemp cursorToProductModel(Cursor cursor) {
+    private OrderItemModelTemp cursorToOrderItemModelTemp(Cursor cursor) {
         return new OrderItemModelTemp(
                 cursor.getString(OrderItemsTable.COLUMN_INDEX_PRODUCT_CODE),
                 cursor.getDouble(OrderItemsTable.COLUMN_INDEX_RATE),
                 cursor.getDouble(OrderItemsTable.COLUMN_INDEX_QUANTITY),
-                cursor.getDouble(OrderItemsTable.COLUMN_INDEX_AMOUNT)
+                cursor.getDouble(OrderItemsTable.COLUMN_INDEX_AMOUNT),
+                true
         );
     }
 

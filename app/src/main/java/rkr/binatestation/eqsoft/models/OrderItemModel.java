@@ -50,6 +50,16 @@ public class OrderItemModel implements Serializable {
         dbHelper = new RKRsEqSoftSQLiteHelper(context);
     }
 
+    public static OrderItemModel cursorToOrderItemModelStatic(Cursor cursor) {
+        return new OrderItemModel(
+                cursor.getString(OrderItemsTable.COLUMN_INDEX_ORDER_ID),
+                cursor.getString(OrderItemsTable.COLUMN_INDEX_PRODUCT_CODE),
+                cursor.getDouble(OrderItemsTable.COLUMN_INDEX_RATE),
+                cursor.getDouble(OrderItemsTable.COLUMN_INDEX_QUANTITY),
+                cursor.getDouble(OrderItemsTable.COLUMN_INDEX_AMOUNT)
+        );
+    }
+
     public String getOrderId() {
         return orderId;
     }
@@ -179,7 +189,7 @@ public class OrderItemModel implements Serializable {
         Cursor cursor = database.query(OrderItemsTable.TABLE_NAME, null, null, null, null, null, null);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            OrderItemModel obj = cursorToProductModel(cursor);
+            OrderItemModel obj = cursorToOrderItemModel(cursor);
             list.add(obj);
             cursor.moveToNext();
         }
@@ -205,12 +215,13 @@ public class OrderItemModel implements Serializable {
         Cursor cursor = database.query(OrderItemsTable.TABLE_NAME, null, OrderItemsTable.COLUMN_NAME_ORDER_ID + " = ?", new String[]{orderId}, null, null, null);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            OrderItemModel obj = cursorToProductModel(cursor);
+            OrderItemModel obj = cursorToOrderItemModel(cursor);
             OrderItemModelTemp temp = new OrderItemModelTemp(
                     obj.getProductCode(),
                     obj.getRate(),
                     obj.getQuantity(),
-                    obj.getAmount()
+                    obj.getAmount(),
+                    false
             );
             list.put(obj.getProductCode(), temp);
             cursor.moveToNext();
@@ -224,7 +235,7 @@ public class OrderItemModel implements Serializable {
         Cursor cursor = database.query(OrderItemsTable.TABLE_NAME, null, OrderItemsTable.COLUMN_NAME_ORDER_ID + " = ?", new String[]{orderId}, null, null, null);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            OrderItemModel obj = cursorToProductModel(cursor);
+            OrderItemModel obj = cursorToOrderItemModel(cursor);
             totalAmount += obj.getAmount();
             cursor.moveToNext();
         }
@@ -232,21 +243,20 @@ public class OrderItemModel implements Serializable {
         return "" + totalAmount;
     }
 
-
     public OrderItemModel getRow(String productCode, String orderId) {
         Cursor cursor = database.query(OrderItemsTable.TABLE_NAME, null,
                 OrderItemsTable.COLUMN_NAME_PRODUCT_CODE + " = ? and " +
                         OrderItemsTable.COLUMN_NAME_ORDER_ID + " = ? ", new String[]{productCode, orderId}, null, null, null);
         OrderItemModel productModel = null;
         if (cursor.moveToFirst()) {
-            productModel = cursorToProductModel(cursor);
+            productModel = cursorToOrderItemModel(cursor);
         }
         cursor.close();
         return productModel;
     }
 
     @Contract("_ -> !null")
-    private OrderItemModel cursorToProductModel(Cursor cursor) {
+    private OrderItemModel cursorToOrderItemModel(Cursor cursor) {
         return new OrderItemModel(
                 cursor.getString(OrderItemsTable.COLUMN_INDEX_ORDER_ID),
                 cursor.getString(OrderItemsTable.COLUMN_INDEX_PRODUCT_CODE),
