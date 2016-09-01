@@ -86,7 +86,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
         holder.sellingPrice.setText(String.format(Locale.getDefault(), "%.2f", getItem(position).getSellingRate()));
         if (orderItemModelMap.containsKey(getItem(position).getCode())) {
             holder.selectedView.setVisibility(View.VISIBLE);
-            holder.quantity.setText(String.format(Locale.getDefault(), "Qty: %.2f", orderItemModelMap.get(getItem(position).getCode()).getQuantity()));
+            holder.quantity.setText(String.format(Locale.getDefault(), "Qty: %.3f", orderItemModelMap.get(getItem(position).getCode()).getQuantity()));
             holder.amount.setText(String.format(Locale.getDefault(), "Amt: %.2f", orderItemModelMap.get(getItem(position).getCode()).getAmount()));
         } else {
             holder.selectedView.setVisibility(View.GONE);
@@ -144,7 +144,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
                 }
                 if (quantity != null) {
                     if (orderItemModelMap.containsKey(item.getCode())) {
-                        quantity.setText(String.format(Locale.getDefault(), "%.2f", orderItemModelMap.get(item.getCode()).getQuantity()));
+                        quantity.setText(String.format(Locale.getDefault(), "%.3f", orderItemModelMap.get(item.getCode()).getQuantity()));
                         quantity.setSelection(quantity.getText().length());
                     }
                     quantity.addTextChangedListener(new TextWatcher() {

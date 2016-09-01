@@ -215,9 +215,9 @@ public class ProductModel implements Serializable {
             default:
                 sortBy = ProductsTable.COLUMN_NAME_NAME;
         }
-        Cursor cursor = database.query(ProductsTable.TABLE_NAME, null, ProductsTable.COLUMN_NAME_NAME + " LIKE '%" + query + "%' OR " +
-                ProductsTable.COLUMN_NAME_CODE + " LIKE '%" + query + "%' OR " +
-                ProductsTable.COLUMN_NAME_CATEGORY + " LIKE '%" + query + "%' ", null, null, null, sortBy);
+        Cursor cursor = database.query(ProductsTable.TABLE_NAME, null, ProductsTable.COLUMN_NAME_NAME + " LIKE '" + query.replace(" ", "%") + "%' OR " +
+                ProductsTable.COLUMN_NAME_CODE + " LIKE '" + query.replace(" ", "%") + "%' OR " +
+                ProductsTable.COLUMN_NAME_CATEGORY + " LIKE '" + query.replace(" ", "%") + "%' ", null, null, null, sortBy);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             ProductModel obj = cursorToProductModel(cursor);
