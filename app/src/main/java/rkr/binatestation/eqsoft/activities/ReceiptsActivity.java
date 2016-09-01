@@ -206,7 +206,7 @@ public class ReceiptsActivity extends AppCompatActivity {
     }
 
     public void showSearchDialog(View view) {
-        startActivityForResult(new Intent(getBaseContext(), CustomersActivity.class), Constants.REQUEST_CODE_CUSTOMER);
+        startActivityForResult(new Intent(getBaseContext(), CustomersActivity.class), Constants.REQUEST_CODE_CUSTOMER_ORDER_SUMMARY);
     }
 
     public void setCustomerDetails() {
@@ -314,7 +314,7 @@ public class ReceiptsActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK && requestCode == Constants.REQUEST_CODE_CUSTOMER && data.hasExtra(Constants.KEY_CUSTOMER)) {
+        if (resultCode == RESULT_OK && requestCode == Constants.REQUEST_CODE_CUSTOMER_ORDER_SUMMARY && data.hasExtra(Constants.KEY_CUSTOMER)) {
             customerModel = (CustomerModel) data.getSerializableExtra(Constants.KEY_CUSTOMER);
             setCustomerDetails();
         }

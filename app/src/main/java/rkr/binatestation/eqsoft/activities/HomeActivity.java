@@ -103,7 +103,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     public void onCustomerClick(View view) {
-        startActivityForResult(new Intent(view.getContext(), CustomersActivity.class), Constants.REQUEST_CODE_CUSTOMER);
+        startActivityForResult(new Intent(view.getContext(), CustomersActivity.class), Constants.REQUEST_CODE_CUSTOMER_PRODUCT);
     }
 
     public void onProductsClick(View view) {
@@ -114,8 +114,8 @@ public class HomeActivity extends AppCompatActivity {
         startActivity(new Intent(view.getContext(), ReceiptsActivity.class));
     }
 
-    public void order(View view) {
-        startActivityForResult(new Intent(view.getContext(), CustomersActivity.class), Constants.REQUEST_CODE_CUSTOMER);
+    public void onOrderSummaryClick(View view) {
+        startActivityForResult(new Intent(view.getContext(), CustomersActivity.class), Constants.REQUEST_CODE_CUSTOMER_ORDER_SUMMARY);
     }
 
 
@@ -260,7 +260,11 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK && requestCode == Constants.REQUEST_CODE_CUSTOMER && data.hasExtra(Constants.KEY_CUSTOMER)) {
+        if (resultCode == RESULT_OK && requestCode == Constants.REQUEST_CODE_CUSTOMER_ORDER_SUMMARY && data.hasExtra(Constants.KEY_CUSTOMER)) {
+            startActivity(new Intent(getBaseContext(), CheckoutActivity.class)
+                    .putExtra(Constants.KEY_CUSTOMER, data.getSerializableExtra(Constants.KEY_CUSTOMER))
+            );
+        } else if (resultCode == RESULT_OK && requestCode == Constants.REQUEST_CODE_CUSTOMER_ORDER_SUMMARY && data.hasExtra(Constants.KEY_CUSTOMER)) {
             startActivity(new Intent(getBaseContext(), CheckoutActivity.class)
                     .putExtra(Constants.KEY_CUSTOMER, data.getSerializableExtra(Constants.KEY_CUSTOMER))
             );

@@ -200,13 +200,19 @@ public class OrderItemModel implements Serializable {
         return jsonArray;
     }
 
-    public Map<String, OrderItemModel> getAllRows(String orderId) {
-        Map<String, OrderItemModel> list = new LinkedHashMap<>();
+    public Map<String, OrderItemModelTemp> getAllRows(String orderId) {
+        Map<String, OrderItemModelTemp> list = new LinkedHashMap<>();
         Cursor cursor = database.query(OrderItemsTable.TABLE_NAME, null, OrderItemsTable.COLUMN_NAME_ORDER_ID + " = ?", new String[]{orderId}, null, null, null);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             OrderItemModel obj = cursorToProductModel(cursor);
-            list.put(obj.getProductCode(), obj);
+            OrderItemModelTemp temp = new OrderItemModelTemp(
+                    obj.getProductCode(),
+                    obj.getRate(),
+                    obj.getQuantity(),
+                    obj.getAmount()
+            );
+            list.put(obj.getProductCode(), temp);
             cursor.moveToNext();
         }
         cursor.close();

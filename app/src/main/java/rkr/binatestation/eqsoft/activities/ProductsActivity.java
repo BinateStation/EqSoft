@@ -150,7 +150,7 @@ public class ProductsActivity extends AppCompatActivity {
                 productsRecyclerView.setAdapter(productAdapter = new ProductAdapter(productModels, customerModel, orderItemModelMap, true, new ProductAdapter.OnAdapterInteractionListener() {
                     @Override
                     public void onItemClicked() {
-                        startActivityForResult(new Intent(getBaseContext(), CustomersActivity.class), Constants.REQUEST_CODE_CUSTOMER);
+                        startActivityForResult(new Intent(getBaseContext(), CustomersActivity.class), Constants.REQUEST_CODE_CUSTOMER_ORDER_SUMMARY);
                     }
 
                     @Override
@@ -164,12 +164,12 @@ public class ProductsActivity extends AppCompatActivity {
 
     public void checkOut(View view) {
         startActivity(new Intent(getBaseContext(), CheckoutActivity.class)
-                        .putExtra(Constants.KEY_CUSTOMER, customerModel)
+                .putExtra(Constants.KEY_CUSTOMER, customerModel)
         );
     }
 
     public void selectCustomer(View view) {
-        startActivityForResult(new Intent(view.getContext(), CustomersActivity.class), Constants.REQUEST_CODE_CUSTOMER);
+        startActivityForResult(new Intent(view.getContext(), CustomersActivity.class), Constants.REQUEST_CODE_CUSTOMER_ORDER_SUMMARY);
     }
 
     @Override
@@ -238,6 +238,46 @@ public class ProductsActivity extends AppCompatActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        new AlertDialog.Builder(ProductsActivity.this)
+                .setTitle("Alert")
+                .setMessage("By going back you will loose all the orders. Do you need to proceed ?")
+                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                })
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        removeAllOrdersAndGoBack();
+                    }
+                }).show();
+
+    }
+
+    private void removeAllOrdersAndGoBack() {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                OrderItemModelTemp orderItemModelTempDB = new OrderItemModelTemp(ProductsActivity.this);
+                orderItemModelTempDB.open();
+                orderItemModelTempDB.deleteAll();
+                orderItemModelTempDB.close();
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+                startActivity(new Intent(getBaseContext(), HomeActivity.class
+                ).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
+            }
+        }.execute();
     }
 
     private void alertClearAll() {
@@ -318,7 +358,7 @@ public class ProductsActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK && requestCode == Constants.REQUEST_CODE_CUSTOMER && data.hasExtra(Constants.KEY_CUSTOMER)) {
+        if (resultCode == RESULT_OK && requestCode == Constants.REQUEST_CODE_CUSTOMER_ORDER_SUMMARY && data.hasExtra(Constants.KEY_CUSTOMER)) {
             customerModel = (CustomerModel) data.getSerializableExtra(Constants.KEY_CUSTOMER);
             if (productAdapter != null && customerModel != null) {
                 productAdapter.setCustomerModel(customerModel);

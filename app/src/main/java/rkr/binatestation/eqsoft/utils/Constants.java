@@ -37,8 +37,9 @@ public final class Constants {
     public static final String KEY_LAST_SELECTED_CUSTOMER = "last_selected_customer_code";
 
     /**
-     ***********************************************************************************************
+     * **********************************************************************************************
      */
-    public static final Integer REQUEST_CODE_CUSTOMER = 100;
+    public static final Integer REQUEST_CODE_CUSTOMER_ORDER_SUMMARY = 100;
+    public static final Integer REQUEST_CODE_CUSTOMER_PRODUCT = 101;
 
 }
