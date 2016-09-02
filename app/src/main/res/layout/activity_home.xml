@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -27,6 +28,7 @@
         <android.support.v7.widget.LinearLayoutCompat
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@android:color/white"
             android:orientation="vertical">
 
             <TextView
@@ -40,7 +42,7 @@
                 android:layout_marginStart="@dimen/activity_widget_margin"
                 android:layout_marginTop="@dimen/activity_vertical_margin"
                 android:gravity="end"
-                android:text="@string/username" />
+                android:text="@string/welcome" />
 
             <TextView
                 android:id="@+id/AH_username"
@@ -52,270 +54,256 @@
                 android:layout_marginLeft="@dimen/activity_widget_margin"
                 android:layout_marginRight="@dimen/activity_widget_margin"
                 android:layout_marginStart="@dimen/activity_widget_margin"
-                android:gravity="end" />
+                android:gravity="end"
+                tools:text="Common Rep" />
 
             <android.support.v7.widget.LinearLayoutCompat
-                android:id="@+id/AH_orderSummaryLayout"
+                android:id="@+id/AH_productsLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/activity_vertical_margin"
-                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:layout_margin="@dimen/activity_widget_margin"
                 android:background="@drawable/bg_button_light"
-                android:onClick="onOrderSummaryClick"
-                android:orientation="vertical">
+                android:onClick="onProductsClick"
+                android:orientation="horizontal"
+                android:padding="@dimen/activity_widget_margin">
 
                 <TextView
                     style="@style/Base.TextAppearance.AppCompat.Title"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/activity_top_padding"
-                    android:paddingLeft="@dimen/activity_horizontal_margin"
-                    android:paddingRight="@dimen/activity_horizontal_margin"
-                    android:text="@string/order_summary" />
+                    android:layout_weight="3"
+                    android:drawableLeft="@drawable/ic_products"
+                    android:drawablePadding="@dimen/activity_widget_margin"
+                    android:drawableStart="@drawable/ic_products"
+                    android:text="@string/products" />
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="2dp"
-                    android:background="@color/light_shade" />
+                <TextView
+                    android:id="@+id/AH_noOfProducts"
+                    style="@style/Base.TextAppearance.AppCompat.Title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    tools:text="739" />
+
+            </android.support.v7.widget.LinearLayoutCompat>
+
+            <android.support.v7.widget.LinearLayoutCompat
+                android:id="@+id/AH_customersLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/activity_widget_margin"
+                android:background="@drawable/bg_button_light"
+                android:onClick="onCustomerClick"
+                android:orientation="horizontal"
+                android:padding="@dimen/activity_widget_margin">
+
+                <TextView
+                    style="@style/Base.TextAppearance.AppCompat.Title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:drawableLeft="@drawable/ic_customers"
+                    android:drawablePadding="@dimen/activity_widget_margin"
+                    android:drawableStart="@drawable/ic_customers"
+                    android:text="@string/customers" />
+
+                <TextView
+                    android:id="@+id/AH_noOfCustomers"
+                    style="@style/Base.TextAppearance.AppCompat.Title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    tools:text="739" />
+
+            </android.support.v7.widget.LinearLayoutCompat>
+
+            <android.support.v7.widget.LinearLayoutCompat
+                android:id="@+id/AH_receiptsLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/activity_widget_margin"
+                android:background="@drawable/bg_button_light"
+                android:onClick="onReceiptsClick"
+                android:orientation="horizontal"
+                android:padding="@dimen/activity_widget_margin">
+
+                <TextView
+                    style="@style/Base.TextAppearance.AppCompat.Title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:drawableLeft="@drawable/ic_receipts"
+                    android:drawablePadding="@dimen/activity_widget_margin"
+                    android:drawableStart="@drawable/ic_receipts"
+                    android:text="@string/receipts" />
+
+                <TextView
+                    android:id="@+id/AH_noOfReceipts"
+                    style="@style/Base.TextAppearance.AppCompat.Title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    tools:text="1" />
+
+            </android.support.v7.widget.LinearLayoutCompat>
+
+            <TextView
+                style="@style/Base.TextAppearance.AppCompat.Caption"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/activity_top_padding"
+                android:background="@color/colorPrimary"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:text="@string/order_summary"
+                android:textColor="@android:color/white" />
+
+            <android.support.v7.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/activity_widget_margin"
+                android:layout_marginRight="@dimen/activity_widget_margin"
+                android:orientation="horizontal"
+                android:paddingLeft="@dimen/activity_widget_margin"
+                android:paddingRight="@dimen/activity_widget_margin">
+
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center"
+                    android:contentDescription="@string/total_orders"
+                    android:src="@drawable/ic_total_orders" />
 
                 <android.support.v7.widget.LinearLayoutCompat
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:orientation="vertical"
+                    android:padding="@dimen/activity_widget_margin">
 
-                    <android.support.v7.widget.LinearLayoutCompat
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:padding="@dimen/activity_horizontal_margin">
+                    <TextView
+                        style="@style/Base.TextAppearance.AppCompat.Caption"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/total_orders" />
 
-                        <TextView
-                            style="@style/Base.TextAppearance.AppCompat.Subhead"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:text="@string/total_orders" />
-
-                        <TextView
-                            android:id="@+id/AH_totalOrders"
-                            style="@style/TextAppearance.AppCompat.Headline"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:gravity="center" />
-                    </android.support.v7.widget.LinearLayoutCompat>
-
-                    <android.support.v7.widget.LinearLayoutCompat
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:padding="@dimen/activity_horizontal_margin">
-
-                        <TextView
-                            style="@style/Base.TextAppearance.AppCompat.Subhead"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:text="@string/total_amount" />
-
-                        <TextView
-                            android:id="@+id/AH_totalAmount"
-                            style="@style/TextAppearance.AppCompat.Headline"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:gravity="center" />
-                    </android.support.v7.widget.LinearLayoutCompat>
-                </android.support.v7.widget.LinearLayoutCompat>
-
-                <android.support.v7.widget.LinearLayoutCompat
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/activity_horizontal_margin"
-                    android:orientation="horizontal">
-
-                    <android.support.v7.widget.LinearLayoutCompat
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:padding="@dimen/activity_horizontal_margin">
-
-                        <TextView
-                            style="@style/Base.TextAppearance.AppCompat.Subhead"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:text="@string/amount_received" />
-
-                        <TextView
-                            android:id="@+id/AH_amountReceived"
-                            style="@style/TextAppearance.AppCompat.Headline"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:gravity="center" />
-                    </android.support.v7.widget.LinearLayoutCompat>
-
-                    <android.support.v7.widget.LinearLayoutCompat
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:padding="@dimen/activity_horizontal_margin">
-
-                        <TextView
-                            style="@style/Base.TextAppearance.AppCompat.Subhead"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:text="@string/amount_pending" />
-
-                        <TextView
-                            android:id="@+id/AH_amountPending"
-                            style="@style/TextAppearance.AppCompat.Headline"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:gravity="center" />
-                    </android.support.v7.widget.LinearLayoutCompat>
+                    <TextView
+                        android:id="@+id/AH_totalOrders"
+                        style="@style/TextAppearance.AppCompat.Headline"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        tools:text="1" />
                 </android.support.v7.widget.LinearLayoutCompat>
             </android.support.v7.widget.LinearLayoutCompat>
 
             <android.support.v7.widget.LinearLayoutCompat
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/activity_horizontal_margin"
-                android:layout_marginTop="@dimen/activity_horizontal_margin"
-                android:orientation="horizontal">
+                android:layout_marginLeft="@dimen/activity_widget_margin"
+                android:layout_marginRight="@dimen/activity_widget_margin"
+                android:orientation="horizontal"
+                android:paddingLeft="@dimen/activity_widget_margin"
+                android:paddingRight="@dimen/activity_widget_margin">
+
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center"
+                    android:contentDescription="@string/total_amount"
+                    android:src="@drawable/ic_total_amount" />
 
                 <android.support.v7.widget.LinearLayoutCompat
-                    android:id="@+id/AH_receiptsLayout"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_margin="@dimen/activity_widget_margin"
-                    android:layout_weight="1"
-                    android:background="@drawable/bg_button_light"
-                    android:onClick="onReceiptsClick"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="@dimen/activity_widget_margin">
 
                     <TextView
-                        style="@style/Base.TextAppearance.AppCompat.Subhead"
+                        style="@style/Base.TextAppearance.AppCompat.Caption"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="@dimen/activity_vertical_margin"
-                        android:layout_marginTop="@dimen/activity_vertical_margin"
-                        android:gravity="center"
-                        android:text="@string/receipts" />
+                        android:text="@string/total_amount" />
 
                     <TextView
-                        android:id="@+id/AH_noOfReceipts"
+                        android:id="@+id/AH_totalAmount"
                         style="@style/TextAppearance.AppCompat.Headline"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="@dimen/activity_vertical_margin"
-                        android:layout_marginTop="@dimen/activity_vertical_margin"
-                        android:gravity="center" />
+                        tools:text="0.00" />
+                </android.support.v7.widget.LinearLayoutCompat>
+            </android.support.v7.widget.LinearLayoutCompat>
 
-                    <android.support.design.widget.FloatingActionButton
-                        android:layout_width="wrap_content"
+            <android.support.v7.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/activity_widget_margin"
+                android:layout_marginRight="@dimen/activity_widget_margin"
+                android:orientation="horizontal"
+                android:paddingLeft="@dimen/activity_widget_margin"
+                android:paddingRight="@dimen/activity_widget_margin">
+
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center"
+                    android:contentDescription="@string/amount_received"
+                    android:src="@drawable/ic_amount_received" />
+
+                <android.support.v7.widget.LinearLayoutCompat
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/activity_widget_margin">
+
+                    <TextView
+                        style="@style/Base.TextAppearance.AppCompat.Caption"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:background="@drawable/bg_button_oval_dark"
-                        android:contentDescription="@string/receipts"
-                        android:onClick="onReceiptsClick"
-                        android:src="@drawable/ic_add_white_24dp"
-                        app:fabSize="mini"
-                        app:layout_anchor="@id/AH_receiptsLayout"
-                        app:layout_anchorGravity="bottom|center" />
+                        android:text="@string/amount_received" />
 
-
+                    <TextView
+                        android:id="@+id/AH_amountReceived"
+                        style="@style/TextAppearance.AppCompat.Headline"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        tools:text="13445" />
                 </android.support.v7.widget.LinearLayoutCompat>
 
+            </android.support.v7.widget.LinearLayoutCompat>
+
+            <android.support.v7.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/activity_widget_margin"
+                android:layout_marginRight="@dimen/activity_widget_margin"
+                android:orientation="horizontal"
+                android:paddingLeft="@dimen/activity_widget_margin"
+                android:paddingRight="@dimen/activity_widget_margin">
+
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center"
+                    android:contentDescription="@string/amount_pending"
+                    android:src="@drawable/ic_amount_pending" />
+
                 <android.support.v7.widget.LinearLayoutCompat
-                    android:id="@+id/AH_productsLayout"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_margin="@dimen/activity_widget_margin"
-                    android:layout_weight="1"
-                    android:background="@drawable/bg_button_light"
-                    android:onClick="onProductsClick"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="@dimen/activity_widget_margin">
 
                     <TextView
-                        style="@style/Base.TextAppearance.AppCompat.Subhead"
+                        style="@style/Base.TextAppearance.AppCompat.Caption"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="@dimen/activity_vertical_margin"
-                        android:layout_marginTop="@dimen/activity_vertical_margin"
-                        android:gravity="center"
-                        android:text="@string/products" />
+                        android:text="@string/amount_pending" />
 
                     <TextView
-                        android:id="@+id/AH_noOfProducts"
+                        android:id="@+id/AH_amountPending"
                         style="@style/TextAppearance.AppCompat.Headline"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="@dimen/activity_vertical_margin"
-                        android:layout_marginTop="@dimen/activity_vertical_margin"
-                        android:gravity="center" />
-
-                    <android.support.design.widget.FloatingActionButton
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:background="@drawable/bg_button_oval_dark"
-                        android:contentDescription="@string/products"
-                        android:onClick="onProductsClick"
-                        android:src="@drawable/ic_add_white_24dp"
-                        app:fabSize="mini"
-                        app:layout_anchor="@id/AH_productsLayout"
-                        app:layout_anchorGravity="bottom|center" />
-
-                </android.support.v7.widget.LinearLayoutCompat>
-
-                <android.support.v7.widget.LinearLayoutCompat
-                    android:id="@+id/AH_customersLayout"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_margin="@dimen/activity_widget_margin"
-                    android:layout_weight="1"
-                    android:background="@drawable/bg_button_light"
-                    android:onClick="onCustomerClick"
-                    android:orientation="vertical"
-                    android:padding="@dimen/activity_widget_margin">
-
-                    <TextView
-                        style="@style/Base.TextAppearance.AppCompat.Subhead"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="@dimen/activity_vertical_margin"
-                        android:layout_marginTop="@dimen/activity_vertical_margin"
-                        android:gravity="center"
-                        android:text="@string/customers" />
-
-                    <TextView
-                        android:id="@+id/AH_noOfCustomers"
-                        style="@style/TextAppearance.AppCompat.Headline"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="@dimen/activity_vertical_margin"
-                        android:layout_marginTop="@dimen/activity_vertical_margin"
-                        android:gravity="center" />
-
-                    <android.support.design.widget.FloatingActionButton
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginTop="@dimen/activity_widget_margin"
-                        android:background="@drawable/bg_button_oval_dark"
-                        android:contentDescription="@string/customers"
-                        android:onClick="onCustomerClick"
-                        android:src="@drawable/ic_add_white_24dp"
-                        app:fabSize="mini"
-                        app:layout_anchor="@id/AH_customersLayout"
-                        app:layout_anchorGravity="bottom|center" />
-
+                        tools:text="13445" />
                 </android.support.v7.widget.LinearLayoutCompat>
             </android.support.v7.widget.LinearLayoutCompat>
         </android.support.v7.widget.LinearLayoutCompat>
@@ -325,11 +313,10 @@
     <android.support.design.widget.FloatingActionButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
         android:onClick="onOrderSummaryClick"
-        android:src="@drawable/ic_add_white_24dp"
-        app:fabSize="normal"
-        app:layout_anchor="@id/AH_orderSummaryLayout"
-        app:layout_anchorGravity="bottom|center" />
+        android:src="@drawable/ic_add_white_24dp" />
 
 
 </android.support.design.widget.CoordinatorLayout>
