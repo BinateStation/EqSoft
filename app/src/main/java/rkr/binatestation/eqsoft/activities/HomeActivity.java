@@ -269,8 +269,8 @@ public class HomeActivity extends AppCompatActivity {
             startActivity(new Intent(getBaseContext(), CheckoutActivity.class)
                     .putExtra(Constants.KEY_CUSTOMER, data.getSerializableExtra(Constants.KEY_CUSTOMER))
             );
-        } else if (resultCode == RESULT_OK && requestCode == Constants.REQUEST_CODE_CUSTOMER_ORDER_SUMMARY && data.hasExtra(Constants.KEY_CUSTOMER)) {
-            startActivity(new Intent(getBaseContext(), CheckoutActivity.class)
+        } else if (resultCode == RESULT_OK && requestCode == Constants.REQUEST_CODE_CUSTOMER_PRODUCT && data.hasExtra(Constants.KEY_CUSTOMER)) {
+            startActivity(new Intent(getBaseContext(), ProductsActivity.class)
                     .putExtra(Constants.KEY_CUSTOMER, data.getSerializableExtra(Constants.KEY_CUSTOMER))
             );
         }
