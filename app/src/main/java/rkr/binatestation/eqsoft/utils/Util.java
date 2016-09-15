@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
 
+import rkr.binatestation.eqsoft.R;
 import rkr.binatestation.eqsoft.activities.LoginActivity;
 
 /**
@@ -104,7 +105,7 @@ public class Util {
 
     public static void logoutAlert(final Activity activity, String title, String message) {
         try {
-            new AlertDialog.Builder(activity)
+            new AlertDialog.Builder(activity, R.style.AppTheme_Light_Dialog)
                     .setTitle(title)
                     .setMessage(message)
                     .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
@@ -134,7 +135,7 @@ public class Util {
 
     public static void showAlert(final Context context, String title, String message) {
         try {
-            new AlertDialog.Builder(context)
+            new AlertDialog.Builder(context, R.style.AppTheme_Light_Dialog)
                     .setTitle(title)
                     .setMessage(message)
                     .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {

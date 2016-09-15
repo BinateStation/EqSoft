@@ -21,6 +21,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -65,18 +66,29 @@ public class CheckoutActivity extends AppCompatActivity {
         previousBalance = (TextView) findViewById(R.id.AO_previousBalance);
         totalAmount = (AppCompatTextView) findViewById(R.id.AO_totalAmount);
         receivedAmount = (TextInputEditText) findViewById(R.id.AO_receivedAmount);
-        receivedAmount.requestFocus();
-        receivedAmount.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    proceedOrder(textView);
-                    return true;
-                }
-                return false;
-            }
-        });
+        ImageButton clearText = (ImageButton) findViewById(R.id.AO_clearText);
 
+        if (clearText != null && receivedAmount != null) {
+            clearText.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    receivedAmount.setText("");
+                }
+            });
+        }
+        if (receivedAmount != null) {
+            receivedAmount.requestFocus();
+            receivedAmount.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                @Override
+                public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+                    if (actionId == EditorInfo.IME_ACTION_DONE) {
+                        proceedOrder(textView);
+                        return true;
+                    }
+                    return false;
+                }
+            });
+        }
         selectedProductsRecyclerView.setLayoutManager(new LinearLayoutManager(selectedProductsRecyclerView.getContext()));
     }
 
@@ -324,7 +336,7 @@ public class CheckoutActivity extends AppCompatActivity {
     }
 
     private void alertSync() {
-        new AlertDialog.Builder(CheckoutActivity.this)
+        new AlertDialog.Builder(CheckoutActivity.this, R.style.AppTheme_Light_Dialog)
                 .setTitle("Alert")
                 .setMessage("Sync will replace the previously sync data. Please ensure that previously synced data is copied to your computer and proceed..")
                 .setPositiveButton("Proceed", new DialogInterface.OnClickListener() {
@@ -385,7 +397,7 @@ public class CheckoutActivity extends AppCompatActivity {
     }
 
     private void alertClearAll() {
-        new AlertDialog.Builder(CheckoutActivity.this)
+        new AlertDialog.Builder(CheckoutActivity.this, R.style.AppTheme_Light_Dialog)
                 .setTitle("Alert")
                 .setMessage("This will clear all the data in your database, and can't able to recollect. Are you sure you need to proceed..?")
                 .setPositiveButton("Proceed", new DialogInterface.OnClickListener() {

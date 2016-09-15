@@ -125,7 +125,7 @@ public class HomeActivity extends AppCompatActivity {
 
 
     private void alertSync() {
-        new AlertDialog.Builder(HomeActivity.this)
+        new AlertDialog.Builder(HomeActivity.this, R.style.AppTheme_Light_Dialog)
                 .setTitle("Alert")
                 .setMessage("Sync will replace the previously sync data. Please ensure that previously synced data is copied to your computer and proceed..")
                 .setPositiveButton("Proceed", new DialogInterface.OnClickListener() {
@@ -187,7 +187,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void alertClearAll() {
-        new AlertDialog.Builder(HomeActivity.this)
+        new AlertDialog.Builder(HomeActivity.this, R.style.AppTheme_Light_Dialog)
                 .setTitle("Alert")
                 .setMessage("This will clear all the data in your database, and can't able to recollect. Are you sure you need to proceed..?")
                 .setPositiveButton("Proceed", new DialogInterface.OnClickListener() {
