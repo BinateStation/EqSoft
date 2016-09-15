@@ -19,6 +19,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -110,22 +111,24 @@ public class ProductsActivity extends AppCompatActivity {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
-                OrderItemModelTemp orderItemModelTempDB = new OrderItemModelTemp(getBaseContext());
-                orderItemModelTempDB.open();
-                orderItemModelMap = orderItemModelTempDB.getAllRowsAsMap();
-                orderItemModelTempDB.close();
-
                 OrderModel orderModelDB = new OrderModel(getBaseContext());
                 orderModelDB.open();
                 OrderModel orderModel = orderModelDB.getCustomersRow(customerModel.getCode());
                 orderModelDB.close();
 
+                List<OrderItemModelTemp> orderItemModelTemps = new ArrayList<>();
                 if (orderModel != null) {
                     OrderItemModel orderItemModelDB = new OrderItemModel(getBaseContext());
                     orderItemModelDB.open();
-                    orderItemModelMap.putAll(orderItemModelDB.getAllRows(orderModel.getOrderId()));
+                    orderItemModelTemps = orderItemModelDB.getAllRows(orderModel.getOrderId());
                     orderItemModelDB.close();
                 }
+
+                OrderItemModelTemp orderItemModelTempDB = new OrderItemModelTemp(getBaseContext());
+                orderItemModelTempDB.open();
+                orderItemModelTempDB.insertMultipleRows(orderItemModelTemps);
+                orderItemModelMap = orderItemModelTempDB.getAllRowsAsMap();
+                orderItemModelTempDB.close();
 
                 return null;
             }

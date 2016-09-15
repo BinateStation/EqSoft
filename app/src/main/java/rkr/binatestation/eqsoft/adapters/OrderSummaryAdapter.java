@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import java.util.LinkedHashMap;
@@ -25,7 +26,9 @@ import java.util.Map;
 
 import rkr.binatestation.eqsoft.R;
 import rkr.binatestation.eqsoft.models.CustomerModel;
+import rkr.binatestation.eqsoft.models.OrderItemModel;
 import rkr.binatestation.eqsoft.models.OrderItemModelTemp;
+import rkr.binatestation.eqsoft.models.OrderModel;
 import rkr.binatestation.eqsoft.models.ProductModel;
 import rkr.binatestation.eqsoft.utils.Util;
 
@@ -77,8 +80,8 @@ public class OrderSummaryAdapter extends RecyclerView.Adapter<OrderSummaryAdapte
         holder.sellingPrice.setText(String.format(Locale.getDefault(), "%.2f", getItem(position).getSellingRate()));
         if (orderItemModelMap.containsKey(getItem(position).getCode())) {
             holder.selectedView.setVisibility(View.VISIBLE);
-            holder.quantity.setText(String.format(Locale.getDefault(), "Qty: %.2f", orderItemModelMap.get(getItem(position).getCode()).getQuantity()));
-            holder.amount.setText(String.format(Locale.getDefault(), "Amt: %.2f", orderItemModelMap.get(getItem(position).getCode()).getAmount()));
+            holder.quantity.setText(String.format(Locale.getDefault(), "Q: %.3f", orderItemModelMap.get(getItem(position).getCode()).getQuantity()));
+            holder.amount.setText(String.format(Locale.getDefault(), "A: %.2f", orderItemModelMap.get(getItem(position).getCode()).getAmount()));
         } else {
             holder.selectedView.setVisibility(View.GONE);
         }
@@ -115,6 +118,16 @@ public class OrderSummaryAdapter extends RecyclerView.Adapter<OrderSummaryAdapte
         final AppCompatTextView amount = (AppCompatTextView) appCompatDialog.findViewById(R.id.PEPQ_amount);
         final AppCompatButton okay = (AppCompatButton) appCompatDialog.findViewById(R.id.PEPQ_ok);
         final AppCompatButton remove = (AppCompatButton) appCompatDialog.findViewById(R.id.PEPQ_remove);
+        ImageButton clearText = (ImageButton) appCompatDialog.findViewById(R.id.PPEPQ_clearText);
+
+        if (clearText != null && quantity != null) {
+            clearText.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    quantity.setText("");
+                }
+            });
+        }
 
         try {
             if (item != null) {
@@ -133,10 +146,12 @@ public class OrderSummaryAdapter extends RecyclerView.Adapter<OrderSummaryAdapte
                 if (sellingPrice != null) {
                     sellingPrice.setText(String.format(Locale.getDefault(), "%.2f", item.getSellingRate()));
                 }
-                if (quantity != null) {
+                if (quantity != null && amount != null) {
                     if (orderItemModelMap.containsKey(item.getCode())) {
-                        quantity.setText(String.format(Locale.getDefault(), "%.2f", orderItemModelMap.get(item.getCode()).getQuantity()));
+                        quantity.setText(String.format(Locale.getDefault(), "%.3f", orderItemModelMap.get(item.getCode()).getQuantity()));
                         quantity.setSelection(quantity.getText().length());
+                        Double amountDouble = item.getSellingRate() * orderItemModelMap.get(item.getCode()).getQuantity();
+                        amount.setText(String.format(Locale.getDefault(), "%.2f", amountDouble));
                     }
                     quantity.addTextChangedListener(new TextWatcher() {
                         @Override
@@ -153,9 +168,7 @@ public class OrderSummaryAdapter extends RecyclerView.Adapter<OrderSummaryAdapte
                         public void afterTextChanged(Editable editable) {
                             if (editable.length() > 0) {
                                 try {
-                                    if (amount != null) {
-                                        amount.setText(String.format(Locale.getDefault(), "%.2f", (Integer.parseInt(editable.toString()) * item.getSellingRate())));
-                                    }
+                                    amount.setText(String.format(Locale.getDefault(), "%.2f", (Integer.parseInt(editable.toString()) * item.getSellingRate())));
                                 } catch (NumberFormatException e) {
                                     e.printStackTrace();
                                     Util.showAlert(amount.getContext(), "Alert", "Please enter a valid quantity.");
@@ -190,14 +203,20 @@ public class OrderSummaryAdapter extends RecyclerView.Adapter<OrderSummaryAdapte
                         @Override
                         public void onClick(View view) {
                             if (quantity != null && amount != null && quantity.getText().length() > 0 && amount.getText().length() > 0) {
-                                addOrder(
-                                        view.getContext(),
-                                        item,
-                                        quantity.getText().toString().trim(),
-                                        amount.getText().toString().trim(),
-                                        appCompatDialog,
-                                        adapterPosition
-                                );
+                                try {
+                                    Double quantityDouble = Double.parseDouble(quantity.getText().toString().trim());
+                                    addOrder(
+                                            view.getContext(),
+                                            item,
+                                            quantityDouble,
+                                            amount.getText().toString().trim(),
+                                            appCompatDialog,
+                                            adapterPosition
+                                    );
+                                } catch (NumberFormatException e) {
+                                    e.printStackTrace();
+                                    Util.showAlert(okay.getContext(), "Alert", "Please enter a valid quantity.");
+                                }
                             } else {
                                 appCompatDialog.dismiss();
                             }
@@ -220,14 +239,14 @@ public class OrderSummaryAdapter extends RecyclerView.Adapter<OrderSummaryAdapte
         appCompatDialog.show();
     }
 
-    private void addOrder(final Context context, final ProductModel item, final String quantity, final String amount, final AppCompatDialog appCompatDialog, final int adapterPosition) {
+    private void addOrder(final Context context, final ProductModel item, final Double quantity, final String amount, final AppCompatDialog appCompatDialog, final int adapterPosition) {
         new AsyncTask<Void, Void, OrderItemModelTemp>() {
             @Override
             protected OrderItemModelTemp doInBackground(Void... voids) {
                 OrderItemModelTemp orderItemModelTemp = new OrderItemModelTemp(
                         item.getCode(),
                         item.getSellingRate(),
-                        Double.parseDouble(quantity),
+                        quantity,
                         Double.parseDouble(amount),
                         true
                 );
@@ -235,6 +254,26 @@ public class OrderSummaryAdapter extends RecyclerView.Adapter<OrderSummaryAdapte
                 orderItemModelTempDB.open();
                 orderItemModelTempDB.insert(orderItemModelTemp);
                 orderItemModelTempDB.close();
+                if (customerModel != null) {
+                    OrderModel orderModelDB = new OrderModel(context);
+                    orderModelDB.open();
+                    OrderModel orderModel = orderModelDB.getCustomersRow(customerModel.getCode());
+                    orderModelDB.close();
+                    if (orderModel != null) {
+                        OrderItemModel orderItemModelDB = new OrderItemModel(context);
+                        orderItemModelDB.open();
+                        orderItemModelDB.insert(new OrderItemModel(
+                                orderModel.getOrderId(),
+                                item.getCode(),
+                                item.getSellingRate(),
+                                quantity,
+                                Double.parseDouble(amount),
+                                customerModel.getCode()
+                        ));
+                        orderItemModelDB.close();
+                    }
+                }
+
                 return orderItemModelTemp;
             }
 
@@ -263,6 +302,13 @@ public class OrderSummaryAdapter extends RecyclerView.Adapter<OrderSummaryAdapte
                 orderItemModelTempDB.open();
                 orderItemModelTempDB.deleteRow(item.getCode());
                 orderItemModelTempDB.close();
+
+                if (customerModel != null) {
+                    OrderItemModel orderItemModelDB = new OrderItemModel(context);
+                    orderItemModelDB.open();
+                    orderItemModelDB.deleteRow(item.getCode(), customerModel.getCode());
+                    orderItemModelDB.close();
+                }
                 return null;
             }
 

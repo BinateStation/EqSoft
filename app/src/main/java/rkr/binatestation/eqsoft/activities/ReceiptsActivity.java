@@ -17,6 +17,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import java.util.Locale;
@@ -37,6 +38,7 @@ public class ReceiptsActivity extends AppCompatActivity {
 
     TextView customerLedgerName, mobile, balance;
     TextInputEditText receivedAmount;
+    ImageButton clearText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +51,15 @@ public class ReceiptsActivity extends AppCompatActivity {
         mobile = (TextView) findViewById(R.id.AR_customerMobile);
         balance = (TextView) findViewById(R.id.AR_balance);
         receivedAmount = (TextInputEditText) findViewById(R.id.AR_receivedAmount);
+        clearText = (ImageButton) findViewById(R.id.AR_clearText);
         receivedAmount.requestFocus();
+
+        clearText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                receivedAmount.setText("");
+            }
+        });
         receivedAmount.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
@@ -60,6 +70,13 @@ public class ReceiptsActivity extends AppCompatActivity {
                 return false;
             }
         });
+
+        if (getIntent().hasExtra(Constants.KEY_CUSTOMER)) {
+            customerModel = (CustomerModel) getIntent().getSerializableExtra(Constants.KEY_CUSTOMER);
+            setCustomerDetails();
+        }
+
+
     }
 
     @Override
@@ -206,7 +223,7 @@ public class ReceiptsActivity extends AppCompatActivity {
     }
 
     public void showSearchDialog(View view) {
-        startActivityForResult(new Intent(getBaseContext(), CustomersActivity.class), Constants.REQUEST_CODE_CUSTOMER_ORDER_SUMMARY);
+        startActivityForResult(new Intent(getBaseContext(), CustomersActivity.class), Constants.REQUEST_CODE_CUSTOMER_RECEIPT);
     }
 
     public void setCustomerDetails() {
@@ -276,6 +293,10 @@ public class ReceiptsActivity extends AppCompatActivity {
             @Override
             protected String doInBackground(Void... voids) {
                 if (receivedAmount.length() > 0) {
+                    Double receivedAmountDouble = Double.parseDouble(receivedAmount);
+                    if (receivedAmountDouble <= 0.0) {
+                        return "Please enter a valid amount.";
+                    }
                     try {
                         ReceiptModel receiptModelDB = new ReceiptModel(context);
                         receiptModelDB.open();
@@ -283,7 +304,7 @@ public class ReceiptsActivity extends AppCompatActivity {
                                 "0",
                                 Util.getCurrentDate("yyyy-MM-dd HH:mm:ss"),
                                 customerModel.getCode(),
-                                Double.parseDouble(receivedAmount),
+                                receivedAmountDouble,
                                 Util.getStringFromSharedPreferences(context, Constants.KEY_USER_ID)
                         ));
                         receiptModelDB.close();
@@ -293,18 +314,17 @@ public class ReceiptsActivity extends AppCompatActivity {
                         e.printStackTrace();
                         return "Please enter a valid amount.";
                     }
+                    return "1";
+                } else {
+                    return "Please enter a valid amount.";
                 }
-
-                return "1";
             }
 
             @Override
             protected void onPostExecute(String result) {
                 super.onPostExecute(result);
                 if ("1".equalsIgnoreCase(result)) {
-                    startActivity(new Intent(
-                            getBaseContext(),
-                            HomeActivity.class
+                    startActivity(new Intent(getBaseContext(), HomeActivity.class
                     ).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
                 } else {
                     Util.showAlert(context, "Alert", result);
@@ -316,7 +336,7 @@ public class ReceiptsActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK && requestCode == Constants.REQUEST_CODE_CUSTOMER_ORDER_SUMMARY && data.hasExtra(Constants.KEY_CUSTOMER)) {
+        if (resultCode == RESULT_OK && requestCode == Constants.REQUEST_CODE_CUSTOMER_RECEIPT && data.hasExtra(Constants.KEY_CUSTOMER)) {
             customerModel = (CustomerModel) data.getSerializableExtra(Constants.KEY_CUSTOMER);
             setCustomerDetails();
         }

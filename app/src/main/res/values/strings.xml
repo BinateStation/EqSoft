@@ -53,4 +53,6 @@
     <string name="clear_all">Clear All</string>
     <string name="checkout">Checkout</string>
     <string name="welcome">Welcome</string>
+    <string name="clear_text">Clear text</string>
+    <string name="sp">SP :</string>
 </resources>

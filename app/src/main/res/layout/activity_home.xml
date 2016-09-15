@@ -163,6 +163,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/activity_widget_margin"
                 android:layout_marginRight="@dimen/activity_widget_margin"
+                android:onClick="onOrderSummaryClick"
                 android:orientation="horizontal"
                 android:paddingLeft="@dimen/activity_widget_margin"
                 android:paddingRight="@dimen/activity_widget_margin">
@@ -315,7 +316,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        android:onClick="onOrderSummaryClick"
+        android:onClick="onProductsClick"
         android:src="@drawable/ic_add_white_24dp" />
 
 

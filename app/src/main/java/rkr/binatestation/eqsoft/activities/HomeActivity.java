@@ -116,7 +116,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     public void onReceiptsClick(View view) {
-        startActivity(new Intent(view.getContext(), ReceiptsActivity.class));
+        startActivityForResult(new Intent(view.getContext(), CustomersActivity.class), Constants.REQUEST_CODE_CUSTOMER_RECEIPT);
     }
 
     public void onOrderSummaryClick(View view) {
@@ -271,6 +271,10 @@ public class HomeActivity extends AppCompatActivity {
             );
         } else if (resultCode == RESULT_OK && requestCode == Constants.REQUEST_CODE_CUSTOMER_PRODUCT && data.hasExtra(Constants.KEY_CUSTOMER)) {
             startActivity(new Intent(getBaseContext(), ProductsActivity.class)
+                    .putExtra(Constants.KEY_CUSTOMER, data.getSerializableExtra(Constants.KEY_CUSTOMER))
+            );
+        } else if (resultCode == RESULT_OK && requestCode == Constants.REQUEST_CODE_CUSTOMER_RECEIPT && data.hasExtra(Constants.KEY_CUSTOMER)) {
+            startActivity(new Intent(getBaseContext(), ReceiptsActivity.class)
                     .putExtra(Constants.KEY_CUSTOMER, data.getSerializableExtra(Constants.KEY_CUSTOMER))
             );
         }

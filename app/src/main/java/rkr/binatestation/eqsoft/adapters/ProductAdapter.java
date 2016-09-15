@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import java.util.LinkedHashMap;
@@ -25,7 +26,9 @@ import java.util.Map;
 
 import rkr.binatestation.eqsoft.R;
 import rkr.binatestation.eqsoft.models.CustomerModel;
+import rkr.binatestation.eqsoft.models.OrderItemModel;
 import rkr.binatestation.eqsoft.models.OrderItemModelTemp;
+import rkr.binatestation.eqsoft.models.OrderModel;
 import rkr.binatestation.eqsoft.models.ProductModel;
 import rkr.binatestation.eqsoft.utils.Util;
 
@@ -69,16 +72,12 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if (getItem(holder.getAdapterPosition()).getStock() > 0) {
-                        if (customerModel != null) {
-                            popupEnterQuantity(view.getContext(), getItem(holder.getAdapterPosition()), holder.getAdapterPosition());
-                        } else {
-                            if (onAdapterInteractionListener != null) {
-                                onAdapterInteractionListener.onItemClicked();
-                            }
-                        }
+                    if (customerModel != null) {
+                        popupEnterQuantity(view.getContext(), getItem(holder.getAdapterPosition()), holder.getAdapterPosition());
                     } else {
-                        Util.showAlert(holder.itemView.getContext(), "Alert", "No more stock available.!");
+                        if (onAdapterInteractionListener != null) {
+                            onAdapterInteractionListener.onItemClicked();
+                        }
                     }
                 }
             });
@@ -100,6 +99,8 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
             holder.amount.setText(String.format(Locale.getDefault(), "Amt: %.2f", orderItemModelMap.get(getItem(position).getCode()).getAmount()));
         } else {
             holder.selectedView.setVisibility(View.GONE);
+            holder.quantity.setText("");
+            holder.amount.setText("");
         }
     }
 
@@ -134,7 +135,16 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
         final AppCompatTextView amount = (AppCompatTextView) appCompatDialog.findViewById(R.id.PEPQ_amount);
         final AppCompatButton okay = (AppCompatButton) appCompatDialog.findViewById(R.id.PEPQ_ok);
         final AppCompatButton remove = (AppCompatButton) appCompatDialog.findViewById(R.id.PEPQ_remove);
+        ImageButton clearText = (ImageButton) appCompatDialog.findViewById(R.id.PPEPQ_clearText);
 
+        if (clearText != null && quantity != null) {
+            clearText.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    quantity.setText("");
+                }
+            });
+        }
         try {
             if (item != null) {
                 if (productName != null) {
@@ -152,10 +162,12 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
                 if (sellingPrice != null) {
                     sellingPrice.setText(String.format(Locale.getDefault(), "%.2f", item.getSellingRate()));
                 }
-                if (quantity != null) {
+                if (quantity != null && amount != null) {
                     if (orderItemModelMap.containsKey(item.getCode())) {
                         quantity.setText(String.format(Locale.getDefault(), "%.3f", orderItemModelMap.get(item.getCode()).getQuantity()));
                         quantity.setSelection(quantity.getText().length());
+                        Double amountDouble = item.getSellingRate() * orderItemModelMap.get(item.getCode()).getQuantity();
+                        amount.setText(String.format(Locale.getDefault(), "%.2f", amountDouble));
                     }
                     quantity.addTextChangedListener(new TextWatcher() {
                         @Override
@@ -172,9 +184,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
                         public void afterTextChanged(Editable editable) {
                             if (editable.length() > 0) {
                                 try {
-                                    if (amount != null) {
-                                        amount.setText(String.format(Locale.getDefault(), "%.2f", (Double.parseDouble(editable.toString()) * item.getSellingRate())));
-                                    }
+                                    amount.setText(String.format(Locale.getDefault(), "%.2f", (Double.parseDouble(editable.toString()) * item.getSellingRate())));
                                 } catch (NumberFormatException e) {
                                     e.printStackTrace();
                                     Util.showAlert(amount.getContext(), "Alert", "Please enter a valid quantity.");
@@ -211,18 +221,14 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
                             if (quantity != null && amount != null && quantity.getText().length() > 0 && amount.getText().length() > 0) {
                                 try {
                                     Double quantityDouble = Double.parseDouble(quantity.getText().toString().trim());
-                                    if (quantityDouble <= item.getStock()) {
-                                        addOrder(
-                                                view.getContext(),
-                                                item,
-                                                quantityDouble,
-                                                amount.getText().toString().trim(),
-                                                appCompatDialog,
-                                                adapterPosition
-                                        );
-                                    } else {
-                                        Util.showAlert(view.getContext(), "Alert", "There is no such stock available, please enter a lesser quantity.!");
-                                    }
+                                    addOrder(
+                                            view.getContext(),
+                                            item,
+                                            quantityDouble,
+                                            amount.getText().toString().trim(),
+                                            appCompatDialog,
+                                            adapterPosition
+                                    );
                                 } catch (NumberFormatException e) {
                                     e.printStackTrace();
                                     Util.showAlert(okay.getContext(), "Alert", "Please enter a valid quantity.");
@@ -264,6 +270,26 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
                 orderItemModelTempDB.open();
                 orderItemModelTempDB.insert(orderItemModelTemp);
                 orderItemModelTempDB.close();
+                if (customerModel != null) {
+                    OrderModel orderModelDB = new OrderModel(context);
+                    orderModelDB.open();
+                    OrderModel orderModel = orderModelDB.getCustomersRow(customerModel.getCode());
+                    orderModelDB.close();
+                    if (orderModel != null) {
+                        OrderItemModel orderItemModelDB = new OrderItemModel(context);
+                        orderItemModelDB.open();
+                        orderItemModelDB.insert(new OrderItemModel(
+                                orderModel.getOrderId(),
+                                item.getCode(),
+                                item.getSellingRate(),
+                                quantity,
+                                Double.parseDouble(amount),
+                                customerModel.getCode()
+                        ));
+                        orderItemModelDB.close();
+                    }
+                }
+
                 return orderItemModelTemp;
             }
 
@@ -292,6 +318,13 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
                 orderItemModelTempDB.open();
                 orderItemModelTempDB.deleteRow(item.getCode());
                 orderItemModelTempDB.close();
+
+                if (customerModel != null) {
+                    OrderItemModel orderItemModelDB = new OrderItemModel(context);
+                    orderItemModelDB.open();
+                    orderItemModelDB.deleteRow(item.getCode(), customerModel.getCode());
+                    orderItemModelDB.close();
+                }
                 return null;
             }
 

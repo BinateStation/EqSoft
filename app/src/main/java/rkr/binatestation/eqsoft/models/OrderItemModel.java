@@ -17,9 +17,7 @@ import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by RKR on 1/8/2016.
@@ -32,17 +30,19 @@ public class OrderItemModel implements Serializable {
     Double rate;
     Double quantity;
     Double amount;
+    String customerCode;
 
     Context context;
     private SQLiteDatabase database;
     private RKRsEqSoftSQLiteHelper dbHelper;
 
-    public OrderItemModel(String orderId, String productCode, Double rate, Double quantity, Double amount) {
+    public OrderItemModel(String orderId, String productCode, Double rate, Double quantity, Double amount, String customerCode) {
         this.orderId = orderId;
         this.productCode = productCode;
         this.rate = rate;
         this.quantity = quantity;
         this.amount = amount;
+        this.customerCode = customerCode;
     }
 
     public OrderItemModel(Context context) {
@@ -56,7 +56,8 @@ public class OrderItemModel implements Serializable {
                 cursor.getString(OrderItemsTable.COLUMN_INDEX_PRODUCT_CODE),
                 cursor.getDouble(OrderItemsTable.COLUMN_INDEX_RATE),
                 cursor.getDouble(OrderItemsTable.COLUMN_INDEX_QUANTITY),
-                cursor.getDouble(OrderItemsTable.COLUMN_INDEX_AMOUNT)
+                cursor.getDouble(OrderItemsTable.COLUMN_INDEX_AMOUNT),
+                cursor.getString(OrderItemsTable.COLUMN_INDEX_CUSTOMER_CODE)
         );
     }
 
@@ -100,6 +101,14 @@ public class OrderItemModel implements Serializable {
         this.amount = amount;
     }
 
+    public String getCustomerCode() {
+        return customerCode;
+    }
+
+    public void setCustomerCode(String customerCode) {
+        this.customerCode = customerCode;
+    }
+
     public void open() throws SQLException {
         database = dbHelper.getWritableDatabase();
     }
@@ -116,6 +125,7 @@ public class OrderItemModel implements Serializable {
             values.put(OrderItemsTable.COLUMN_NAME_RATE, obj.getRate());
             values.put(OrderItemsTable.COLUMN_NAME_QUANTITY, obj.getQuantity());
             values.put(OrderItemsTable.COLUMN_NAME_AMOUNT, obj.getAmount());
+            values.put(OrderItemsTable.COLUMN_NAME_CUSTOMER_CODE, obj.getCustomerCode());
 
             long insertId;
             insertId = database.insert(OrderItemsTable.TABLE_NAME, null, values);
@@ -140,14 +150,16 @@ public class OrderItemModel implements Serializable {
                     OrderItemsTable.COLUMN_NAME_PRODUCT_CODE + "','" +
                     OrderItemsTable.COLUMN_NAME_RATE + "','" +
                     OrderItemsTable.COLUMN_NAME_QUANTITY + "','" +
-                    OrderItemsTable.COLUMN_NAME_AMOUNT + "') VALUES ('";
+                    OrderItemsTable.COLUMN_NAME_AMOUNT + "','" +
+                    OrderItemsTable.COLUMN_NAME_CUSTOMER_CODE + "') VALUES ('";
             for (int i = 0; i < masterList.size(); i++) {
                 OrderItemModel master = masterList.get(i);
                 query += master.getOrderId() + "' , '" +
                         master.getProductCode() + "' , '" +
                         master.getRate() + "' , '" +
                         master.getQuantity() + "' , '" +
-                        master.getAmount() + "')";
+                        master.getAmount() + "' , '" +
+                        master.getCustomerCode() + "')";
                 if (i != (masterList.size() - 1)) {
                     query += ",('";
                 }
@@ -166,6 +178,7 @@ public class OrderItemModel implements Serializable {
         values.put(OrderItemsTable.COLUMN_NAME_RATE, obj.getRate());
         values.put(OrderItemsTable.COLUMN_NAME_QUANTITY, obj.getQuantity());
         values.put(OrderItemsTable.COLUMN_NAME_AMOUNT, obj.getAmount());
+        values.put(OrderItemsTable.COLUMN_NAME_CUSTOMER_CODE, obj.getCustomerCode());
 
         database.update(OrderItemsTable.TABLE_NAME, values,
                 OrderItemsTable.COLUMN_NAME_PRODUCT_CODE + " = ? and " +
@@ -173,10 +186,10 @@ public class OrderItemModel implements Serializable {
         System.out.println("Categories Row Updated with id: " + obj.getProductCode());
     }
 
-    public void deleteRow(String productCode, String orderId) {
+    public void deleteRow(String productCode, String customerCode) {
         database.delete(OrderItemsTable.TABLE_NAME, OrderItemsTable.COLUMN_NAME_PRODUCT_CODE + " = ? AND " +
-                OrderItemsTable.COLUMN_NAME_ORDER_ID + " = ? ", new String[]{productCode, orderId});
-        System.out.println("Categories Row deleted with id: " + productCode + " , " + orderId);
+                OrderItemsTable.COLUMN_NAME_CUSTOMER_CODE + " = ? ", new String[]{productCode, customerCode});
+        System.out.println("Categories Row deleted with id: " + productCode + " , " + customerCode);
     }
 
     public void deleteAll() {
@@ -210,8 +223,8 @@ public class OrderItemModel implements Serializable {
         return jsonArray;
     }
 
-    public Map<String, OrderItemModelTemp> getAllRows(String orderId) {
-        Map<String, OrderItemModelTemp> list = new LinkedHashMap<>();
+    public List<OrderItemModelTemp> getAllRows(String orderId) {
+        List<OrderItemModelTemp> list = new ArrayList<>();
         Cursor cursor = database.query(OrderItemsTable.TABLE_NAME, null, OrderItemsTable.COLUMN_NAME_ORDER_ID + " = ?", new String[]{orderId}, null, null, null);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
@@ -221,9 +234,9 @@ public class OrderItemModel implements Serializable {
                     obj.getRate(),
                     obj.getQuantity(),
                     obj.getAmount(),
-                    false
+                    true
             );
-            list.put(obj.getProductCode(), temp);
+            list.add(temp);
             cursor.moveToNext();
         }
         cursor.close();
@@ -262,8 +275,8 @@ public class OrderItemModel implements Serializable {
                 cursor.getString(OrderItemsTable.COLUMN_INDEX_PRODUCT_CODE),
                 cursor.getDouble(OrderItemsTable.COLUMN_INDEX_RATE),
                 cursor.getDouble(OrderItemsTable.COLUMN_INDEX_QUANTITY),
-                cursor.getDouble(OrderItemsTable.COLUMN_INDEX_AMOUNT)
-        );
+                cursor.getDouble(OrderItemsTable.COLUMN_INDEX_AMOUNT),
+                cursor.getString(OrderItemsTable.COLUMN_INDEX_CUSTOMER_CODE));
     }
 
     private JSONObject cursorToJSONObject(Cursor cursor) {
@@ -286,11 +299,13 @@ public class OrderItemModel implements Serializable {
         public static final String COLUMN_NAME_RATE = "rate";
         public static final String COLUMN_NAME_QUANTITY = "quantity";
         public static final String COLUMN_NAME_AMOUNT = "amount";
+        public static final String COLUMN_NAME_CUSTOMER_CODE = "customer_code";
         public static final int COLUMN_INDEX_ORDER_ID = 1;
         public static final int COLUMN_INDEX_PRODUCT_CODE = 2;
         public static final int COLUMN_INDEX_RATE = 3;
         public static final int COLUMN_INDEX_QUANTITY = 4;
         public static final int COLUMN_INDEX_AMOUNT = 5;
+        public static final int COLUMN_INDEX_CUSTOMER_CODE = 6;
 
         private static final String TEXT_TYPE = " TEXT";
         private static final String COMMA_SEP = ",";
@@ -303,7 +318,8 @@ public class OrderItemModel implements Serializable {
                         COLUMN_NAME_RATE + TEXT_TYPE + COMMA_SEP +
                         COLUMN_NAME_QUANTITY + TEXT_TYPE + COMMA_SEP +
                         COLUMN_NAME_AMOUNT + TEXT_TYPE + COMMA_SEP +
-                        UNIQUE + "( " + COLUMN_NAME_PRODUCT_CODE + COMMA_SEP + COLUMN_NAME_ORDER_ID + ") ON CONFLICT REPLACE)";
+                        COLUMN_NAME_CUSTOMER_CODE + TEXT_TYPE + COMMA_SEP +
+                        UNIQUE + "( " + COLUMN_NAME_PRODUCT_CODE + COMMA_SEP + COLUMN_NAME_ORDER_ID + COMMA_SEP + COLUMN_NAME_CUSTOMER_CODE + ") ON CONFLICT REPLACE)";
     }
 
 }

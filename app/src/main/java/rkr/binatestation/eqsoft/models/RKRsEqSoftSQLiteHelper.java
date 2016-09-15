@@ -7,7 +7,7 @@ import android.util.Log;
 
 public class RKRsEqSoftSQLiteHelper extends SQLiteOpenHelper {
 
-    private static int DB_VERSION = 3;
+    private static int DB_VERSION = 4;
     Context context;
 
     public RKRsEqSoftSQLiteHelper(Context context) {

@@ -41,5 +41,6 @@ public final class Constants {
      */
     public static final Integer REQUEST_CODE_CUSTOMER_ORDER_SUMMARY = 100;
     public static final Integer REQUEST_CODE_CUSTOMER_PRODUCT = 101;
+    public static final Integer REQUEST_CODE_CUSTOMER_RECEIPT = 102;
 
 }
