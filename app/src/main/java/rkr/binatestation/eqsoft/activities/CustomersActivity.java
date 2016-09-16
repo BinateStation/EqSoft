@@ -115,7 +115,7 @@ public class CustomersActivity extends AppCompatActivity {
                     linearLayoutManager.scrollToPosition(findLastSelectedCustomerPosition(customerModelList));
                 }
             }
-        }.execute();
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     private int findLastSelectedCustomerPosition(List<CustomerModel> customerModelList) {
@@ -269,7 +269,7 @@ public class CustomersActivity extends AppCompatActivity {
                     Util.showAlert(CustomersActivity.this, "Alert", "Some thing went wrong please contact administrator", false);
                 }
             }
-        }.execute();
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
 }

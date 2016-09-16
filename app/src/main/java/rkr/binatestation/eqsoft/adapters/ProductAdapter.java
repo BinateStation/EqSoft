@@ -307,7 +307,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
                     }
                 }
             }
-        }.execute();
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     private void removeOrder(final Context context, final ProductModel item, final AppCompatDialog appCompatDialog, final int adapterPosition) {
@@ -341,7 +341,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
                     onAdapterInteractionListener.onProductSelected();
                 }
             }
-        }.execute();
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     public interface OnAdapterInteractionListener {

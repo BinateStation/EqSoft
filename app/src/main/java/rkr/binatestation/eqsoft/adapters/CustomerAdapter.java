@@ -68,7 +68,7 @@ public class CustomerAdapter extends RecyclerView.Adapter<CustomerAdapter.ItemVi
                 super.onPostExecute(balance);
                 balanceTextView.setText(balance);
             }
-        }.execute();
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     @Override

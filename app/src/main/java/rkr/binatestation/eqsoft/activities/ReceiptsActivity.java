@@ -219,7 +219,7 @@ public class ReceiptsActivity extends AppCompatActivity {
                     Util.showAlert(ReceiptsActivity.this, "Alert", "Some thing went wrong please contact administrator", false);
                 }
             }
-        }.execute();
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     public void showSearchDialog(View view) {
@@ -251,7 +251,7 @@ public class ReceiptsActivity extends AppCompatActivity {
                 super.onPostExecute(balance);
                 balanceTextView.setText(balance);
             }
-        }.execute();
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     private void setReceivedAmount() {
@@ -277,7 +277,7 @@ public class ReceiptsActivity extends AppCompatActivity {
                     receivedAmount.requestFocus();
                 }
             }
-        }.execute();
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     public void done(View view) {
@@ -330,7 +330,7 @@ public class ReceiptsActivity extends AppCompatActivity {
                     Util.showAlert(context, "Alert", result);
                 }
             }
-        }.execute();
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     @Override

@@ -122,7 +122,7 @@ public class CheckoutActivity extends AppCompatActivity {
                 super.onPostExecute(balance);
                 balanceTextView.setText(balance);
             }
-        }.execute();
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     private void setOrderItemModelMap() {
@@ -188,7 +188,7 @@ public class CheckoutActivity extends AppCompatActivity {
                     getProducts(TextUtils.join(",", orderItemModelMap.keySet()));
                 }
             }
-        }.execute();
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     private void getProducts(final String query) {
@@ -216,7 +216,7 @@ public class CheckoutActivity extends AppCompatActivity {
                     }
                 }));
             }
-        }.execute();
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     public void addMore(View view) {
@@ -325,7 +325,7 @@ public class CheckoutActivity extends AppCompatActivity {
                 startActivity(new Intent(getBaseContext(), HomeActivity.class
                 ).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
             }
-        }.execute();
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     @Override
@@ -468,7 +468,7 @@ public class CheckoutActivity extends AppCompatActivity {
                     Util.showAlert(CheckoutActivity.this, "Alert", "Some thing went wrong please contact administrator", false);
                 }
             }
-        }.execute();
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
 }

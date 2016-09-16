@@ -146,7 +146,7 @@ public class ProductsActivity extends AppCompatActivity {
                     productAdapter.notifyDataSetChanged();
                 }
             }
-        }.execute();
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     private void getProducts(final String query, final int sortType) {
@@ -175,7 +175,7 @@ public class ProductsActivity extends AppCompatActivity {
                     }
                 }));
             }
-        }.execute();
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     public void checkOut(View view) {
@@ -293,7 +293,7 @@ public class ProductsActivity extends AppCompatActivity {
                 startActivity(new Intent(getBaseContext(), HomeActivity.class
                 ).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
             }
-        }.execute();
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     private void alertClearAll() {
@@ -368,7 +368,7 @@ public class ProductsActivity extends AppCompatActivity {
                     Util.showAlert(ProductsActivity.this, "Alert", "Some thing went wrong please contact administrator", false);
                 }
             }
-        }.execute();
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     @Override

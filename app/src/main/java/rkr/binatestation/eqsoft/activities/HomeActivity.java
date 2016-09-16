@@ -104,10 +104,14 @@ public class HomeActivity extends AppCompatActivity {
                 noOfProducts.setText(stringStringMap.get("KEY_TOTAL_PRODUCTS"));
                 noOfCustomers.setText(stringStringMap.get("KEY_TOTAL_CUSTOMERS"));
             }
-        }.execute();
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     public void onCustomerClick(View view) {
+        startActivityForResult(new Intent(view.getContext(), CustomersActivity.class), Constants.REQUEST_CODE_CUSTOMER_ORDER_SUMMARY);
+    }
+
+    public void onAddOrderClick(View view) {
         startActivityForResult(new Intent(view.getContext(), CustomersActivity.class), Constants.REQUEST_CODE_CUSTOMER_PRODUCT);
     }
 
@@ -259,7 +263,7 @@ public class HomeActivity extends AppCompatActivity {
                     Util.showAlert(HomeActivity.this, "Alert", "Some thing went wrong please contact administrator", false);
                 }
             }
-        }.execute();
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     @Override
