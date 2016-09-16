@@ -47,6 +47,7 @@ public class ProductsActivity extends AppCompatActivity {
     CustomerModel customerModel;
     ProductAdapter productAdapter;
     Map<String, OrderItemModelTemp> orderItemModelMap = new LinkedHashMap<>();
+    ReceiptModel receiptModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,6 +115,9 @@ public class ProductsActivity extends AppCompatActivity {
                 OrderModel orderModelDB = new OrderModel(getBaseContext());
                 orderModelDB.open();
                 OrderModel orderModel = orderModelDB.getCustomersRow(customerModel.getCode());
+                if (orderModel != null) {
+                    orderModelDB.deleteRow(orderModel.getOrderId());
+                }
                 orderModelDB.close();
 
                 List<OrderItemModelTemp> orderItemModelTemps = new ArrayList<>();
@@ -121,8 +125,14 @@ public class ProductsActivity extends AppCompatActivity {
                     OrderItemModel orderItemModelDB = new OrderItemModel(getBaseContext());
                     orderItemModelDB.open();
                     orderItemModelTemps = orderItemModelDB.getAllRows(orderModel.getOrderId());
+                    orderItemModelDB.deleteAll(orderModel.getOrderId());
                     orderItemModelDB.close();
                 }
+
+                ReceiptModel receiptModelDB = new ReceiptModel(getBaseContext());
+                receiptModelDB.open();
+                receiptModel = receiptModelDB.getRow(customerModel.getCode());
+                receiptModelDB.close();
 
                 OrderItemModelTemp orderItemModelTempDB = new OrderItemModelTemp(getBaseContext());
                 orderItemModelTempDB.open();
@@ -181,6 +191,7 @@ public class ProductsActivity extends AppCompatActivity {
     public void checkOut(View view) {
         startActivity(new Intent(getBaseContext(), CheckoutActivity.class)
                 .putExtra(Constants.KEY_CUSTOMER, customerModel)
+                .putExtra(Constants.KEY_RECEIPT, receiptModel)
         );
     }
 

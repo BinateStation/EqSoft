@@ -197,9 +197,9 @@ public class OrderModel implements Serializable {
         System.out.println("Categories Row Updated with id: " + obj.getOrderId());
     }
 
-    public void deleteRow(String id) {
-        database.delete(OrdersTable.TABLE_NAME, OrdersTable._ID + " = ?", new String[]{id});
-        System.out.println("Categories Row deleted with id: " + id);
+    public void deleteRow(String orderId) {
+        database.delete(OrdersTable.TABLE_NAME, OrdersTable._ID + " = ?", new String[]{orderId});
+        System.out.println("Categories Row deleted with id: " + orderId);
     }
 
     public void deleteAll() {

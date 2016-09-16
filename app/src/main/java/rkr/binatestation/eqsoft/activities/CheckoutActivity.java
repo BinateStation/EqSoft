@@ -48,6 +48,7 @@ public class CheckoutActivity extends AppCompatActivity {
     TextInputEditText receivedAmount;
     AppCompatTextView totalAmount;
     CustomerModel customerModel;
+    ReceiptModel receiptModel;
     OrderSummaryAdapter orderSummaryAdapter;
     Map<String, OrderItemModelTemp> orderItemModelMap = new LinkedHashMap<>();
     ProgressDialog progressDialog;
@@ -60,6 +61,7 @@ public class CheckoutActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         customerModel = (CustomerModel) getIntent().getSerializableExtra(Constants.KEY_CUSTOMER);
+        receiptModel = (ReceiptModel) getIntent().getSerializableExtra(Constants.KEY_RECEIPT);
 
         selectedProductsRecyclerView = (RecyclerView) findViewById(R.id.AO_selectedProducts);
         customerLedgerName = (TextView) findViewById(R.id.AO_customerLedgerName);
@@ -159,13 +161,16 @@ public class CheckoutActivity extends AppCompatActivity {
                 ReceiptModel receiptModelDB = new ReceiptModel(getBaseContext());
                 receiptModelDB.open();
                 ReceiptModel receiptModel = receiptModelDB.getRow(customerModel.getCode());
-                receiptModelDB.close();
-
                 if (receiptModel != null) {
                     result[1] = receiptModel.getAmount();
+                } else if (CheckoutActivity.this.receiptModel != null) {
+                    receiptModelDB.deleteRow(CheckoutActivity.this.receiptModel.getReceiptId());
+                    result[1] = CheckoutActivity.this.receiptModel.getAmount();
                 } else {
                     result[1] = 0.0;
                 }
+                receiptModelDB.close();
+
 
                 return result;
             }

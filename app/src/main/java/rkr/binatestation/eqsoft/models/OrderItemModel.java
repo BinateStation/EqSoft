@@ -192,6 +192,11 @@ public class OrderItemModel implements Serializable {
         System.out.println("Categories Row deleted with id: " + productCode + " , " + customerCode);
     }
 
+    public void deleteAll(String orderId) {
+        database.delete(OrderItemsTable.TABLE_NAME, OrderItemsTable.COLUMN_NAME_ORDER_ID + " = ?", new String[]{orderId});
+        System.out.println("Categories table Deleted ALL with Order ID : " + orderId);
+    }
+
     public void deleteAll() {
         database.delete(OrderItemsTable.TABLE_NAME, null, null);
         System.out.println("Categories table Deleted ALL");
