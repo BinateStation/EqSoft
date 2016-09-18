@@ -252,24 +252,6 @@ public class ProductModel implements Serializable {
         return productModel;
     }
 
-    public Double getCurrentStock(String code) {
-        Cursor cursor = database.query(ProductsTable.TABLE_NAME, null, ProductsTable.COLUMN_NAME_CODE + " = ?", new String[]{code}, null, null, null);
-        Double currentStock = 0.0;
-        if (cursor.moveToFirst()) {
-            currentStock += cursorToProductModel(cursor).getStock();
-        }
-        cursor.close();
-        Cursor cursorOrderItem = database.query(OrderItemModel.OrderItemsTable.TABLE_NAME, null, OrderItemModel.OrderItemsTable.COLUMN_NAME_PRODUCT_CODE + " = ?", new String[]{code}, null, null, null);
-        cursorOrderItem.moveToFirst();
-        while (!cursorOrderItem.isAfterLast()) {
-            OrderItemModel obj = OrderItemModel.cursorToOrderItemModelStatic(cursorOrderItem);
-            currentStock -= obj.getQuantity();
-            cursorOrderItem.moveToNext();
-        }
-        cursorOrderItem.close();
-        return currentStock;
-    }
-
     /**
      * This method will counts how many rows available in this table
      *
