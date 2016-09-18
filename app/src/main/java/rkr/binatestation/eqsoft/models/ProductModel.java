@@ -221,7 +221,6 @@ public class ProductModel implements Serializable {
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             ProductModel obj = cursorToProductModel(cursor);
-            obj.setStock(getCurrentStock(obj.getCode()));
             list.add(obj);
             cursor.moveToNext();
         }

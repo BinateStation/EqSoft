@@ -261,6 +261,19 @@ public class OrderItemModel implements Serializable {
         return "" + totalAmount;
     }
 
+    public Double getTotalQuantity(String productCode) {
+        Double totalQuantity = 0.0;
+        Cursor cursor = database.query(OrderItemsTable.TABLE_NAME, null, OrderItemsTable.COLUMN_NAME_PRODUCT_CODE + " = ?", new String[]{productCode}, null, null, null);
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            OrderItemModel obj = cursorToOrderItemModel(cursor);
+            totalQuantity += obj.getQuantity();
+            cursor.moveToNext();
+        }
+        cursor.close();
+        return totalQuantity;
+    }
+
     public OrderItemModel getRow(String productCode, String orderId) {
         Cursor cursor = database.query(OrderItemsTable.TABLE_NAME, null,
                 OrderItemsTable.COLUMN_NAME_PRODUCT_CODE + " = ? and " +

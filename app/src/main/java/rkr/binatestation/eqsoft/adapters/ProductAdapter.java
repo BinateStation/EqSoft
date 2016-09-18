@@ -65,6 +65,31 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
         );
     }
 
+    private void setStock(final Context context, final TextView stock, final int position) {
+        new AsyncTask<Void, Void, Double>() {
+            @Override
+            protected Double doInBackground(Void... voids) {
+                Double stockDouble = getItem(position).getStock();
+                if (orderItemModelMap.containsKey(getItem(position).getCode())) {
+                    stockDouble -= orderItemModelMap.get(getItem(position).getCode()).getQuantity();
+                }
+
+                OrderItemModel orderItemModelDB = new OrderItemModel(context);
+                orderItemModelDB.open();
+                stockDouble -= orderItemModelDB.getTotalQuantity(getItem(position).getCode());
+                orderItemModelDB.close();
+                return stockDouble;
+            }
+
+            @Override
+            protected void onPostExecute(Double stockDouble) {
+                super.onPostExecute(stockDouble);
+                stock.setText(String.format(Locale.getDefault(), "%.2f", stockDouble));
+            }
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+    }
+
     @Override
     public void onBindViewHolder(final ItemView holder, int position) {
         if (clickable) {
@@ -84,13 +109,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
         holder.productName.setText(getItem(position).getName());
         holder.productMRP.setText(String.format(Locale.getDefault(), "MRP - %.2f", getItem(position).getMRP()));
         holder.productCode.setText(getItem(position).getCode());
-        Double stock;
-        if (orderItemModelMap.containsKey(getItem(position).getCode()) && orderItemModelMap.get(getItem(position).getCode()).getTemp()) {
-            stock = getItem(position).getStock() - orderItemModelMap.get(getItem(position).getCode()).getQuantity();
-        } else {
-            stock = getItem(position).getStock();
-        }
-        holder.stock.setText(String.format(Locale.getDefault(), "%.2f", stock));
+        setStock(holder.stock.getContext(), holder.stock, position);
         holder.sellingPrice.setText(String.format(Locale.getDefault(), "%.2f", getItem(position).getSellingRate()));
         if (orderItemModelMap.containsKey(getItem(position).getCode())) {
             holder.selectedView.setVisibility(View.VISIBLE);
