@@ -230,28 +230,9 @@ public class ReceiptsActivity extends AppCompatActivity {
         if (customerModel != null) {
             customerLedgerName.setText(customerModel.getLedgerName());
             mobile.setText(customerModel.getMobile());
-            setCustomerBalance(balance.getContext(), customerModel.getCode(), balance);
+            balance.setText(String.format(Locale.getDefault(), "%.2f", customerModel.getBalance()));
             setReceivedAmount();
         }
-    }
-
-    private void setCustomerBalance(final Context context, final String customerCode, final TextView balanceTextView) {
-        new AsyncTask<Void, Void, String>() {
-            @Override
-            protected String doInBackground(Void... voids) {
-                CustomerModel customerModelDB = new CustomerModel(context);
-                customerModelDB.open();
-                String balance = customerModelDB.getCustomerBalance(customerCode);
-                customerModelDB.close();
-                return balance;
-            }
-
-            @Override
-            protected void onPostExecute(String balance) {
-                super.onPostExecute(balance);
-                balanceTextView.setText(balance);
-            }
-        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     private void setReceivedAmount() {

@@ -103,28 +103,9 @@ public class CheckoutActivity extends AppCompatActivity {
     public void setCustomerDetails() {
         if (customerModel != null) {
             customerLedgerName.setText(customerModel.getLedgerName());
-            setCustomerBalance(previousBalance.getContext(), customerModel.getCode(), previousBalance);
+            previousBalance.setText(String.format(Locale.getDefault(), "%.2f", customerModel.getBalance()));
             setOrderItemModelMap();
         }
-    }
-
-    private void setCustomerBalance(final Context context, final String customerCode, final TextView balanceTextView) {
-        new AsyncTask<Void, Void, String>() {
-            @Override
-            protected String doInBackground(Void... voids) {
-                CustomerModel customerModelDB = new CustomerModel(context);
-                customerModelDB.open();
-                String balance = customerModelDB.getCustomerBalance(customerCode);
-                customerModelDB.close();
-                return balance;
-            }
-
-            @Override
-            protected void onPostExecute(String balance) {
-                super.onPostExecute(balance);
-                balanceTextView.setText(balance);
-            }
-        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     private void setOrderItemModelMap() {
