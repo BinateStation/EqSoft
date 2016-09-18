@@ -214,11 +214,11 @@ public class CheckoutActivity extends AppCompatActivity {
 
     public void proceedOrder(View view) {
         if (customerModel != null) {
-            saveOrder(view.getContext(), receivedAmount.getText().toString().trim(), totalAmount.getText().toString().trim());
+            saveOrder(view.getContext(), receivedAmount.getText().toString().trim());
         }
     }
 
-    private void saveOrder(final Context context, final String receivedAmount, final String totalAmount) {
+    private void saveOrder(final Context context, final String receivedAmount) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
@@ -228,6 +228,12 @@ public class CheckoutActivity extends AppCompatActivity {
                     OrderModel orderModel = orderModelDB.getCustomersRow(customerModel.getCode());
                     Long orderId = -1L;
                     Double receivedAmountDouble = 0.0;
+                    Double totalAmountDouble = 0.0;
+                    for (OrderItemModelTemp temp : orderItemModelMap.values()) {
+                        if (temp != null) {
+                            totalAmountDouble += (temp.getQuantity() * temp.getRate());
+                        }
+                    }
                     try {
                         receivedAmountDouble = Double.parseDouble(receivedAmount);
                     } catch (NumberFormatException e) {
@@ -238,7 +244,7 @@ public class CheckoutActivity extends AppCompatActivity {
                                 "0",
                                 Util.getCurrentDate("yyyy-MM-dd HH:mm:ss"),
                                 customerModel.getCode(),
-                                Double.parseDouble(totalAmount),
+                                totalAmountDouble,
                                 receivedAmountDouble,
                                 "",
                                 "",
@@ -249,8 +255,8 @@ public class CheckoutActivity extends AppCompatActivity {
                                 orderModel.getOrderId(),
                                 orderModel.getDocDate(),
                                 orderModel.getCustomerCode(),
-                                Double.parseDouble(totalAmount),
-                                Double.parseDouble(receivedAmount),
+                                totalAmountDouble,
+                                receivedAmountDouble,
                                 orderModel.getDueDate(),
                                 orderModel.getRemarks(),
                                 orderModel.getUserId()
