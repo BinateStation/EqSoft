@@ -129,10 +129,15 @@ public class ProductsActivity extends AppCompatActivity {
                     orderItemModelDB.close();
                 }
 
-                ReceiptModel receiptModelDB = new ReceiptModel(getBaseContext());
-                receiptModelDB.open();
-                receiptModel = receiptModelDB.getRow(customerModel.getCode());
-                receiptModelDB.close();
+                if (receiptModel == null) {
+                    ReceiptModel receiptModelDB = new ReceiptModel(getBaseContext());
+                    receiptModelDB.open();
+                    receiptModel = receiptModelDB.getRow(customerModel.getCode());
+                    if (receiptModel != null) {
+                        receiptModelDB.deleteRow(receiptModel.getReceiptId());
+                    }
+                    receiptModelDB.close();
+                }
 
                 OrderItemModelTemp orderItemModelTempDB = new OrderItemModelTemp(getBaseContext());
                 orderItemModelTempDB.open();

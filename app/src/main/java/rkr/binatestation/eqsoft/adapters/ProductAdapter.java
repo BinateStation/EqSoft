@@ -28,7 +28,6 @@ import rkr.binatestation.eqsoft.R;
 import rkr.binatestation.eqsoft.models.CustomerModel;
 import rkr.binatestation.eqsoft.models.OrderItemModel;
 import rkr.binatestation.eqsoft.models.OrderItemModelTemp;
-import rkr.binatestation.eqsoft.models.OrderModel;
 import rkr.binatestation.eqsoft.models.ProductModel;
 import rkr.binatestation.eqsoft.utils.Util;
 
@@ -270,25 +269,6 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
                 orderItemModelTempDB.open();
                 orderItemModelTempDB.insert(orderItemModelTemp);
                 orderItemModelTempDB.close();
-                if (customerModel != null) {
-                    OrderModel orderModelDB = new OrderModel(context);
-                    orderModelDB.open();
-                    OrderModel orderModel = orderModelDB.getCustomersRow(customerModel.getCode());
-                    orderModelDB.close();
-                    if (orderModel != null) {
-                        OrderItemModel orderItemModelDB = new OrderItemModel(context);
-                        orderItemModelDB.open();
-                        orderItemModelDB.insert(new OrderItemModel(
-                                orderModel.getOrderId(),
-                                item.getCode(),
-                                item.getSellingRate(),
-                                quantity,
-                                Double.parseDouble(amount),
-                                customerModel.getCode()
-                        ));
-                        orderItemModelDB.close();
-                    }
-                }
 
                 return orderItemModelTemp;
             }

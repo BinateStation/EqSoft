@@ -146,8 +146,10 @@ public class CheckoutActivity extends AppCompatActivity {
 
                 OrderItemModelTemp orderItemModelTempDB = new OrderItemModelTemp(getBaseContext());
                 orderItemModelTempDB.open();
-                orderItemModelTempDB.insertMultipleRows(orderItemModelTemps);
-                orderItemModelMap = orderItemModelTempDB.getAllRowsAsMap();
+                for (OrderItemModelTemp temp : orderItemModelTemps) {
+                    orderItemModelMap.put(temp.getProductCode(), temp);
+                }
+                orderItemModelMap.putAll(orderItemModelTempDB.getAllRowsAsMap());
                 orderItemModelTempDB.close();
 
 
@@ -161,11 +163,10 @@ public class CheckoutActivity extends AppCompatActivity {
                 ReceiptModel receiptModelDB = new ReceiptModel(getBaseContext());
                 receiptModelDB.open();
                 ReceiptModel receiptModel = receiptModelDB.getRow(customerModel.getCode());
-                if (receiptModel != null) {
-                    result[1] = receiptModel.getAmount();
-                } else if (CheckoutActivity.this.receiptModel != null) {
-                    receiptModelDB.deleteRow(CheckoutActivity.this.receiptModel.getReceiptId());
+                if (CheckoutActivity.this.receiptModel != null) {
                     result[1] = CheckoutActivity.this.receiptModel.getAmount();
+                } else if (receiptModel != null) {
+                    result[1] = receiptModel.getAmount();
                 } else {
                     result[1] = 0.0;
                 }
@@ -245,13 +246,19 @@ public class CheckoutActivity extends AppCompatActivity {
                     orderModelDB.open();
                     OrderModel orderModel = orderModelDB.getCustomersRow(customerModel.getCode());
                     Long orderId = -1L;
+                    Double receivedAmountDouble = 0.0;
+                    try {
+                        receivedAmountDouble = Double.parseDouble(receivedAmount);
+                    } catch (NumberFormatException e) {
+                        e.printStackTrace();
+                    }
                     if (orderModel == null) {
                         orderId = orderModelDB.insert(new OrderModel(
                                 "0",
                                 Util.getCurrentDate("yyyy-MM-dd HH:mm:ss"),
                                 customerModel.getCode(),
                                 Double.parseDouble(totalAmount),
-                                Double.parseDouble(receivedAmount),
+                                receivedAmountDouble,
                                 "",
                                 "",
                                 Util.getStringFromSharedPreferences(context, Constants.KEY_USER_ID)
@@ -298,7 +305,6 @@ public class CheckoutActivity extends AppCompatActivity {
                     orderItemModelDB.close();
                     if (receivedAmount.length() > 0) {
                         try {
-                            Double receivedAmountDouble = Double.parseDouble(receivedAmount);
                             if (receivedAmountDouble > 0) {
                                 ReceiptModel receiptModelDB = new ReceiptModel(context);
                                 receiptModelDB.open();
@@ -331,6 +337,15 @@ public class CheckoutActivity extends AppCompatActivity {
                 ).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
             }
         }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
+    @Override
+    public void onBackPressed() {
+        OrderItemModelTemp orderItemModelTempDB = new OrderItemModelTemp(CheckoutActivity.this);
+        orderItemModelTempDB.open();
+        orderItemModelTempDB.deleteAll();
+        orderItemModelTempDB.close();
+        super.onBackPressed();
     }
 
     @Override
