@@ -292,7 +292,7 @@ public class CheckoutActivity extends AppCompatActivity {
                     orderItemModelDB.close();
                     if (receivedAmount.length() > 0) {
                         try {
-                            if (receivedAmountDouble > 0) {
+                            if (receivedAmountDouble >= 0) {
                                 ReceiptModel receiptModelDB = new ReceiptModel(context);
                                 receiptModelDB.open();
                                 receiptModelDB.insert(new ReceiptModel(

@@ -21,14 +21,13 @@ import java.util.List;
  * ProductModel.
  */
 public class ProductModel implements Serializable {
-    String category;
-    String code;
-    Double MRP;
-    String name;
-    Double sellingRate;
-    Double stock;
-    Double taxRate;
-    Context context;
+    private String category;
+    private String code;
+    private Double MRP;
+    private String name;
+    private Double sellingRate;
+    private Double stock;
+    private Double taxRate;
     private SQLiteDatabase database;
     private RKRsEqSoftSQLiteHelper dbHelper;
 
@@ -43,32 +42,19 @@ public class ProductModel implements Serializable {
     }
 
     public ProductModel(Context context) {
-        this.context = context;
         dbHelper = new RKRsEqSoftSQLiteHelper(context);
     }
 
-    public String getCategory() {
+    private String getCategory() {
         return category;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
     }
 
     public String getCode() {
         return code;
     }
 
-    public void setCode(String code) {
-        this.code = code;
-    }
-
     public Double getMRP() {
         return MRP;
-    }
-
-    public void setMRP(Double MRP) {
-        this.MRP = MRP;
     }
 
     public String getName() {
@@ -83,24 +69,12 @@ public class ProductModel implements Serializable {
         return sellingRate;
     }
 
-    public void setSellingRate(Double sellingRate) {
-        this.sellingRate = sellingRate;
-    }
-
     public Double getStock() {
         return stock;
     }
 
-    public void setStock(Double stock) {
-        this.stock = stock;
-    }
-
-    public Double getTaxRate() {
+    private Double getTaxRate() {
         return taxRate;
-    }
-
-    public void setTaxRate(Double taxRate) {
-        this.taxRate = taxRate;
     }
 
     public void open() throws SQLException {
@@ -167,7 +141,7 @@ public class ProductModel implements Serializable {
         }
     }
 
-    public void updateRow(ProductModel obj) {
+    private void updateRow(ProductModel obj) {
 
         ContentValues values = new ContentValues();
         values.put(ProductsTable.COLUMN_NAME_CATEGORY, obj.getCategory());
@@ -182,27 +156,9 @@ public class ProductModel implements Serializable {
         System.out.println("Categories Row Updated with id: " + obj.getCode());
     }
 
-    public void deleteRow(ProductModel obj) {
-        database.delete(ProductsTable.TABLE_NAME, ProductsTable.COLUMN_NAME_CODE + " = ?", new String[]{obj.getCode()});
-        System.out.println("Categories Row deleted with id: " + obj.getCode());
-    }
-
     public void deleteAll() {
         database.delete(ProductsTable.TABLE_NAME, null, null);
         System.out.println("Categories table Deleted ALL");
-    }
-
-    public List<ProductModel> getAllRows() {
-        List<ProductModel> list = new ArrayList<>();
-        Cursor cursor = database.query(ProductsTable.TABLE_NAME, null, null, null, null, null, null);
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
-            ProductModel obj = cursorToProductModel(cursor);
-            list.add(obj);
-            cursor.moveToNext();
-        }
-        cursor.close();
-        return list;
     }
 
     public List<ProductModel> getAllRows(String query, int sortType) {
@@ -279,27 +235,27 @@ public class ProductModel implements Serializable {
         );
     }
 
-    protected class ProductsTable implements BaseColumns {
-        public static final String TABLE_NAME = "products";
-        public static final String COLUMN_NAME_CATEGORY = "category";
-        public static final String COLUMN_NAME_CODE = "code";
-        public static final String COLUMN_NAME_MRP = "MRP";
-        public static final String COLUMN_NAME_NAME = "name";
-        public static final String COLUMN_NAME_SELLING_RATE = "selling_rate";
-        public static final String COLUMN_NAME_STOCK = "stock";
-        public static final String COLUMN_NAME_TAX_RATE = "tax_rate";
-        public static final int COLUMN_INDEX_CATEGORY = 1;
-        public static final int COLUMN_INDEX_CODE = 2;
-        public static final int COLUMN_INDEX_MRP = 3;
-        public static final int COLUMN_INDEX_NAME = 4;
-        public static final int COLUMN_INDEX_SELLING_RATE = 5;
-        public static final int COLUMN_INDEX_STOCK = 6;
-        public static final int COLUMN_INDEX_TAX_RATE = 7;
+    class ProductsTable implements BaseColumns {
+        static final String TABLE_NAME = "products";
+        static final String COLUMN_NAME_CATEGORY = "category";
+        static final String COLUMN_NAME_CODE = "code";
+        static final String COLUMN_NAME_MRP = "MRP";
+        static final String COLUMN_NAME_NAME = "name";
+        static final String COLUMN_NAME_SELLING_RATE = "selling_rate";
+        static final String COLUMN_NAME_STOCK = "stock";
+        static final String COLUMN_NAME_TAX_RATE = "tax_rate";
+        static final int COLUMN_INDEX_CATEGORY = 1;
+        static final int COLUMN_INDEX_CODE = 2;
+        static final int COLUMN_INDEX_MRP = 3;
+        static final int COLUMN_INDEX_NAME = 4;
+        static final int COLUMN_INDEX_SELLING_RATE = 5;
+        static final int COLUMN_INDEX_STOCK = 6;
+        static final int COLUMN_INDEX_TAX_RATE = 7;
 
         private static final String TEXT_TYPE = " TEXT";
         private static final String COMMA_SEP = ",";
         private static final String UNIQUE = " UNIQUE ";
-        public static final String SQL_CREATE_USER_DETAILS =
+        static final String SQL_CREATE_USER_DETAILS =
                 "CREATE TABLE " + TABLE_NAME + " (" +
                         _ID + " INTEGER PRIMARY KEY," +
                         COLUMN_NAME_CATEGORY + TEXT_TYPE + COMMA_SEP +

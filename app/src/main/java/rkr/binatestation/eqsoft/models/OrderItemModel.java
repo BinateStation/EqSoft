@@ -25,14 +25,13 @@ import java.util.List;
  */
 public class OrderItemModel implements Serializable {
 
-    String orderId;
-    String productCode;
-    Double rate;
-    Double quantity;
-    Double amount;
-    String customerCode;
+    private String orderId;
+    private String productCode;
+    private Double rate;
+    private Double quantity;
+    private Double amount;
+    private String customerCode;
 
-    Context context;
     private SQLiteDatabase database;
     private RKRsEqSoftSQLiteHelper dbHelper;
 
@@ -46,67 +45,31 @@ public class OrderItemModel implements Serializable {
     }
 
     public OrderItemModel(Context context) {
-        this.context = context;
         dbHelper = new RKRsEqSoftSQLiteHelper(context);
     }
 
-    public static OrderItemModel cursorToOrderItemModelStatic(Cursor cursor) {
-        return new OrderItemModel(
-                cursor.getString(OrderItemsTable.COLUMN_INDEX_ORDER_ID),
-                cursor.getString(OrderItemsTable.COLUMN_INDEX_PRODUCT_CODE),
-                cursor.getDouble(OrderItemsTable.COLUMN_INDEX_RATE),
-                cursor.getDouble(OrderItemsTable.COLUMN_INDEX_QUANTITY),
-                cursor.getDouble(OrderItemsTable.COLUMN_INDEX_AMOUNT),
-                cursor.getString(OrderItemsTable.COLUMN_INDEX_CUSTOMER_CODE)
-        );
-    }
-
-    public String getOrderId() {
+    private String getOrderId() {
         return orderId;
     }
 
-    public void setOrderId(String orderId) {
-        this.orderId = orderId;
-    }
-
-    public String getProductCode() {
+    private String getProductCode() {
         return productCode;
     }
 
-    public void setProductCode(String productCode) {
-        this.productCode = productCode;
-    }
-
-    public Double getRate() {
+    private Double getRate() {
         return rate;
     }
 
-    public void setRate(Double rate) {
-        this.rate = rate;
-    }
-
-    public Double getQuantity() {
+    private Double getQuantity() {
         return quantity;
-    }
-
-    public void setQuantity(Double quantity) {
-        this.quantity = quantity;
     }
 
     public Double getAmount() {
         return amount;
     }
 
-    public void setAmount(Double amount) {
-        this.amount = amount;
-    }
-
-    public String getCustomerCode() {
+    private String getCustomerCode() {
         return customerCode;
-    }
-
-    public void setCustomerCode(String customerCode) {
-        this.customerCode = customerCode;
     }
 
     public void open() throws SQLException {
@@ -170,7 +133,7 @@ public class OrderItemModel implements Serializable {
         }
     }
 
-    public void updateRow(OrderItemModel obj) {
+    private void updateRow(OrderItemModel obj) {
 
         ContentValues values = new ContentValues();
         values.put(OrderItemsTable.COLUMN_NAME_ORDER_ID, obj.getOrderId());
@@ -202,20 +165,7 @@ public class OrderItemModel implements Serializable {
         System.out.println("Categories table Deleted ALL");
     }
 
-    public List<OrderItemModel> getAllRows() {
-        List<OrderItemModel> list = new ArrayList<>();
-        Cursor cursor = database.query(OrderItemsTable.TABLE_NAME, null, null, null, null, null, null);
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
-            OrderItemModel obj = cursorToOrderItemModel(cursor);
-            list.add(obj);
-            cursor.moveToNext();
-        }
-        cursor.close();
-        return list;
-    }
-
-    public JSONArray getAllRowsAsJSONArray(String orderId) {
+    JSONArray getAllRowsAsJSONArray(String orderId) {
         JSONArray jsonArray = new JSONArray();
         Cursor cursor = database.query(OrderItemsTable.TABLE_NAME, null, OrderItemsTable.COLUMN_NAME_ORDER_ID + " = ?", new String[]{orderId}, null, null, null);
         cursor.moveToFirst();
@@ -238,27 +188,13 @@ public class OrderItemModel implements Serializable {
                     obj.getProductCode(),
                     obj.getRate(),
                     obj.getQuantity(),
-                    obj.getAmount(),
-                    true
+                    obj.getAmount()
             );
             list.add(temp);
             cursor.moveToNext();
         }
         cursor.close();
         return list;
-    }
-
-    public String getTotalAmount(String orderId) {
-        Double totalAmount = 0.0;
-        Cursor cursor = database.query(OrderItemsTable.TABLE_NAME, null, OrderItemsTable.COLUMN_NAME_ORDER_ID + " = ?", new String[]{orderId}, null, null, null);
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
-            OrderItemModel obj = cursorToOrderItemModel(cursor);
-            totalAmount += obj.getAmount();
-            cursor.moveToNext();
-        }
-        cursor.close();
-        return "" + totalAmount;
     }
 
     public Double getTotalQuantity(String productCode) {
@@ -310,25 +246,25 @@ public class OrderItemModel implements Serializable {
         return jsonObject;
     }
 
-    protected class OrderItemsTable implements BaseColumns {
-        public static final String TABLE_NAME = "order_items";
-        public static final String COLUMN_NAME_ORDER_ID = "order_id";
-        public static final String COLUMN_NAME_PRODUCT_CODE = "product_code";
-        public static final String COLUMN_NAME_RATE = "rate";
-        public static final String COLUMN_NAME_QUANTITY = "quantity";
-        public static final String COLUMN_NAME_AMOUNT = "amount";
-        public static final String COLUMN_NAME_CUSTOMER_CODE = "customer_code";
-        public static final int COLUMN_INDEX_ORDER_ID = 1;
-        public static final int COLUMN_INDEX_PRODUCT_CODE = 2;
-        public static final int COLUMN_INDEX_RATE = 3;
-        public static final int COLUMN_INDEX_QUANTITY = 4;
-        public static final int COLUMN_INDEX_AMOUNT = 5;
-        public static final int COLUMN_INDEX_CUSTOMER_CODE = 6;
+    class OrderItemsTable implements BaseColumns {
+        static final String TABLE_NAME = "order_items";
+        static final String COLUMN_NAME_ORDER_ID = "order_id";
+        static final String COLUMN_NAME_PRODUCT_CODE = "product_code";
+        static final String COLUMN_NAME_RATE = "rate";
+        static final String COLUMN_NAME_QUANTITY = "quantity";
+        static final String COLUMN_NAME_AMOUNT = "amount";
+        static final String COLUMN_NAME_CUSTOMER_CODE = "customer_code";
+        static final int COLUMN_INDEX_ORDER_ID = 1;
+        static final int COLUMN_INDEX_PRODUCT_CODE = 2;
+        static final int COLUMN_INDEX_RATE = 3;
+        static final int COLUMN_INDEX_QUANTITY = 4;
+        static final int COLUMN_INDEX_AMOUNT = 5;
+        static final int COLUMN_INDEX_CUSTOMER_CODE = 6;
 
         private static final String TEXT_TYPE = " TEXT";
         private static final String COMMA_SEP = ",";
         private static final String UNIQUE = " UNIQUE ";
-        public static final String SQL_CREATE_USER_DETAILS =
+        static final String SQL_CREATE_USER_DETAILS =
                 "CREATE TABLE " + TABLE_NAME + " (" +
                         _ID + " INTEGER PRIMARY KEY," +
                         COLUMN_NAME_ORDER_ID + TEXT_TYPE + COMMA_SEP +

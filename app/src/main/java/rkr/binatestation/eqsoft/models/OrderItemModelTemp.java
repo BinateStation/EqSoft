@@ -13,7 +13,6 @@ import com.google.common.collect.Lists;
 import org.jetbrains.annotations.Contract;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,77 +23,39 @@ import java.util.Map;
  */
 public class OrderItemModelTemp implements Serializable {
 
-    String productCode;
-    Double rate;
-    Double quantity;
-    Double amount;
-    Boolean isTemp;
+    private String productCode;
+    private Double rate;
+    private Double quantity;
+    private Double amount;
 
-    Context context;
     private SQLiteDatabase database;
     private RKRsEqSoftSQLiteHelper dbHelper;
 
-    public OrderItemModelTemp(String productCode, Double rate, Double quantity, Double amount, Boolean isTemp) {
+    public OrderItemModelTemp(String productCode, Double rate, Double quantity, Double amount) {
         this.productCode = productCode;
         this.rate = rate;
         this.quantity = quantity;
         this.amount = amount;
-        this.isTemp = isTemp;
     }
 
     public OrderItemModelTemp(Context context) {
-        this.context = context;
         dbHelper = new RKRsEqSoftSQLiteHelper(context);
-    }
-
-    public static OrderItemModelTemp cursorToOrderItemModelTempStatic(Cursor cursor) {
-        return new OrderItemModelTemp(
-                cursor.getString(OrderItemsTable.COLUMN_INDEX_PRODUCT_CODE),
-                cursor.getDouble(OrderItemsTable.COLUMN_INDEX_RATE),
-                cursor.getDouble(OrderItemsTable.COLUMN_INDEX_QUANTITY),
-                cursor.getDouble(OrderItemsTable.COLUMN_INDEX_AMOUNT),
-                true
-        );
     }
 
     public String getProductCode() {
         return productCode;
     }
 
-    public void setProductCode(String productCode) {
-        this.productCode = productCode;
-    }
-
     public Double getRate() {
         return rate;
-    }
-
-    public void setRate(Double rate) {
-        this.rate = rate;
     }
 
     public Double getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(Double quantity) {
-        this.quantity = quantity;
-    }
-
     public Double getAmount() {
         return amount;
-    }
-
-    public void setAmount(Double amount) {
-        this.amount = amount;
-    }
-
-    public Boolean getTemp() {
-        return isTemp;
-    }
-
-    public void setTemp(Boolean temp) {
-        isTemp = temp;
     }
 
     public void open() throws SQLException {
@@ -152,7 +113,7 @@ public class OrderItemModelTemp implements Serializable {
         }
     }
 
-    public void updateRow(OrderItemModelTemp obj) {
+    private void updateRow(OrderItemModelTemp obj) {
 
         ContentValues values = new ContentValues();
         values.put(OrderItemsTable.COLUMN_NAME_PRODUCT_CODE, obj.getProductCode());
@@ -173,19 +134,6 @@ public class OrderItemModelTemp implements Serializable {
     public void deleteAll() {
         database.delete(OrderItemsTable.TABLE_NAME, null, null);
         System.out.println("Categories table Deleted ALL");
-    }
-
-    public List<OrderItemModelTemp> getAllRows() {
-        List<OrderItemModelTemp> list = new ArrayList<>();
-        Cursor cursor = database.query(OrderItemsTable.TABLE_NAME, null, null, null, null, null, null);
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
-            OrderItemModelTemp obj = cursorToOrderItemModelTemp(cursor);
-            list.add(obj);
-            cursor.moveToNext();
-        }
-        cursor.close();
-        return list;
     }
 
     public Map<String, OrderItemModelTemp> getAllRowsAsMap() {
@@ -218,26 +166,25 @@ public class OrderItemModelTemp implements Serializable {
                 cursor.getString(OrderItemsTable.COLUMN_INDEX_PRODUCT_CODE),
                 cursor.getDouble(OrderItemsTable.COLUMN_INDEX_RATE),
                 cursor.getDouble(OrderItemsTable.COLUMN_INDEX_QUANTITY),
-                cursor.getDouble(OrderItemsTable.COLUMN_INDEX_AMOUNT),
-                true
+                cursor.getDouble(OrderItemsTable.COLUMN_INDEX_AMOUNT)
         );
     }
 
-    protected class OrderItemsTable implements BaseColumns {
-        public static final String TABLE_NAME = "order_items_temp";
-        public static final String COLUMN_NAME_PRODUCT_CODE = "product_code";
-        public static final String COLUMN_NAME_RATE = "rate";
-        public static final String COLUMN_NAME_QUANTITY = "quantity";
-        public static final String COLUMN_NAME_AMOUNT = "amount";
-        public static final int COLUMN_INDEX_PRODUCT_CODE = 1;
-        public static final int COLUMN_INDEX_RATE = 2;
-        public static final int COLUMN_INDEX_QUANTITY = 3;
-        public static final int COLUMN_INDEX_AMOUNT = 4;
+    class OrderItemsTable implements BaseColumns {
+        static final String TABLE_NAME = "order_items_temp";
+        static final String COLUMN_NAME_PRODUCT_CODE = "product_code";
+        static final String COLUMN_NAME_RATE = "rate";
+        static final String COLUMN_NAME_QUANTITY = "quantity";
+        static final String COLUMN_NAME_AMOUNT = "amount";
+        static final int COLUMN_INDEX_PRODUCT_CODE = 1;
+        static final int COLUMN_INDEX_RATE = 2;
+        static final int COLUMN_INDEX_QUANTITY = 3;
+        static final int COLUMN_INDEX_AMOUNT = 4;
 
         private static final String TEXT_TYPE = " TEXT";
         private static final String COMMA_SEP = ",";
         private static final String UNIQUE = " UNIQUE ";
-        public static final String SQL_CREATE_USER_DETAILS =
+        static final String SQL_CREATE_USER_DETAILS =
                 "CREATE TABLE " + TABLE_NAME + " (" +
                         _ID + " INTEGER PRIMARY KEY," +
                         COLUMN_NAME_PRODUCT_CODE + TEXT_TYPE + UNIQUE + COMMA_SEP +

@@ -8,17 +8,13 @@ import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 import android.util.Log;
 
-import com.google.common.collect.Lists;
-
 import org.jetbrains.annotations.Contract;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -28,16 +24,16 @@ import java.util.Map;
  */
 public class OrderModel implements Serializable {
 
-    String orderId;
-    String docDate;
-    String customerCode;
-    Double amount;
-    Double receivedAmount;
-    String dueDate;
-    String remarks;
-    String userId;
+    private String orderId;
+    private String docDate;
+    private String customerCode;
+    private Double amount;
+    private Double receivedAmount;
+    private String dueDate;
+    private String remarks;
+    private String userId;
 
-    Context context;
+    private Context context;
     private SQLiteDatabase database;
     private RKRsEqSoftSQLiteHelper dbHelper;
 
@@ -61,64 +57,32 @@ public class OrderModel implements Serializable {
         return orderId;
     }
 
-    public void setOrderId(String orderId) {
-        this.orderId = orderId;
-    }
-
     public String getDocDate() {
         return docDate;
-    }
-
-    public void setDocDate(String docDate) {
-        this.docDate = docDate;
     }
 
     public String getCustomerCode() {
         return customerCode;
     }
 
-    public void setCustomerCode(String customerCode) {
-        this.customerCode = customerCode;
-    }
-
     public Double getAmount() {
         return amount;
     }
 
-    public void setAmount(Double amount) {
-        this.amount = amount;
-    }
-
-    public Double getReceivedAmount() {
+    private Double getReceivedAmount() {
         return receivedAmount;
-    }
-
-    public void setReceivedAmount(Double receivedAmount) {
-        this.receivedAmount = receivedAmount;
     }
 
     public String getDueDate() {
         return dueDate;
     }
 
-    public void setDueDate(String dueDate) {
-        this.dueDate = dueDate;
-    }
-
     public String getRemarks() {
         return remarks;
     }
 
-    public void setRemarks(String remarks) {
-        this.remarks = remarks;
-    }
-
     public String getUserId() {
         return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
     }
 
     public void open() throws SQLException {
@@ -146,42 +110,6 @@ public class OrderModel implements Serializable {
         return insertId;
     }
 
-    /**
-     * This method will do a compound insert in to the table
-     * It will splits the list in to lists of 500 objects and generate insert query for all 500 objects in each
-     *
-     * @param productModelList the list of table rows to insert.
-     */
-    public void insertMultipleRows(List<OrderModel> productModelList) {
-        for (List<OrderModel> masterList : Lists.partition(productModelList, 500)) {
-            String query = "REPLACE INTO '" +
-                    OrdersTable.TABLE_NAME + "' ('" +
-                    OrdersTable.COLUMN_NAME_DOC_DATE + "','" +
-                    OrdersTable.COLUMN_NAME_CUSTOMER_CODE + "','" +
-                    OrdersTable.COLUMN_NAME_AMOUNT + "','" +
-                    OrdersTable.COLUMN_NAME_RECEIVED_AMOUNT + "','" +
-                    OrdersTable.COLUMN_NAME_DUE_DATE + "','" +
-                    OrdersTable.COLUMN_NAME_REMARKS + "','" +
-                    OrdersTable.COLUMN_NAME_USER_ID + "') VALUES ('";
-            for (int i = 0; i < masterList.size(); i++) {
-                OrderModel master = masterList.get(i);
-                query += master.getDocDate() + "' , '" +
-                        master.getCustomerCode() + "' , '" +
-                        master.getAmount() + "' , '" +
-                        master.getReceivedAmount() + "' , '" +
-                        master.getDueDate() + "' , '" +
-                        master.getRemarks() + "' , '" +
-                        master.getUserId() + "')";
-                if (i != (masterList.size() - 1)) {
-                    query += ",('";
-                }
-            }
-            Cursor cursor = database.rawQuery(query, null);
-            Log.d("Query executed", cursor.getCount() + " : " + query);
-            cursor.close();
-        }
-    }
-
     public void updateRow(OrderModel obj) {
 
         ContentValues values = new ContentValues();
@@ -205,19 +133,6 @@ public class OrderModel implements Serializable {
     public void deleteAll() {
         database.delete(OrdersTable.TABLE_NAME, null, null);
         System.out.println("Categories table Deleted ALL");
-    }
-
-    public List<OrderModel> getAllRows() {
-        List<OrderModel> list = new ArrayList<>();
-        Cursor cursor = database.query(OrdersTable.TABLE_NAME, null, null, null, null, null, null);
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
-            OrderModel obj = cursorToOrderModel(cursor);
-            list.add(obj);
-            cursor.moveToNext();
-        }
-        cursor.close();
-        return list;
     }
 
     public JSONArray getAllRowsAsJSONArray() {
@@ -311,27 +226,27 @@ public class OrderModel implements Serializable {
         return jsonObject;
     }
 
-    protected class OrdersTable implements BaseColumns {
-        public static final String TABLE_NAME = "orders";
-        public static final String COLUMN_NAME_DOC_DATE = "doc_date";
-        public static final String COLUMN_NAME_CUSTOMER_CODE = "customer_code";
-        public static final String COLUMN_NAME_AMOUNT = "amount";
-        public static final String COLUMN_NAME_RECEIVED_AMOUNT = "received_amount";
-        public static final String COLUMN_NAME_DUE_DATE = "due_date";
-        public static final String COLUMN_NAME_REMARKS = "remarks";
-        public static final String COLUMN_NAME_USER_ID = "user_id";
-        public static final int COLUMN_INDEX_DOC_DATE = 1;
-        public static final int COLUMN_INDEX_CUSTOMER_CODE = 2;
-        public static final int COLUMN_INDEX_AMOUNT = 3;
-        public static final int COLUMN_INDEX_RECEIVED_AMOUNT = 4;
-        public static final int COLUMN_INDEX_DUE_DATE = 5;
-        public static final int COLUMN_INDEX_REMARKS = 6;
-        public static final int COLUMN_INDEX_USER_ID = 7;
+    class OrdersTable implements BaseColumns {
+        static final String TABLE_NAME = "orders";
+        static final String COLUMN_NAME_DOC_DATE = "doc_date";
+        static final String COLUMN_NAME_CUSTOMER_CODE = "customer_code";
+        static final String COLUMN_NAME_AMOUNT = "amount";
+        static final String COLUMN_NAME_RECEIVED_AMOUNT = "received_amount";
+        static final String COLUMN_NAME_DUE_DATE = "due_date";
+        static final String COLUMN_NAME_REMARKS = "remarks";
+        static final String COLUMN_NAME_USER_ID = "user_id";
+        static final int COLUMN_INDEX_DOC_DATE = 1;
+        static final int COLUMN_INDEX_CUSTOMER_CODE = 2;
+        static final int COLUMN_INDEX_AMOUNT = 3;
+        static final int COLUMN_INDEX_RECEIVED_AMOUNT = 4;
+        static final int COLUMN_INDEX_DUE_DATE = 5;
+        static final int COLUMN_INDEX_REMARKS = 6;
+        static final int COLUMN_INDEX_USER_ID = 7;
 
         private static final String TEXT_TYPE = " TEXT";
         private static final String COMMA_SEP = ",";
         private static final String UNIQUE = " UNIQUE ";
-        public static final String SQL_CREATE_USER_DETAILS =
+        static final String SQL_CREATE_USER_DETAILS =
                 "CREATE TABLE " + TABLE_NAME + " (" +
                         _ID + " INTEGER PRIMARY KEY," +
                         COLUMN_NAME_DOC_DATE + TEXT_TYPE + COMMA_SEP +

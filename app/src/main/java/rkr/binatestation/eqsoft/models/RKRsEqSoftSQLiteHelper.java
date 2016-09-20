@@ -5,14 +5,12 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-public class RKRsEqSoftSQLiteHelper extends SQLiteOpenHelper {
+class RKRsEqSoftSQLiteHelper extends SQLiteOpenHelper {
 
     private static int DB_VERSION = 4;
-    Context context;
 
-    public RKRsEqSoftSQLiteHelper(Context context) {
+    RKRsEqSoftSQLiteHelper(Context context) {
         super(context, context.getPackageName(), null, DB_VERSION);
-        this.context = context;
     }
 
     @Override

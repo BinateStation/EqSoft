@@ -18,8 +18,8 @@ import rkr.binatestation.eqsoft.models.CustomerModel;
  * CustomerAdapter.
  */
 public class CustomerAdapter extends RecyclerView.Adapter<CustomerAdapter.ItemView> {
-    List<CustomerModel> customerModelList;
-    OnAdapterInteractionListener listener;
+    private List<CustomerModel> customerModelList;
+    private OnAdapterInteractionListener listener;
 
     public CustomerAdapter(List<CustomerModel> customerModelList, OnAdapterInteractionListener listener) {
         this.customerModelList = customerModelList;
@@ -84,7 +84,7 @@ public class CustomerAdapter extends RecyclerView.Adapter<CustomerAdapter.ItemVi
         TextView ledgerName, phone, balance;
         View itemView;
 
-        public ItemView(View itemView) {
+        ItemView(View itemView) {
             super(itemView);
             this.itemView = itemView;
             ledgerName = (TextView) itemView.findViewById(R.id.AC_ledgerName);

@@ -13,7 +13,6 @@ import com.google.common.collect.Lists;
 import org.jetbrains.annotations.Contract;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -21,10 +20,9 @@ import java.util.List;
  * UserDetailsModel.
  */
 public class UserDetailsModel implements Serializable {
-    String userId;
-    String userName;
-    String password;
-    Context context;
+    private String userId;
+    private String userName;
+    private String password;
     private SQLiteDatabase database;
     private RKRsEqSoftSQLiteHelper dbHelper;
 
@@ -35,7 +33,6 @@ public class UserDetailsModel implements Serializable {
     }
 
     public UserDetailsModel(Context context) {
-        this.context = context;
         dbHelper = new RKRsEqSoftSQLiteHelper(context);
     }
 
@@ -43,24 +40,12 @@ public class UserDetailsModel implements Serializable {
         return userId;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
     public String getUserName() {
         return userName;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public String getPassword() {
+    private String getPassword() {
         return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public void open() throws SQLException {
@@ -115,7 +100,7 @@ public class UserDetailsModel implements Serializable {
         }
     }
 
-    public void updateRow(UserDetailsModel obj) {
+    private void updateRow(UserDetailsModel obj) {
 
         ContentValues values = new ContentValues();
         values.put(UserDetailsTable.COLUMN_NAME_USER_ID, obj.getUserId());
@@ -126,27 +111,9 @@ public class UserDetailsModel implements Serializable {
         System.out.println("Categories Row Updated with id: " + obj.getUserId());
     }
 
-    public void deleteRow(UserDetailsModel obj) {
-        database.delete(UserDetailsTable.TABLE_NAME, UserDetailsTable.COLUMN_NAME_USER_ID + " = ?", new String[]{obj.getUserId()});
-        System.out.println("Categories Row deleted with id: " + obj.getUserId());
-    }
-
     public void deleteAll() {
         database.delete(UserDetailsTable.TABLE_NAME, null, null);
         System.out.println("Categories table Deleted ALL");
-    }
-
-    public List<UserDetailsModel> getAllRows() {
-        List<UserDetailsModel> list = new ArrayList<>();
-        Cursor cursor = database.query(UserDetailsTable.TABLE_NAME, null, null, null, null, null, null);
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
-            UserDetailsModel obj = cursorToUserDetailsModel(cursor);
-            list.add(obj);
-            cursor.moveToNext();
-        }
-        cursor.close();
-        return list;
     }
 
 
@@ -179,19 +146,19 @@ public class UserDetailsModel implements Serializable {
         );
     }
 
-    protected class UserDetailsTable implements BaseColumns {
-        public static final String TABLE_NAME = "user_details";
-        public static final String COLUMN_NAME_USER_ID = "user_id";
-        public static final String COLUMN_NAME_USER_NAME = "user_name";
-        public static final String COLUMN_NAME_PASSWORD = "password";
-        public static final int COLUMN_INDEX_USER_ID = 1;
-        public static final int COLUMN_INDEX_USER_NAME = 2;
-        public static final int COLUMN_INDEX_PASSWORD = 3;
+    class UserDetailsTable implements BaseColumns {
+        static final String TABLE_NAME = "user_details";
+        static final String COLUMN_NAME_USER_ID = "user_id";
+        static final String COLUMN_NAME_USER_NAME = "user_name";
+        static final String COLUMN_NAME_PASSWORD = "password";
+        static final int COLUMN_INDEX_USER_ID = 1;
+        static final int COLUMN_INDEX_USER_NAME = 2;
+        static final int COLUMN_INDEX_PASSWORD = 3;
 
         private static final String TEXT_TYPE = " TEXT";
         private static final String COMMA_SEP = ",";
         private static final String UNIQUE = " UNIQUE ";
-        public static final String SQL_CREATE_USER_DETAILS =
+        static final String SQL_CREATE_USER_DETAILS =
                 "CREATE TABLE " + TABLE_NAME + " (" +
                         _ID + " INTEGER PRIMARY KEY," +
                         COLUMN_NAME_USER_ID + TEXT_TYPE + UNIQUE + COMMA_SEP +

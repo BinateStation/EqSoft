@@ -32,9 +32,9 @@ import rkr.binatestation.eqsoft.utils.Util;
  * DataSync.
  */
 public class DataSync extends AsyncTask<Integer, Integer, Boolean> {
-    Context context;
+    private Context context;
 
-    public DataSync(Context context) {
+    protected DataSync(Context context) {
         this.context = context;
     }
 

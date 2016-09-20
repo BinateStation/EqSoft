@@ -36,11 +36,11 @@ import rkr.binatestation.eqsoft.utils.Util;
  * CustomerAdapter.
  */
 public class OrderSummaryAdapter extends RecyclerView.Adapter<OrderSummaryAdapter.ItemView> {
-    List<ProductModel> productModelList;
-    CustomerModel customerModel;
-    Map<String, OrderItemModelTemp> orderItemModelMap = new LinkedHashMap<>();
-    OnAdapterInteractionListener onAdapterInteractionListener;
-    Boolean clickable;
+    private List<ProductModel> productModelList;
+    private CustomerModel customerModel;
+    private Map<String, OrderItemModelTemp> orderItemModelMap = new LinkedHashMap<>();
+    private OnAdapterInteractionListener onAdapterInteractionListener;
+    private Boolean clickable;
 
     public OrderSummaryAdapter(List<ProductModel> productModelList, CustomerModel customerModel, Map<String, OrderItemModelTemp> orderItemModelMap, boolean clickable, OnAdapterInteractionListener onAdapterInteractionListener) {
         this.productModelList = productModelList;
@@ -101,11 +101,13 @@ public class OrderSummaryAdapter extends RecyclerView.Adapter<OrderSummaryAdapte
 
         WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
         Window window = appCompatDialog.getWindow();
-        layoutParams.copyFrom(window.getAttributes());
-        layoutParams.width = WindowManager.LayoutParams.MATCH_PARENT;
-        layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
-        window.setAttributes(layoutParams);
-        window.getAttributes().windowAnimations = R.style.dialog_animation;
+        if (window != null) {
+            layoutParams.copyFrom(window.getAttributes());
+            layoutParams.width = WindowManager.LayoutParams.MATCH_PARENT;
+            layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
+            window.setAttributes(layoutParams);
+            window.getAttributes().windowAnimations = R.style.dialog_animation;
+        }
 
 
         TextView productName = (TextView) appCompatDialog.findViewById(R.id.PEPQ_productName);
@@ -167,7 +169,7 @@ public class OrderSummaryAdapter extends RecyclerView.Adapter<OrderSummaryAdapte
                         public void afterTextChanged(Editable editable) {
                             if (editable.length() > 0) {
                                 try {
-                                    amount.setText(String.format(Locale.getDefault(), "%.2f", (Integer.parseInt(editable.toString()) * item.getSellingRate())));
+                                    amount.setText(String.format(Locale.getDefault(), "%.2f", (Double.parseDouble(editable.toString()) * item.getSellingRate())));
                                 } catch (NumberFormatException e) {
                                     e.printStackTrace();
                                     Util.showAlert(amount.getContext(), "Alert", "Please enter a valid quantity.");
@@ -246,8 +248,7 @@ public class OrderSummaryAdapter extends RecyclerView.Adapter<OrderSummaryAdapte
                         item.getCode(),
                         item.getSellingRate(),
                         quantity,
-                        Double.parseDouble(amount),
-                        true
+                        Double.parseDouble(amount)
                 );
                 OrderItemModelTemp orderItemModelTempDB = new OrderItemModelTemp(context);
                 orderItemModelTempDB.open();
@@ -319,7 +320,7 @@ public class OrderSummaryAdapter extends RecyclerView.Adapter<OrderSummaryAdapte
         TextView productName, productMRP, productCode, sellingPrice, quantity, amount;
         View selectedView;
 
-        public ItemView(View itemView) {
+        ItemView(View itemView) {
             super(itemView);
             this.itemView = itemView;
             productName = (TextView) itemView.findViewById(R.id.AP_productName);

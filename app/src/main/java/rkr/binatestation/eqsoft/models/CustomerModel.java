@@ -11,9 +11,6 @@ import android.util.Log;
 import com.google.common.collect.Lists;
 
 import org.jetbrains.annotations.Contract;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -25,19 +22,18 @@ import java.util.Locale;
  * CustomerModel.
  */
 public class CustomerModel implements Serializable {
-    String address1;
-    String address2;
-    String address3;
-    Double balance;
-    String code;
-    String email;
-    String ledgerName;
-    String mobile;
-    String name;
-    String phone;
-    String route;
-    String routeIndex;
-    Context context;
+    private String address1;
+    private String address2;
+    private String address3;
+    private Double balance;
+    private String code;
+    private String email;
+    private String ledgerName;
+    private String mobile;
+    private String name;
+    private String phone;
+    private String route;
+    private String routeIndex;
     private SQLiteDatabase database;
     private RKRsEqSoftSQLiteHelper dbHelper;
 
@@ -57,72 +53,39 @@ public class CustomerModel implements Serializable {
     }
 
     public CustomerModel(Context context) {
-        this.context = context;
         dbHelper = new RKRsEqSoftSQLiteHelper(context);
     }
 
-    public String getAddress2() {
+    private String getAddress2() {
         return address2;
     }
 
-    public void setAddress2(String address2) {
-        this.address2 = address2;
-    }
-
-    public String getAddress1() {
+    private String getAddress1() {
         return address1;
     }
 
-    public void setAddress1(String address1) {
-        this.address1 = address1;
-    }
-
-    public String getAddress3() {
+    private String getAddress3() {
         return address3;
-    }
-
-    public void setAddress3(String address3) {
-        this.address3 = address3;
     }
 
     public Double getBalance() {
         return balance;
     }
 
-    public void setBalance(Double balance) {
-        this.balance = balance;
-    }
-
     public String getCode() {
         return code;
     }
 
-    public void setCode(String code) {
-        this.code = code;
-    }
-
-    public String getEmail() {
+    private String getEmail() {
         return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     public String getLedgerName() {
         return ledgerName;
     }
 
-    public void setLedgerName(String ledgerName) {
-        this.ledgerName = ledgerName;
-    }
-
     public String getMobile() {
         return mobile;
-    }
-
-    public void setMobile(String mobile) {
-        this.mobile = mobile;
     }
 
     public String getName() {
@@ -133,28 +96,16 @@ public class CustomerModel implements Serializable {
         this.name = name;
     }
 
-    public String getPhone() {
+    private String getPhone() {
         return phone;
     }
 
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public String getRoute() {
+    private String getRoute() {
         return route;
     }
 
-    public void setRoute(String route) {
-        this.route = route;
-    }
-
-    public String getRouteIndex() {
+    private String getRouteIndex() {
         return routeIndex;
-    }
-
-    public void setRouteIndex(String routeIndex) {
-        this.routeIndex = routeIndex;
     }
 
     public void open() throws SQLException {
@@ -236,7 +187,7 @@ public class CustomerModel implements Serializable {
         }
     }
 
-    public void updateRow(CustomerModel obj) {
+    private void updateRow(CustomerModel obj) {
 
         ContentValues values = new ContentValues();
         values.put(CustomersTable.COLUMN_NAME_ADDRESS_1, obj.getAddress1());
@@ -256,27 +207,9 @@ public class CustomerModel implements Serializable {
         System.out.println("Categories Row Updated with id: " + obj.getCode());
     }
 
-    public void deleteRow(CustomerModel obj) {
-        database.delete(CustomersTable.TABLE_NAME, CustomersTable.COLUMN_NAME_CODE + " = ?", new String[]{obj.getCode()});
-        System.out.println("Categories Row deleted with id: " + obj.getCode());
-    }
-
     public void deleteAll() {
         database.delete(CustomersTable.TABLE_NAME, null, null);
         System.out.println("Categories table Deleted ALL");
-    }
-
-    public List<CustomerModel> getAllRows() {
-        List<CustomerModel> list = new ArrayList<>();
-        Cursor cursor = database.query(CustomersTable.TABLE_NAME, null, null, null, null, null, null);
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
-            CustomerModel obj = cursorToCustomerModel(cursor);
-            list.add(obj);
-            cursor.moveToNext();
-        }
-        cursor.close();
-        return list;
     }
 
     public Double getTotalBalance() {
@@ -290,19 +223,6 @@ public class CustomerModel implements Serializable {
         }
         cursor.close();
         return totalBalance;
-    }
-
-    public JSONArray getAllRowsAsJSONArray() {
-        JSONArray jsonArray = new JSONArray();
-        Cursor cursor = database.query(CustomersTable.TABLE_NAME, null, null, null, null, null, null);
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
-            JSONObject obj = cursorToJSONObject(cursor);
-            jsonArray.put(obj);
-            cursor.moveToNext();
-        }
-        cursor.close();
-        return jsonArray;
     }
 
     public List<CustomerModel> getAllRows(String query, int sortType) {
@@ -389,58 +309,37 @@ public class CustomerModel implements Serializable {
         );
     }
 
-    private JSONObject cursorToJSONObject(Cursor cursor) {
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("address1", cursor.getString(CustomersTable.COLUMN_INDEX_ADDRESS_1));
-            jsonObject.put("address2", cursor.getString(CustomersTable.COLUMN_INDEX_ADDRESS_2));
-            jsonObject.put("address3", cursor.getString(CustomersTable.COLUMN_INDEX_ADDRESS_3));
-            jsonObject.put("balance", cursor.getString(CustomersTable.COLUMN_INDEX_BALANCE));
-            jsonObject.put("code", cursor.getString(CustomersTable.COLUMN_INDEX_CODE));
-            jsonObject.put("email", cursor.getString(CustomersTable.COLUMN_INDEX_EMAIL));
-            jsonObject.put("ledger_name", cursor.getString(CustomersTable.COLUMN_INDEX_LEDGER_NAME));
-            jsonObject.put("mobile", cursor.getString(CustomersTable.COLUMN_INDEX_MOBILE));
-            jsonObject.put("name", cursor.getString(CustomersTable.COLUMN_INDEX_NAME));
-            jsonObject.put("phone", cursor.getString(CustomersTable.COLUMN_INDEX_PHONE));
-            jsonObject.put("route", cursor.getString(CustomersTable.COLUMN_INDEX_ROUTE));
-            jsonObject.put("route_index", cursor.getString(CustomersTable.COLUMN_INDEX_ROUTE_INDEX));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return jsonObject;
-    }
-
-    protected class CustomersTable implements BaseColumns {
-        public static final String TABLE_NAME = "customers";
-        public static final String COLUMN_NAME_ADDRESS_1 = "address1";
-        public static final String COLUMN_NAME_ADDRESS_2 = "address2";
-        public static final String COLUMN_NAME_ADDRESS_3 = "address3";
-        public static final String COLUMN_NAME_BALANCE = "balance";
-        public static final String COLUMN_NAME_CODE = "code";
-        public static final String COLUMN_NAME_EMAIL = "email";
-        public static final String COLUMN_NAME_LEDGER_NAME = "ledger_name";
-        public static final String COLUMN_NAME_MOBILE = "mobile";
-        public static final String COLUMN_NAME_NAME = "name";
-        public static final String COLUMN_NAME_PHONE = "phone";
-        public static final String COLUMN_NAME_ROUTE = "route";
-        public static final String COLUMN_NAME_ROUTE_INDEX = "route_index";
-        public static final int COLUMN_INDEX_ADDRESS_1 = 1;
-        public static final int COLUMN_INDEX_ADDRESS_2 = 2;
-        public static final int COLUMN_INDEX_ADDRESS_3 = 3;
-        public static final int COLUMN_INDEX_BALANCE = 4;
-        public static final int COLUMN_INDEX_CODE = 5;
-        public static final int COLUMN_INDEX_EMAIL = 6;
-        public static final int COLUMN_INDEX_LEDGER_NAME = 7;
-        public static final int COLUMN_INDEX_MOBILE = 8;
-        public static final int COLUMN_INDEX_NAME = 9;
-        public static final int COLUMN_INDEX_PHONE = 10;
-        public static final int COLUMN_INDEX_ROUTE = 11;
-        public static final int COLUMN_INDEX_ROUTE_INDEX = 12;
+    class CustomersTable implements BaseColumns {
+        static final String TABLE_NAME = "customers";
+        static final String COLUMN_NAME_ADDRESS_1 = "address1";
+        static final String COLUMN_NAME_ADDRESS_2 = "address2";
+        static final String COLUMN_NAME_ADDRESS_3 = "address3";
+        static final String COLUMN_NAME_BALANCE = "balance";
+        static final String COLUMN_NAME_CODE = "code";
+        static final String COLUMN_NAME_EMAIL = "email";
+        static final String COLUMN_NAME_LEDGER_NAME = "ledger_name";
+        static final String COLUMN_NAME_MOBILE = "mobile";
+        static final String COLUMN_NAME_NAME = "name";
+        static final String COLUMN_NAME_PHONE = "phone";
+        static final String COLUMN_NAME_ROUTE = "route";
+        static final String COLUMN_NAME_ROUTE_INDEX = "route_index";
+        static final int COLUMN_INDEX_ADDRESS_1 = 1;
+        static final int COLUMN_INDEX_ADDRESS_2 = 2;
+        static final int COLUMN_INDEX_ADDRESS_3 = 3;
+        static final int COLUMN_INDEX_BALANCE = 4;
+        static final int COLUMN_INDEX_CODE = 5;
+        static final int COLUMN_INDEX_EMAIL = 6;
+        static final int COLUMN_INDEX_LEDGER_NAME = 7;
+        static final int COLUMN_INDEX_MOBILE = 8;
+        static final int COLUMN_INDEX_NAME = 9;
+        static final int COLUMN_INDEX_PHONE = 10;
+        static final int COLUMN_INDEX_ROUTE = 11;
+        static final int COLUMN_INDEX_ROUTE_INDEX = 12;
 
         private static final String TEXT_TYPE = " TEXT";
         private static final String COMMA_SEP = ",";
         private static final String UNIQUE = " UNIQUE ";
-        public static final String SQL_CREATE_USER_DETAILS =
+        static final String SQL_CREATE_USER_DETAILS =
                 "CREATE TABLE " + TABLE_NAME + " (" +
                         _ID + " INTEGER PRIMARY KEY," +
                         COLUMN_NAME_ADDRESS_1 + TEXT_TYPE + COMMA_SEP +
