@@ -27,15 +27,17 @@ public class OrderItemModelTemp implements Serializable {
     private Double rate;
     private Double quantity;
     private Double amount;
+    private Boolean isNew;
 
     private SQLiteDatabase database;
     private RKRsEqSoftSQLiteHelper dbHelper;
 
-    public OrderItemModelTemp(String productCode, Double rate, Double quantity, Double amount) {
+    public OrderItemModelTemp(String productCode, Double rate, Double quantity, Double amount, Boolean isNew) {
         this.productCode = productCode;
         this.rate = rate;
         this.quantity = quantity;
         this.amount = amount;
+        this.isNew = isNew;
     }
 
     public OrderItemModelTemp(Context context) {
@@ -58,6 +60,14 @@ public class OrderItemModelTemp implements Serializable {
         return amount;
     }
 
+    public Boolean getNew() {
+        return isNew;
+    }
+
+    public void setNew(Boolean aNew) {
+        isNew = aNew;
+    }
+
     public void open() throws SQLException {
         database = dbHelper.getWritableDatabase();
     }
@@ -73,6 +83,7 @@ public class OrderItemModelTemp implements Serializable {
             values.put(OrderItemsTable.COLUMN_NAME_RATE, obj.getRate());
             values.put(OrderItemsTable.COLUMN_NAME_QUANTITY, obj.getQuantity());
             values.put(OrderItemsTable.COLUMN_NAME_AMOUNT, obj.getAmount());
+            values.put(OrderItemsTable.COLUMN_NAME_NEW, obj.getNew());
 
             long insertId;
             insertId = database.insert(OrderItemsTable.TABLE_NAME, null, values);
@@ -96,13 +107,15 @@ public class OrderItemModelTemp implements Serializable {
                     OrderItemsTable.COLUMN_NAME_PRODUCT_CODE + "','" +
                     OrderItemsTable.COLUMN_NAME_RATE + "','" +
                     OrderItemsTable.COLUMN_NAME_QUANTITY + "','" +
-                    OrderItemsTable.COLUMN_NAME_AMOUNT + "') VALUES ('";
+                    OrderItemsTable.COLUMN_NAME_AMOUNT + "','" +
+                    OrderItemsTable.COLUMN_NAME_NEW + "') VALUES ('";
             for (int i = 0; i < masterList.size(); i++) {
                 OrderItemModelTemp master = masterList.get(i);
                 query += master.getProductCode() + "' , '" +
                         master.getRate() + "' , '" +
                         master.getQuantity() + "' , '" +
-                        master.getAmount() + "')";
+                        master.getAmount() + "' , '" +
+                        master.getNew() + "')";
                 if (i != (masterList.size() - 1)) {
                     query += ",('";
                 }
@@ -120,6 +133,7 @@ public class OrderItemModelTemp implements Serializable {
         values.put(OrderItemsTable.COLUMN_NAME_RATE, obj.getRate());
         values.put(OrderItemsTable.COLUMN_NAME_QUANTITY, obj.getQuantity());
         values.put(OrderItemsTable.COLUMN_NAME_AMOUNT, obj.getAmount());
+        values.put(OrderItemsTable.COLUMN_NAME_NEW, obj.getNew());
 
         database.update(OrderItemsTable.TABLE_NAME, values,
                 OrderItemsTable.COLUMN_NAME_PRODUCT_CODE + " = ? ", new String[]{obj.getProductCode()});
@@ -166,7 +180,8 @@ public class OrderItemModelTemp implements Serializable {
                 cursor.getString(OrderItemsTable.COLUMN_INDEX_PRODUCT_CODE),
                 cursor.getDouble(OrderItemsTable.COLUMN_INDEX_RATE),
                 cursor.getDouble(OrderItemsTable.COLUMN_INDEX_QUANTITY),
-                cursor.getDouble(OrderItemsTable.COLUMN_INDEX_AMOUNT)
+                cursor.getDouble(OrderItemsTable.COLUMN_INDEX_AMOUNT),
+                "1".equalsIgnoreCase(cursor.getString(OrderItemsTable.COLUMN_INDEX_NEW))
         );
     }
 
@@ -176,10 +191,12 @@ public class OrderItemModelTemp implements Serializable {
         static final String COLUMN_NAME_RATE = "rate";
         static final String COLUMN_NAME_QUANTITY = "quantity";
         static final String COLUMN_NAME_AMOUNT = "amount";
+        static final String COLUMN_NAME_NEW = "is_new";
         static final int COLUMN_INDEX_PRODUCT_CODE = 1;
         static final int COLUMN_INDEX_RATE = 2;
         static final int COLUMN_INDEX_QUANTITY = 3;
         static final int COLUMN_INDEX_AMOUNT = 4;
+        static final int COLUMN_INDEX_NEW = 5;
 
         private static final String TEXT_TYPE = " TEXT";
         private static final String COMMA_SEP = ",";
@@ -190,7 +207,8 @@ public class OrderItemModelTemp implements Serializable {
                         COLUMN_NAME_PRODUCT_CODE + TEXT_TYPE + UNIQUE + COMMA_SEP +
                         COLUMN_NAME_RATE + TEXT_TYPE + COMMA_SEP +
                         COLUMN_NAME_QUANTITY + TEXT_TYPE + COMMA_SEP +
-                        COLUMN_NAME_AMOUNT + TEXT_TYPE +
+                        COLUMN_NAME_AMOUNT + TEXT_TYPE + COMMA_SEP +
+                        COLUMN_NAME_NEW + TEXT_TYPE +
                         " )";
     }
 

@@ -3,6 +3,7 @@ package rkr.binatestation.eqsoft.activities;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.SQLException;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -133,9 +134,6 @@ public class ProductsActivity extends AppCompatActivity {
                     ReceiptModel receiptModelDB = new ReceiptModel(getBaseContext());
                     receiptModelDB.open();
                     receiptModel = receiptModelDB.getRow(customerModel.getCode());
-                    if (receiptModel != null) {
-                        receiptModelDB.deleteRow(receiptModel.getReceiptId());
-                    }
                     receiptModelDB.close();
                 }
 
@@ -296,10 +294,103 @@ public class ProductsActivity extends AppCompatActivity {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
+                if (orderItemModelMap.size() > 0) {
+                    OrderModel orderModelDB = new OrderModel(getBaseContext());
+                    orderModelDB.open();
+                    OrderModel orderModel = orderModelDB.getCustomersRow(customerModel.getCode());
+                    Long orderId = -1L;
+                    Double receivedAmountDouble = 0.0;
+                    Double totalAmountDouble = 0.0;
+                    for (OrderItemModelTemp temp : orderItemModelMap.values()) {
+                        if (temp != null) {
+                            totalAmountDouble += (temp.getQuantity() * temp.getRate());
+                        }
+                    }
+                    try {
+                        ReceiptModel receiptModelDB = new ReceiptModel(getBaseContext());
+                        receiptModelDB.open();
+                        ReceiptModel receiptModel = receiptModelDB.getRow(customerModel.getCode());
+                        receiptModelDB.close();
+                        if (receiptModel != null) {
+                            receivedAmountDouble = receiptModel.getAmount();
+                        }
+                    } catch (NumberFormatException e) {
+                        e.printStackTrace();
+                    }
+                    if (orderModel == null) {
+                        orderId = orderModelDB.insert(new OrderModel(
+                                "0",
+                                Util.getCurrentDate("yyyy-MM-dd HH:mm:ss"),
+                                customerModel.getCode(),
+                                totalAmountDouble,
+                                receivedAmountDouble,
+                                "",
+                                "",
+                                Util.getStringFromSharedPreferences(getBaseContext(), Constants.KEY_USER_ID)
+                        ));
+                    } else {
+                        orderModelDB.updateRow(new OrderModel(
+                                orderModel.getOrderId(),
+                                orderModel.getDocDate(),
+                                orderModel.getCustomerCode(),
+                                totalAmountDouble,
+                                receivedAmountDouble,
+                                orderModel.getDueDate(),
+                                orderModel.getRemarks(),
+                                orderModel.getUserId()
+                        ));
+                    }
+                    orderModelDB.close();
+
+                    List<OrderItemModel> orderItemModels = new ArrayList<>();
+                    for (OrderItemModelTemp temp : orderItemModelMap.values()) {
+                        if (orderModel != null && !temp.getNew()) {
+                            orderItemModels.add(new OrderItemModel(
+                                    orderModel.getOrderId(),
+                                    temp.getProductCode(),
+                                    temp.getRate(),
+                                    temp.getQuantity(),
+                                    temp.getAmount(),
+                                    (customerModel != null) ? customerModel.getCode() : ""
+                            ));
+                        } else if (orderId != -1 && !temp.getNew()) {
+                            orderItemModels.add(new OrderItemModel(
+                                    orderId + "",
+                                    temp.getProductCode(),
+                                    temp.getRate(),
+                                    temp.getQuantity(),
+                                    temp.getAmount(),
+                                    (customerModel != null) ? customerModel.getCode() : ""
+                            ));
+                        }
+                    }
+                    OrderItemModel orderItemModelDB = new OrderItemModel(getBaseContext());
+                    orderItemModelDB.open();
+                    orderItemModelDB.insertMultipleRows(orderItemModels);
+                    orderItemModelDB.close();
+                    try {
+                        if (receivedAmountDouble >= 0) {
+                            ReceiptModel receiptModelDB = new ReceiptModel(getBaseContext());
+                            receiptModelDB.open();
+                            receiptModelDB.insert(new ReceiptModel(
+                                    "0",
+                                    Util.getCurrentDate("yyyy-MM-dd HH:mm:ss"),
+                                    customerModel.getCode(),
+                                    receivedAmountDouble,
+                                    Util.getStringFromSharedPreferences(getBaseContext(), Constants.KEY_USER_ID)
+                            ));
+                            receiptModelDB.close();
+                        }
+                    } catch (NumberFormatException | SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+
                 OrderItemModelTemp orderItemModelTempDB = new OrderItemModelTemp(ProductsActivity.this);
                 orderItemModelTempDB.open();
                 orderItemModelTempDB.deleteAll();
                 orderItemModelTempDB.close();
+
                 return null;
             }
 

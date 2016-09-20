@@ -177,7 +177,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
                     productCode.setText(item.getCode());
                 }
                 if (stock != null) {
-                    stock.setText(String.format(Locale.getDefault(), "%.2f", item.getStock()));
+                    setStock(stock.getContext(), stock, adapterPosition);
                 }
                 if (sellingPrice != null) {
                     sellingPrice.setText(String.format(Locale.getDefault(), "%.2f", item.getSellingRate()));
@@ -279,11 +279,17 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
         new AsyncTask<Void, Void, OrderItemModelTemp>() {
             @Override
             protected OrderItemModelTemp doInBackground(Void... voids) {
+                OrderItemModelTemp temp = orderItemModelMap.get(item.getCode());
+                Boolean isNew = true;
+                if (temp != null) {
+                    isNew = temp.getNew();
+                }
                 OrderItemModelTemp orderItemModelTemp = new OrderItemModelTemp(
                         item.getCode(),
                         item.getSellingRate(),
                         quantity,
-                        Double.parseDouble(amount)
+                        Double.parseDouble(amount),
+                        isNew
                 );
                 OrderItemModelTemp orderItemModelTempDB = new OrderItemModelTemp(context);
                 orderItemModelTempDB.open();
@@ -318,13 +324,6 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
                 orderItemModelTempDB.open();
                 orderItemModelTempDB.deleteRow(item.getCode());
                 orderItemModelTempDB.close();
-
-                if (customerModel != null) {
-                    OrderItemModel orderItemModelDB = new OrderItemModel(context);
-                    orderItemModelDB.open();
-                    orderItemModelDB.deleteRow(item.getCode(), customerModel.getCode());
-                    orderItemModelDB.close();
-                }
                 return null;
             }
 

@@ -95,6 +95,31 @@ public class OrderSummaryAdapter extends RecyclerView.Adapter<OrderSummaryAdapte
         return productModelList.size();
     }
 
+    private void setStock(final Context context, final TextView stock, final int position) {
+        new AsyncTask<Void, Void, Double>() {
+            @Override
+            protected Double doInBackground(Void... voids) {
+                Double stockDouble = getItem(position).getStock();
+                if (orderItemModelMap.containsKey(getItem(position).getCode())) {
+                    stockDouble -= orderItemModelMap.get(getItem(position).getCode()).getQuantity();
+                }
+
+                OrderItemModel orderItemModelDB = new OrderItemModel(context);
+                orderItemModelDB.open();
+                stockDouble -= orderItemModelDB.getTotalQuantity(getItem(position).getCode());
+                orderItemModelDB.close();
+                return stockDouble;
+            }
+
+            @Override
+            protected void onPostExecute(Double stockDouble) {
+                super.onPostExecute(stockDouble);
+                stock.setText(String.format(Locale.getDefault(), "%.2f", stockDouble));
+            }
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+    }
+
     private void popupEnterQuantity(Context context, final ProductModel item, final int adapterPosition) {
         final AppCompatDialog appCompatDialog = new AppCompatDialog(context);
         appCompatDialog.setContentView(R.layout.popup_enter_product_quantity);
@@ -142,7 +167,7 @@ public class OrderSummaryAdapter extends RecyclerView.Adapter<OrderSummaryAdapte
                     productCode.setText(item.getCode());
                 }
                 if (stock != null) {
-                    stock.setText(String.format(Locale.getDefault(), "%.2f", item.getStock()));
+                    setStock(stock.getContext(), stock, adapterPosition);
                 }
                 if (sellingPrice != null) {
                     sellingPrice.setText(String.format(Locale.getDefault(), "%.2f", item.getSellingRate()));
@@ -244,11 +269,17 @@ public class OrderSummaryAdapter extends RecyclerView.Adapter<OrderSummaryAdapte
         new AsyncTask<Void, Void, OrderItemModelTemp>() {
             @Override
             protected OrderItemModelTemp doInBackground(Void... voids) {
+                OrderItemModelTemp temp = orderItemModelMap.get(item.getCode());
+                Boolean isNew = true;
+                if (temp != null) {
+                    isNew = temp.getNew();
+                }
                 OrderItemModelTemp orderItemModelTemp = new OrderItemModelTemp(
                         item.getCode(),
                         item.getSellingRate(),
                         quantity,
-                        Double.parseDouble(amount)
+                        Double.parseDouble(amount),
+                        isNew
                 );
                 OrderItemModelTemp orderItemModelTempDB = new OrderItemModelTemp(context);
                 orderItemModelTempDB.open();
@@ -284,12 +315,6 @@ public class OrderSummaryAdapter extends RecyclerView.Adapter<OrderSummaryAdapte
                 orderItemModelTempDB.deleteRow(item.getCode());
                 orderItemModelTempDB.close();
 
-                if (customerModel != null) {
-                    OrderItemModel orderItemModelDB = new OrderItemModel(context);
-                    orderItemModelDB.open();
-                    orderItemModelDB.deleteRow(item.getCode(), customerModel.getCode());
-                    orderItemModelDB.close();
-                }
                 return null;
             }
 
@@ -304,6 +329,7 @@ public class OrderSummaryAdapter extends RecyclerView.Adapter<OrderSummaryAdapte
                 notifyDataSetChanged();
                 if (onAdapterInteractionListener != null) {
                     onAdapterInteractionListener.onProductSelected();
+                    onAdapterInteractionListener.onItemRemoved(item.getCode());
                 }
             }
         }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
@@ -313,6 +339,8 @@ public class OrderSummaryAdapter extends RecyclerView.Adapter<OrderSummaryAdapte
         void onItemClicked();
 
         void onProductSelected();
+
+        void onItemRemoved(String productCode);
     }
 
     class ItemView extends RecyclerView.ViewHolder {
