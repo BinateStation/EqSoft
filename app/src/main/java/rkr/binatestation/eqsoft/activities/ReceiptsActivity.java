@@ -275,9 +275,6 @@ public class ReceiptsActivity extends AppCompatActivity {
             protected String doInBackground(Void... voids) {
                 if (receivedAmount.length() > 0) {
                     Double receivedAmountDouble = Double.parseDouble(receivedAmount);
-                    if (receivedAmountDouble <= 0.0) {
-                        return "Please enter a valid amount.";
-                    }
                     try {
                         ReceiptModel receiptModelDB = new ReceiptModel(context);
                         receiptModelDB.open();
