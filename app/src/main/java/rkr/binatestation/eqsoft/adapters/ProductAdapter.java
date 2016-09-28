@@ -334,7 +334,6 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
                     appCompatDialog.dismiss();
                 }
                 orderItemModelMap.remove(item.getCode());
-                productModelList.remove(adapterPosition);
                 notifyDataSetChanged();
                 if (onAdapterInteractionListener != null) {
                     onAdapterInteractionListener.onProductSelected();

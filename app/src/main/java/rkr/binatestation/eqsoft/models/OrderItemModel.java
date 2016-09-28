@@ -52,6 +52,10 @@ public class OrderItemModel implements Serializable {
         return orderId;
     }
 
+    public void setOrderId(String orderId) {
+        this.orderId = orderId;
+    }
+
     private String getProductCode() {
         return productCode;
     }

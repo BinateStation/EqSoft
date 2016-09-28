@@ -346,7 +346,21 @@ public class CheckoutActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        removeAllOrdersAndGoBack();
+        new AlertDialog.Builder(CheckoutActivity.this, R.style.AppTheme_Light_Dialog)
+                .setTitle("Alert")
+                .setMessage("By going back you will loose all the new orders. Do you need to proceed ?")
+                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                })
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        removeAllOrdersAndGoBack();
+                    }
+                }).show();
     }
 
     private void removeAllOrdersAndGoBack() {
@@ -355,67 +369,12 @@ public class CheckoutActivity extends AppCompatActivity {
                 @Override
                 protected Void doInBackground(Void... voids) {
                     if (orderItemModelMap.size() > 0 && customerModel != null) {
-                        OrderModel orderModelDB = new OrderModel(getBaseContext());
-                        orderModelDB.open();
-                        OrderModel orderModel = orderModelDB.getCustomersRow(customerModel.getCode());
-                        Long orderId = -1L;
-                        Double receivedAmountDouble = 0.0;
-                        Double totalAmountDouble = 0.0;
-                        for (OrderItemModelTemp temp : orderItemModelMap.values()) {
-                            if (temp != null) {
-                                totalAmountDouble += (temp.getQuantity() * temp.getRate());
-                            }
-                        }
-                        try {
-                            ReceiptModel receiptModelDB = new ReceiptModel(getBaseContext());
-                            receiptModelDB.open();
-                            ReceiptModel receiptModel = receiptModelDB.getRow(customerModel.getCode());
-                            receiptModelDB.close();
-                            if (receiptModel != null) {
-                                receivedAmountDouble = receiptModel.getAmount();
-                            }
-                        } catch (NumberFormatException e) {
-                            e.printStackTrace();
-                        }
-                        if (orderModel == null) {
-                            orderId = orderModelDB.insert(new OrderModel(
-                                    "0",
-                                    Util.getCurrentDate("yyyy-MM-dd HH:mm:ss"),
-                                    customerModel.getCode(),
-                                    totalAmountDouble,
-                                    receivedAmountDouble,
-                                    "",
-                                    "",
-                                    Util.getStringFromSharedPreferences(getBaseContext(), Constants.KEY_USER_ID)
-                            ));
-                        } else {
-                            orderModelDB.updateRow(new OrderModel(
-                                    orderModel.getOrderId(),
-                                    orderModel.getDocDate(),
-                                    orderModel.getCustomerCode(),
-                                    totalAmountDouble,
-                                    receivedAmountDouble,
-                                    orderModel.getDueDate(),
-                                    orderModel.getRemarks(),
-                                    orderModel.getUserId()
-                            ));
-                        }
-                        orderModelDB.close();
 
                         List<OrderItemModel> orderItemModels = new ArrayList<>();
                         for (OrderItemModelTemp temp : orderItemModelMap.values()) {
-                            if (orderModel != null && !temp.getNew()) {
+                            if (!temp.getNew()) {
                                 orderItemModels.add(new OrderItemModel(
-                                        orderModel.getOrderId(),
-                                        temp.getProductCode(),
-                                        temp.getRate(),
-                                        temp.getQuantity(),
-                                        temp.getAmount(),
-                                        (customerModel != null) ? customerModel.getCode() : ""
-                                ));
-                            } else if (orderId != -1 && !temp.getNew()) {
-                                orderItemModels.add(new OrderItemModel(
-                                        orderId + "",
+                                        "",
                                         temp.getProductCode(),
                                         temp.getRate(),
                                         temp.getQuantity(),
@@ -424,25 +383,83 @@ public class CheckoutActivity extends AppCompatActivity {
                                 ));
                             }
                         }
-                        OrderItemModel orderItemModelDB = new OrderItemModel(getBaseContext());
-                        orderItemModelDB.open();
-                        orderItemModelDB.insertMultipleRows(orderItemModels);
-                        orderItemModelDB.close();
-                        try {
-                            if (receivedAmountDouble >= 0) {
+
+                        if (orderItemModels.size() > 0) {
+                            OrderModel orderModelDB = new OrderModel(getBaseContext());
+                            orderModelDB.open();
+                            OrderModel orderModel = orderModelDB.getCustomersRow(customerModel.getCode());
+                            Long orderId;
+                            Double receivedAmountDouble = 0.0;
+                            Double totalAmountDouble = 0.0;
+                            for (OrderItemModelTemp temp : orderItemModelMap.values()) {
+                                if (temp != null) {
+                                    totalAmountDouble += (temp.getQuantity() * temp.getRate());
+                                }
+                            }
+                            try {
                                 ReceiptModel receiptModelDB = new ReceiptModel(getBaseContext());
                                 receiptModelDB.open();
-                                receiptModelDB.insert(new ReceiptModel(
+                                ReceiptModel receiptModel = receiptModelDB.getRow(customerModel.getCode());
+                                receiptModelDB.close();
+                                if (receiptModel != null) {
+                                    receivedAmountDouble = receiptModel.getAmount();
+                                }
+                            } catch (NumberFormatException e) {
+                                e.printStackTrace();
+                            }
+
+
+                            if (orderModel == null) {
+                                orderId = orderModelDB.insert(new OrderModel(
                                         "0",
                                         Util.getCurrentDate("yyyy-MM-dd HH:mm:ss"),
                                         customerModel.getCode(),
+                                        totalAmountDouble,
                                         receivedAmountDouble,
+                                        "",
+                                        "",
                                         Util.getStringFromSharedPreferences(getBaseContext(), Constants.KEY_USER_ID)
                                 ));
-                                receiptModelDB.close();
+                            } else {
+                                orderId = Long.parseLong(orderModel.getOrderId());
+                                orderModelDB.updateRow(new OrderModel(
+                                        orderModel.getOrderId(),
+                                        orderModel.getDocDate(),
+                                        orderModel.getCustomerCode(),
+                                        totalAmountDouble,
+                                        receivedAmountDouble,
+                                        orderModel.getDueDate(),
+                                        orderModel.getRemarks(),
+                                        orderModel.getUserId()
+                                ));
                             }
-                        } catch (NumberFormatException | SQLException e) {
-                            e.printStackTrace();
+                            orderModelDB.close();
+
+                            for (OrderItemModel orderItemModel :
+                                    orderItemModels) {
+                                orderItemModel.setOrderId("" + orderId);
+                            }
+
+                            OrderItemModel orderItemModelDB = new OrderItemModel(getBaseContext());
+                            orderItemModelDB.open();
+                            orderItemModelDB.insertMultipleRows(orderItemModels);
+                            orderItemModelDB.close();
+                            try {
+                                if (receivedAmountDouble >= 0) {
+                                    ReceiptModel receiptModelDB = new ReceiptModel(getBaseContext());
+                                    receiptModelDB.open();
+                                    receiptModelDB.insert(new ReceiptModel(
+                                            "0",
+                                            Util.getCurrentDate("yyyy-MM-dd HH:mm:ss"),
+                                            customerModel.getCode(),
+                                            receivedAmountDouble,
+                                            Util.getStringFromSharedPreferences(getBaseContext(), Constants.KEY_USER_ID)
+                                    ));
+                                    receiptModelDB.close();
+                                }
+                            } catch (NumberFormatException | SQLException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
 
@@ -457,12 +474,12 @@ public class CheckoutActivity extends AppCompatActivity {
                 @Override
                 protected void onPostExecute(Void aVoid) {
                     super.onPostExecute(aVoid);
-                    CheckoutActivity.super.onBackPressed();
+                    startActivity(new Intent(getBaseContext(), HomeActivity.class
+                    ).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
                 }
             }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         } catch (Exception e) {
             e.printStackTrace();
-            CheckoutActivity.super.onBackPressed();
         }
     }
 
