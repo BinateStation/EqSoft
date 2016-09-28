@@ -114,7 +114,7 @@ public class OrderSummaryAdapter extends RecyclerView.Adapter<OrderSummaryAdapte
             @Override
             protected void onPostExecute(Double stockDouble) {
                 super.onPostExecute(stockDouble);
-                stock.setText(String.format(Locale.getDefault(), "%.2f", stockDouble));
+                stock.setText(String.format(Locale.getDefault(), "%.3f", stockDouble));
             }
         }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
@@ -269,17 +269,12 @@ public class OrderSummaryAdapter extends RecyclerView.Adapter<OrderSummaryAdapte
         new AsyncTask<Void, Void, OrderItemModelTemp>() {
             @Override
             protected OrderItemModelTemp doInBackground(Void... voids) {
-                OrderItemModelTemp temp = orderItemModelMap.get(item.getCode());
-                Boolean isNew = true;
-                if (temp != null) {
-                    isNew = temp.getNew();
-                }
                 OrderItemModelTemp orderItemModelTemp = new OrderItemModelTemp(
                         item.getCode(),
                         item.getSellingRate(),
                         quantity,
                         Double.parseDouble(amount),
-                        isNew
+                        true
                 );
                 OrderItemModelTemp orderItemModelTempDB = new OrderItemModelTemp(context);
                 orderItemModelTempDB.open();

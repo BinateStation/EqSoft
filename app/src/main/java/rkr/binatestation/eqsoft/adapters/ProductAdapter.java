@@ -84,7 +84,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
             @Override
             protected void onPostExecute(Double stockDouble) {
                 super.onPostExecute(stockDouble);
-                stock.setText(String.format(Locale.getDefault(), "%.2f", stockDouble));
+                stock.setText(String.format(Locale.getDefault(), "%.3f", stockDouble));
             }
         }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
@@ -264,7 +264,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
                     remove.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            removeOrder(view.getContext(), item, appCompatDialog, adapterPosition);
+                            removeOrder(view.getContext(), item, appCompatDialog);
                         }
                     });
                 }
@@ -279,17 +279,12 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
         new AsyncTask<Void, Void, OrderItemModelTemp>() {
             @Override
             protected OrderItemModelTemp doInBackground(Void... voids) {
-                OrderItemModelTemp temp = orderItemModelMap.get(item.getCode());
-                Boolean isNew = true;
-                if (temp != null) {
-                    isNew = temp.getNew();
-                }
                 OrderItemModelTemp orderItemModelTemp = new OrderItemModelTemp(
                         item.getCode(),
                         item.getSellingRate(),
                         quantity,
                         Double.parseDouble(amount),
-                        isNew
+                        true
                 );
                 OrderItemModelTemp orderItemModelTempDB = new OrderItemModelTemp(context);
                 orderItemModelTempDB.open();
@@ -316,7 +311,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ItemView
         }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
-    private void removeOrder(final Context context, final ProductModel item, final AppCompatDialog appCompatDialog, final int adapterPosition) {
+    private void removeOrder(final Context context, final ProductModel item, final AppCompatDialog appCompatDialog) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
