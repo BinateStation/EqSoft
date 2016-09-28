@@ -228,9 +228,9 @@ public class CheckoutActivity extends AppCompatActivity {
     }
 
     private void saveOrder(final Context context, final String receivedAmount) {
-        new AsyncTask<Void, Void, Void>() {
+        new AsyncTask<Void, Void, Boolean>() {
             @Override
-            protected Void doInBackground(Void... voids) {
+            protected Boolean doInBackground(Void... voids) {
                 if (orderItemModelMap.size() > 0) {
                     if (receiptModel != null) {
                         ReceiptModel receiptModelDB = new ReceiptModel(context);
@@ -305,8 +305,8 @@ public class CheckoutActivity extends AppCompatActivity {
                     OrderItemModel orderItemModelDB = new OrderItemModel(context);
                     orderItemModelDB.open();
                     orderItemModelDB.insertMultipleRows(orderItemModels);
-                    orderItemModelDB.deleteRows(TextUtils.join(",", removedItems), customerModel.getCode());
                     orderItemModelDB.close();
+
                     if (receivedAmount.length() > 0) {
                         try {
                             if (receivedAmountDouble >= 0) {
@@ -325,21 +325,76 @@ public class CheckoutActivity extends AppCompatActivity {
                             e.printStackTrace();
                         }
                     }
+                } else {
+                    OrderModel orderModelDB = new OrderModel(context);
+                    orderModelDB.open();
+                    OrderModel orderModel = orderModelDB.getCustomersRow(customerModel.getCode());
+                    if (orderModel != null) {
+                        orderModelDB.deleteRow(orderModel.getOrderId());
+                    }
+                    orderModelDB.close();
+                    if (receivedAmount.length() > 0) {
+                        Double receivedAmountDouble;
+                        try {
+                            receivedAmountDouble = Double.parseDouble(receivedAmount);
+                            if (receivedAmountDouble >= 0) {
+                                OrderItemModel orderItemModelDB = new OrderItemModel(context);
+                                orderItemModelDB.open();
+                                orderItemModelDB.deleteRows(TextUtils.join(",", removedItems), customerModel.getCode());
+                                orderItemModelDB.close();
+
+                                OrderItemModelTemp orderItemModelTempDB = new OrderItemModelTemp(context);
+                                orderItemModelTempDB.open();
+                                orderItemModelTempDB.deleteAll();
+                                orderItemModelTempDB.close();
+
+
+                                return false;
+                            }
+                        } catch (NumberFormatException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
                 }
+                OrderItemModel orderItemModelDB = new OrderItemModel(context);
+                orderItemModelDB.open();
+                orderItemModelDB.deleteRows(TextUtils.join(",", removedItems), customerModel.getCode());
+                orderItemModelDB.close();
 
                 OrderItemModelTemp orderItemModelTempDB = new OrderItemModelTemp(context);
                 orderItemModelTempDB.open();
                 orderItemModelTempDB.deleteAll();
                 orderItemModelTempDB.close();
 
-                return null;
+                return true;
             }
 
             @Override
-            protected void onPostExecute(Void aVoid) {
-                super.onPostExecute(aVoid);
-                startActivity(new Intent(getBaseContext(), HomeActivity.class
-                ).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
+            protected void onPostExecute(Boolean result) {
+                super.onPostExecute(result);
+                if (result) {
+                    startActivity(new Intent(getBaseContext(), HomeActivity.class
+                    ).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
+                } else {
+                    new AlertDialog.Builder(CheckoutActivity.this, R.style.AppTheme_Light_Dialog)
+                            .setTitle("Alert")
+                            .setMessage("You can't save received amount without order items, do you want to add it as receipts ?")
+                            .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    dialogInterface.dismiss();
+                                    startActivity(new Intent(getBaseContext(), HomeActivity.class
+                                    ).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
+                                }
+                            })
+                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    navigateToReceipt();
+                                }
+                            }).show();
+                }
             }
         }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
@@ -361,6 +416,13 @@ public class CheckoutActivity extends AppCompatActivity {
                         removeAllOrdersAndGoBack();
                     }
                 }).show();
+    }
+
+    private void navigateToReceipt() {
+        startActivity(new Intent(getBaseContext(), ReceiptsActivity.class)
+                .putExtra(Constants.KEY_CUSTOMER, customerModel)
+                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        );
     }
 
     private void removeAllOrdersAndGoBack() {
