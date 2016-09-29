@@ -431,7 +431,6 @@ public class CheckoutActivity extends AppCompatActivity {
                 @Override
                 protected Void doInBackground(Void... voids) {
                     if (orderItemModelMap.size() > 0 && customerModel != null) {
-
                         List<OrderItemModel> orderItemModels = new ArrayList<>();
                         for (OrderItemModelTemp temp : orderItemModelMap.values()) {
                             if (!temp.getNew()) {
